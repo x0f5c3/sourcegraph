@@ -9,13 +9,18 @@ import { displayRepoName } from '../components/RepoFileLink'
 import { SearchPatternType } from '../graphql-operations'
 import { SymbolKind } from '../graphql/schema'
 
+interface GenericEvent { type: string; data: unknown }
+
+type StreamEvent =
+    | { type: 'error'; data: ErrorLike }
+    | { type: 'done'; data: {} }
+
 export type SearchEvent =
+    | StreamEvent
     | { type: 'matches'; data: SearchMatch[] }
     | { type: 'progress'; data: Progress }
     | { type: 'filters'; data: Filter[] }
     | { type: 'alert'; data: Alert }
-    | { type: 'error'; data: ErrorLike }
-    | { type: 'done'; data: {} }
 
 export type SearchMatch = ContentMatch | RepositoryMatch | CommitMatch | SymbolMatch | PathMatch
 
@@ -325,7 +330,7 @@ export const switchAggregateSearchResults: OperatorFunction<SearchEvent, Aggrega
     defaultIfEmpty(emptyAggregateResults as AggregateStreamingSearchResults)
 )
 
-export const observeMessages = <T extends SearchEvent>(type: T['type'], eventSource: EventSource): Observable<T> =>
+export const observeMessages = <T extends GenericEvent>(type: T['type'], eventSource: EventSource): Observable<T> =>
     fromEvent(eventSource, type).pipe(
         map((event: Event) => {
             if (!(event instanceof MessageEvent)) {
@@ -341,23 +346,25 @@ export const observeMessages = <T extends SearchEvent>(type: T['type'], eventSou
         map(data => ({ type, data } as T))
     )
 
-const observeMessagesHandler = <T extends SearchEvent>(
+const observeMessagesHandler = <T extends GenericEvent>(
     type: T['type'],
     eventSource: EventSource,
-    observer: Subscriber<SearchEvent>
+    observer: Subscriber<GenericEvent>
 ): Subscription => observeMessages(type, eventSource).subscribe(observer)
 
-type MessageHandler<EventType extends SearchEvent['type'] = SearchEvent['type']> = (
+type MessageHandler<EventType extends string = StreamEvent['type']> = (
     type: EventType,
     eventSource: EventSource,
     observer: Subscriber<SearchEvent>
 ) => Subscription
 
-export type MessageHandlers = {
-    [EventType in SearchEvent['type']]: MessageHandler<EventType>
+type MessageHandlers<Event extends GenericEvent = StreamEvent> = {
+    [EventType in Event['type']]: MessageHandler<EventType>
 }
 
-export const messageHandlers: MessageHandlers = {
+export type SearchMessageHandlers = MessageHandlers<SearchEvent>
+
+export const SEARCH_MESSAGE_HANDLERS: SearchMessageHandlers = {
     done: (type, eventSource, observer) =>
         fromEvent(eventSource, type).subscribe(() => {
             observer.complete()
@@ -415,7 +422,7 @@ function initiateSearchStream(
         decorationContextLines,
         sourcegraphURL = '',
     }: StreamSearchOptions,
-    messageHandlers: MessageHandlers
+    messageHandlers: SearchMessageHandlers
 ): Observable<SearchEvent> {
     return new Observable<SearchEvent>(observer => {
         const subscriptions = new Subscription()
@@ -439,7 +446,7 @@ function initiateSearchStream(
 
         for (const [eventType, handleMessages] of Object.entries(messageHandlers)) {
             subscriptions.add(
-                (handleMessages as MessageHandler)(eventType as SearchEvent['type'], eventSource, observer)
+                (handleMessages as MessageHandler<SearchEvent['type']>)(eventType as SearchEvent['type'], eventSource, observer)
             )
         }
 
@@ -460,7 +467,7 @@ function initiateSearchStream(
 export function search(
     queryObservable: Observable<string>,
     options: StreamSearchOptions,
-    messageHandlers: MessageHandlers
+    messageHandlers: SearchMessageHandlers
 ): Observable<SearchEvent> {
     return queryObservable.pipe(switchMap(query => initiateSearchStream(query, options, messageHandlers)))
 }
@@ -470,7 +477,7 @@ export function aggregateStreamingSearch(
     queryObservable: Observable<string>,
     options: StreamSearchOptions
 ): Observable<AggregateStreamingSearchResults> {
-    return search(queryObservable, options, messageHandlers).pipe(switchAggregateSearchResults)
+    return search(queryObservable, options, SEARCH_MESSAGE_HANDLERS).pipe(switchAggregateSearchResults)
 }
 
 export function getRepositoryUrl(repository: string, branches?: string[]): string {

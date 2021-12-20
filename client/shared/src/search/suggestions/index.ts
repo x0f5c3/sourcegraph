@@ -5,8 +5,8 @@ import { map } from 'rxjs/operators'
 import { SearchPatternType, SearchVersion } from '../../graphql-operations'
 import {
     AggregateStreamingSearchResults,
-    messageHandlers,
-    MessageHandlers,
+    SEARCH_MESSAGE_HANDLERS,
+    SearchMessageHandlers,
     observeMessages,
     search,
     SearchEvent,
@@ -21,8 +21,8 @@ const noopHandler = <T extends SearchEvent>(
     _observer: Subscriber<SearchEvent>
 ): Subscription => fromEvent(eventSource, type).subscribe(noop)
 
-const firstMatchMessageHandlers: MessageHandlers = {
-    ...messageHandlers,
+const firstMatchMessageHandlers: SearchMessageHandlers = {
+    ...SEARCH_MESSAGE_HANDLERS,
     matches: (type, eventSource, observer) =>
         observeMessages(type, eventSource).subscribe(data => {
             observer.next(data)
