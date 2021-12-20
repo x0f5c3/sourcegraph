@@ -15,6 +15,15 @@ type StreamEvent =
     | { type: 'error'; data: ErrorLike }
     | { type: 'done'; data: {} }
 
+export type ComputeEvent =
+    | StreamEvent
+    | { type: 'results'; data: ComputeOutput[] }
+
+export interface ComputeOutput {
+    kind: 'output'
+    value: string
+}
+
 export type SearchEvent =
     | StreamEvent
     | { type: 'matches'; data: SearchMatch[] }
@@ -352,19 +361,17 @@ const observeMessagesHandler = <T extends GenericEvent>(
     observer: Subscriber<GenericEvent>
 ): Subscription => observeMessages(type, eventSource).subscribe(observer)
 
-type MessageHandler<EventType extends string = StreamEvent['type']> = (
+type MessageHandler<Event extends GenericEvent, EventType extends Event['type']> = (
     type: EventType,
     eventSource: EventSource,
-    observer: Subscriber<SearchEvent>
+    observer: Subscriber<GenericEvent>
 ) => Subscription
 
-type MessageHandlers<Event extends GenericEvent = StreamEvent> = {
-    [EventType in Event['type']]: MessageHandler<EventType>
+type MessageHandlers<Event extends GenericEvent> = {
+    [EventType in Event['type']]: MessageHandler<Event, EventType>
 }
 
-export type SearchMessageHandlers = MessageHandlers<SearchEvent>
-
-export const SEARCH_MESSAGE_HANDLERS: SearchMessageHandlers = {
+const COMMON_MESSAGE_HANDLERS: MessageHandlers<StreamEvent> = {
     done: (type, eventSource, observer) =>
         fromEvent(eventSource, type).subscribe(() => {
             observer.complete()
@@ -395,10 +402,68 @@ export const SEARCH_MESSAGE_HANDLERS: SearchMessageHandlers = {
             }
             eventSource.close()
         }),
+}
+
+export type SearchMessageHandlers = MessageHandlers<SearchEvent>
+
+export const SEARCH_MESSAGE_HANDLERS: SearchMessageHandlers = {
+    ...COMMON_MESSAGE_HANDLERS,
     matches: observeMessagesHandler,
     progress: observeMessagesHandler,
     filters: observeMessagesHandler,
     alert: observeMessagesHandler,
+}
+
+type Parameters = [string, string][]
+
+function initiateStream<T extends GenericEvent>(
+    parameters: [string, string][],
+    endpoint: 'search' | 'compute',
+    messageHandlers: MessageHandlers<T>,
+    sourcegraphURL = ''
+): Observable<T> {
+    return new Observable<T>(observer => {
+        const subscriptions = new Subscription()
+        const parameterEncoded = parameters.map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&')
+
+        const eventSource = new EventSource(`${sourcegraphURL}/${endpoint}/stream?${parameterEncoded}`)
+        subscriptions.add(() => eventSource.close())
+
+        for (const [eventType, handleMessages] of Object.entries(messageHandlers)) {
+            subscriptions.add(
+                (handleMessages as MessageHandler<T, T['type']>)(eventType as T['type'], eventSource, observer)
+            )
+        }
+
+        return () => {
+            subscriptions.unsubscribe()
+        }
+    })
+}
+
+export type ComputeMessageHandlers = MessageHandlers<ComputeEvent>
+
+const COMPUTE_MESSAGE_HANDLERS: ComputeMessageHandlers = {
+    ...COMMON_MESSAGE_HANDLERS,
+    results: observeMessagesHandler
+}
+
+/**
+ * Initiates a computation using the /compute/stream endpoint.
+ *
+ * @returns an Observable of the computed values.
+ */
+export function compute(query: string, messageHandlers = COMPUTE_MESSAGE_HANDLERS, sourcegraphURL= ''): Observable<string[]> {
+    return initiateStream<ComputeEvent>([['q', query]], 'compute', messageHandlers, sourcegraphURL).pipe(
+        map(event => {
+            switch (event.type) {
+                case 'results':
+                    return event.data.flatMap(({ value }) => value.split('\n'))
+                default:
+                    return []
+            }
+        })
+    )
 }
 
 export interface StreamSearchOptions {
@@ -411,8 +476,16 @@ export interface StreamSearchOptions {
     decorationContextLines?: number
 }
 
-function initiateSearchStream(
-    query: string,
+/**
+ * Initiates a streaming search.
+ * This is a type safe wrapper around Sourcegraph's streaming search API (using Server Sent Events). The observable will emit each event returned from the backend.
+ *
+ * @param queryObservable is an observables that resolves to a query string
+ * @param options contains the search query and the necessary context to perform the search (version, patternType, caseSensitive, etc.)
+ * @param messageHandlers provide handler functions for each possible `SearchEvent` type
+ */
+export function search(
+    queryObservable: Observable<string>,
     {
         version,
         patternType,
@@ -420,14 +493,11 @@ function initiateSearchStream(
         trace,
         decorationKinds,
         decorationContextLines,
-        sourcegraphURL = '',
-    }: StreamSearchOptions,
+    }: Omit<StreamSearchOptions, 'query'>,
     messageHandlers: SearchMessageHandlers
 ): Observable<SearchEvent> {
-    return new Observable<SearchEvent>(observer => {
-        const subscriptions = new Subscription()
-
-        const parameters = [
+    return queryObservable.pipe(switchMap(query => {
+        const parameters: Parameters = [
             ['q', `${query} ${caseSensitive ? 'case:yes' : ''}`],
             ['v', version],
             ['t', patternType as string],
@@ -439,37 +509,8 @@ function initiateSearchStream(
         if (trace) {
             parameters.push(['trace', trace])
         }
-        const parameterEncoded = parameters.map(([k, v]) => k + '=' + encodeURIComponent(v)).join('&')
-
-        const eventSource = new EventSource(`${sourcegraphURL}/search/stream?${parameterEncoded}`)
-        subscriptions.add(() => eventSource.close())
-
-        for (const [eventType, handleMessages] of Object.entries(messageHandlers)) {
-            subscriptions.add(
-                (handleMessages as MessageHandler<SearchEvent['type']>)(eventType as SearchEvent['type'], eventSource, observer)
-            )
-        }
-
-        return () => {
-            subscriptions.unsubscribe()
-        }
-    })
-}
-
-/**
- * Initiates a streaming search.
- * This is a type safe wrapper around Sourcegraph's streaming search API (using Server Sent Events). The observable will emit each event returned from the backend.
- *
- * @param queryObservable is an observables that resolves to a query string
- * @param options contains the search query and the necessary context to perform the search (version, patternType, caseSensitive, etc.)
- * @param messageHandlers provide handler functions for each possible `SearchEvent` type
- */
-export function search(
-    queryObservable: Observable<string>,
-    options: StreamSearchOptions,
-    messageHandlers: SearchMessageHandlers
-): Observable<SearchEvent> {
-    return queryObservable.pipe(switchMap(query => initiateSearchStream(query, options, messageHandlers)))
+        return initiateStream<SearchEvent>(parameters, 'search', messageHandlers)
+    }))
 }
 
 /** Initiates a streaming search with and aggregates the results. */
