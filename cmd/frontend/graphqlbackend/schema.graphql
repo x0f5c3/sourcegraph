@@ -3165,6 +3165,7 @@ type FileDiffHunk {
         rendering efficiently.
         """
         highlightLongLines: Boolean = false
+        treeSitterEnabled: Boolean = false
     ): HighlightedDiffHunkBody!
 }
 
@@ -4165,6 +4166,8 @@ interface File2 {
         rendering efficiently.
         """
         highlightLongLines: Boolean = false
+
+        treeSitterEnabled: Boolean = false
     ): HighlightedFile!
 }
 
@@ -4228,6 +4231,7 @@ type VirtualFile implements File2 {
         rendering efficiently.
         """
         highlightLongLines: Boolean = false
+        treeSitterEnabled: Boolean = false
     ): HighlightedFile!
 }
 
@@ -4329,6 +4333,7 @@ type GitBlob implements TreeEntry & File2 {
         rendering efficiently.
         """
         highlightLongLines: Boolean = false
+        treeSitterEnabled: Boolean = false
     ): HighlightedFile!
     """
     Submodule metadata if this tree points to a submodule
