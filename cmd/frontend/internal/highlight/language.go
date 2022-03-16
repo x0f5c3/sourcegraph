@@ -51,10 +51,7 @@ type SyntaxEngineQuery struct {
 	LanguageOverride bool
 }
 
-var highlightConfig = syntaxHighlightConfig{
-	Extensions: map[string]string{},
-	Patterns:   []languagePattern{},
-}
+var highlightConfig = syntaxHighlightConfig{}
 
 var engineConfig = syntaxEngineConfig{
 	// This sets the default syntax engine for the sourcegraph server.
