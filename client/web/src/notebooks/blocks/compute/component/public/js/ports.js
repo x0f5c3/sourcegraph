@@ -46,5 +46,5 @@ function initElmPorts(app) {
         });
     });
 
-    ports.emitInput.subscribe(function (args) {});
+    app.ports.emitInput.subscribe(function (args) {});
 }
