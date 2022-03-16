@@ -78,6 +78,14 @@ type alias DataFilter =
     }
 
 
+type ChartColor
+    = Purple
+    | Red
+    | Blue
+    | Teal
+    | Orange
+
+
 type alias Model =
     { sourcegraphURL : String
     , query : String
@@ -85,6 +93,7 @@ type alias Model =
     , dataFilter : DataFilter
     , selectedTab : Tab
     , resultsMap : Dict String DataValue
+    , chartColor : ChartColor
 
     -- Debug client only
     , serverless : Bool
@@ -133,6 +142,7 @@ init json =
                     , excludeStopWords = False
                     }
       , selectedTab = Chart
+      , chartColor = Purple
       , debounce = 0
       , resultsMap = Dict.empty
       , serverless = False
@@ -217,6 +227,7 @@ type Msg
     | OnDebounce
     | OnDataFilter DataFilterMsg
     | OnTabSelected Tab
+    | OnToggleColor
       -- Data processing
     | RunCompute
     | OnResults (List Result)
@@ -299,6 +310,23 @@ update msg model =
             , Cmd.none
             )
 
+        OnToggleColor ->
+            case model.chartColor of
+                Purple ->
+                    ( { model | chartColor = Red }, Cmd.none )
+
+                Red ->
+                    ( { model | chartColor = Blue }, Cmd.none )
+
+                Blue ->
+                    ( { model | chartColor = Orange }, Cmd.none )
+
+                Orange ->
+                    ( { model | chartColor = Teal }, Cmd.none )
+
+                Teal ->
+                    ( { model | chartColor = Purple }, Cmd.none )
+
         ResultStreamDone ->
             ( model, Cmd.none )
 
@@ -372,27 +400,56 @@ table data =
         )
 
 
-histogram : List DataValue -> E.Element Msg
-histogram data =
-    E.el
-        [ E.width E.fill
-        , E.height (E.fill |> E.minimum 400)
-        , E.centerX
-        , E.alignTop
-        , E.padding 30
-        ]
-        (E.html
-            (C.chart
-                [ CA.height 300, CA.width (toFloat width) ]
-                [ C.bars
-                    [ CA.spacing 0.0 ]
-                    [ C.bar .value [ CA.color "#A112FF", CA.roundTop 0.2 ] ]
-                    data
-                , C.binLabels .name [ CA.moveDown 25, CA.rotate 45, CA.alignRight ]
-                , C.barLabels [ CA.moveDown 12, CA.color "white", CA.fontSize 12 ]
+histogram : ChartColor -> List DataValue -> E.Element Msg
+histogram chartColor data =
+    E.column [ E.width E.fill ]
+        [ E.el [ E.paddingXY 0 10, E.alignRight ] <|
+            I.button
+                [ Border.width 1
+                , Border.rounded 3
+                , E.padding 10
+                , E.mouseDown [ Border.color <| E.rgb255 0x99 0x99 0x99 ]
+                , E.mouseOver [ Border.color <| E.rgb 0x99 0x99 0x99 ]
                 ]
+                { onPress = Just OnToggleColor, label = E.text "Toggle chart color" }
+        , E.el
+            [ E.width E.fill
+            , E.height (E.fill |> E.minimum 400)
+            , E.centerX
+            , E.alignTop
+            , E.padding 30
+            ]
+            (E.html
+                (C.chart
+                    [ CA.height 300, CA.width (toFloat width) ]
+                    [ C.bars
+                        [ CA.spacing 0.0 ]
+                        [ C.bar .value
+                            [ case chartColor of
+                                Purple ->
+                                    CA.color "#A112FF"
+
+                                Red ->
+                                    CA.color "#ff7c7c"
+
+                                Teal ->
+                                    CA.color "teal"
+
+                                Blue ->
+                                    CA.color "#4287f5"
+
+                                Orange ->
+                                    CA.color "#f5a742"
+                            , CA.roundTop 0.2
+                            ]
+                        ]
+                        data
+                    , C.binLabels .name [ CA.moveDown 25, CA.rotate 45, CA.alignRight ]
+                    , C.barLabels [ CA.moveDown 12, CA.color "white", CA.fontSize 12 ]
+                    ]
+                )
             )
-        )
+        ]
 
 
 dataView : List DataValue -> E.Element Msg
@@ -545,7 +602,15 @@ outputRow selectedTab =
 
 view : Model -> Html Msg
 view model =
-    E.layout
+    E.layoutWith
+        { options =
+            [ E.focusStyle
+                { borderColor = Nothing
+                , backgroundColor = Nothing
+                , shadow = Nothing
+                }
+            ]
+        }
         [ E.width E.fill
         , F.family [ F.typeface "Fira Code" ]
         , F.size 12
@@ -564,7 +629,7 @@ view model =
                   in
                   case model.selectedTab of
                     Chart ->
-                        histogram data
+                        histogram model.chartColor data
 
                     Table ->
                         table data
