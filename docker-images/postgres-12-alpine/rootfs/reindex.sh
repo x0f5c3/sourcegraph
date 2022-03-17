@@ -103,23 +103,23 @@ if [ "$(id -u)" = '0' ]; then
 fi
 
 # look specifically for REINDEX_COMPLETED_FILE, as it is expected in the DB dir
-if [ ! -s "${REINDEX_COMPLETED_FILE}" ]; then
-  prepare_env
-  postgres_stop
-  postgres_start
-  trap cleanup EXIT
-
-  echo
-  echo 'PostgresSQL must rebuild its indexes. This process can take up to a few hours on systems with a large dataset.'
-  echo
-
-  reindex --system
-  reindex --all
-
-  # mark reindexing process as done
-  echo "Re-indexing for 3.31 release completed successfully at $(date)" >"${REINDEX_COMPLETED_FILE}"
-
-  echo
-  echo 'PostgreSQL reindexing process complete - ready for start up.'
-  echo
-fi
+#if [ ! -s "${REINDEX_COMPLETED_FILE}" ]; then
+#  prepare_env
+#  postgres_stop
+#  postgres_start
+#  trap cleanup EXIT
+#
+#  echo
+#  echo 'PostgresSQL must rebuild its indexes. This process can take up to a few hours on systems with a large dataset.'
+#  echo
+#
+#  reindex --system
+#  reindex --all
+#
+#  # mark reindexing process as done
+#  echo "Re-indexing for 3.31 release completed successfully at $(date)" >"${REINDEX_COMPLETED_FILE}"
+#
+#  echo
+#  echo 'PostgreSQL reindexing process complete - ready for start up.'
+#  echo
+#fi
