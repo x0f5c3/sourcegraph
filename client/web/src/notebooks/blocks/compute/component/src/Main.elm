@@ -133,7 +133,7 @@ init json =
                     , reverse = False
                     , excludeStopWords = False
                     }
-      , selectedTab = Chart
+      , selectedTab = WordCloud
       , debounce = 0
       , resultsMap = Dict.empty
       , serverless = False
@@ -423,6 +423,57 @@ dataView data =
         ]
 
 
+wordCloud : List DataValue -> E.Element Msg
+wordCloud data =
+    let
+        sumWords =
+            data
+                |> List.map .value
+                |> List.sum
+
+        -- make 30 be data filter points
+        normalData =
+            List.map (\{ name, value } -> { name = name, value = value / sumWords }) data
+
+        selectionData =
+            List.map
+                (\{ name, value } ->
+                    { name = name
+                    , value =
+                        value
+                            * (10000
+                                / toFloat
+                                    (if List.length data > 10 then
+                                        List.length data
+
+                                     else
+                                        1000
+                                    )
+                              )
+                    }
+                )
+                normalData
+
+        textList =
+            List.concatMap (\{ name, value } -> List.repeat (ceiling value) name) selectionData
+
+        _ =
+            Debug.log "list length" (String.fromInt <| List.length data)
+
+        _ =
+            Debug.log "normal data" normalData
+
+        _ =
+            Debug.log "selection data" selectionData
+    in
+    E.el [ E.centerX ]
+        (E.image []
+            { src = "https://quickchart.io/wordcloud?text=" ++ String.join " " textList
+            , description = "word cloud"
+            }
+        )
+
+
 viewDataFilter : DataFilter -> E.Element DataFilterMsg
 viewDataFilter dataFilter =
     E.row [ E.paddingXY 0 10 ]
@@ -478,12 +529,14 @@ type Tab
     = Chart
     | Table
     | Data
+    | WordCloud
 
 
 color =
     { skyBlue = E.rgb255 0x00 0xCB 0xEC
     , vividViolet = E.rgb255 0xA1 0x12 0xFF
     , vermillion = E.rgb255 0xFF 0x55 0x43
+    , yellow = E.rgb 0xFF 0x05 0x00
     }
 
 
@@ -525,6 +578,9 @@ tab thisTab selectedTab =
                 Data ->
                     color.skyBlue
 
+                WordCloud ->
+                    color.yellow
+
         text =
             case thisTab of
                 Chart ->
@@ -535,6 +591,9 @@ tab thisTab selectedTab =
 
                 Data ->
                     "Data"
+
+                WordCloud ->
+                    "Word Cloud"
     in
     E.el
         [ Border.widthEach borderWidths
@@ -559,6 +618,7 @@ outputRow selectedTab =
     E.row [ E.centerX, E.width E.fill ]
         [ tab Chart selectedTab
         , tab Table selectedTab
+        , tab WordCloud selectedTab
         , tab Data selectedTab
         ]
 
@@ -591,6 +651,9 @@ view model =
 
                     Data ->
                         dataView data
+
+                    WordCloud ->
+                        wordCloud data
                 ]
             ]
         )
