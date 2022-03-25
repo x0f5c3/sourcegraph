@@ -1,6 +1,8 @@
 port module Main exposing (..)
 
+import Animation
 import Browser
+import Browser.Events
 import Chart as C
 import Chart.Attributes as CA
 import Circle2d
@@ -16,6 +18,7 @@ import Element.Input as I
 import File.Download
 import Geometry.Svg
 import Graph
+import Graph.Force as Force
 import Graph.Layout
 import GraphFile as GF exposing (EdgeId, kitesDefaultEdgeProp, kitesDefaultVertexProp)
 import Html exposing (Html, input, text)
@@ -30,6 +33,7 @@ import Svg as S exposing (Svg)
 import Svg.Attributes as SA
 import Svg.Keyed
 import Task
+import Time
 import Triangle2d
 import Url.Builder
 import Url.Parser exposing (..)
@@ -76,6 +80,16 @@ main =
         }
 
 
+type Animation
+    = NoAnimation
+    | ForceAnimation Force.State
+    | TransitionAnimation
+        { startGraph : GF.GraphFile
+        , endGraph : GF.GraphFile
+        , transitionState : Animation.State
+        }
+
+
 
 -- MODEL
 
@@ -108,6 +122,9 @@ type alias Model =
     , resultsMap : Dict String DataValue
     , alerts : List Alert
     , theme : Theme
+    , animation : Animation
+    , timeList : List Time.Posix
+    , graph : GF.GraphFile
 
     -- Debug client only
     , serverless : Bool
@@ -177,9 +194,54 @@ init json =
       , resultsMap = Dict.empty
       , alerts = []
       , serverless = False
+      , animation = ForceAnimation Force.defaultForceState
+      , timeList = []
+      , graph =
+            let
+                g =
+                    Graph.fromNodesAndEdges
+                        [ { id = 0
+                          , label = kitesDefaultVertexProp
+                          }
+                        , { id = 1
+                          , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
+                          }
+                        , { id = 2
+                          , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
+                          }
+                        , { id = 3
+                          , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
+                          }
+                        ]
+                        [ { from = 0
+                          , to = 1
+                          , label = { kitesDefaultEdgeProp | color = Colors.blue }
+                          }
+                        , { from = 1
+                          , to = 2
+                          , label = { kitesDefaultEdgeProp | color = Colors.blue }
+                          }
+                        , { from = 2
+                          , to = 3
+                          , label = { kitesDefaultEdgeProp | color = Colors.blue }
+                          }
+                        ]
+                        |> Graph.Layout.circular { center = ( 300, 300 ), radius = 250 }
+            in
+            GF.new
+                { graph = g
+                , bags = Dict.empty
+                , defaultVertexProperties = kitesDefaultVertexProp
+                , defaultEdgeProperties = kitesDefaultEdgeProp
+                }
       }
+        |> reheatForce
     , Task.perform identity (Task.succeed RunCompute)
     )
+
+
+reheatForce m =
+    { m | animation = ForceAnimation Force.defaultForceState }
 
 
 
@@ -227,8 +289,24 @@ port emitInput : ComputeInput -> Cmd msg
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.batch [ receiveEvent eventDecoder ]
+subscriptions model =
+    Sub.batch
+        [ receiveEvent eventDecoder
+        , animationFrame model
+        ]
+
+
+animationFrame : Model -> Sub Msg
+animationFrame m =
+    case m.animation of
+        NoAnimation ->
+            Sub.none
+
+        TransitionAnimation _ ->
+            Browser.Events.onAnimationFrameDelta TransitionTimeDelta
+
+        ForceAnimation _ ->
+            Browser.Events.onAnimationFrame ForceTick
 
 
 eventDecoder : RawEvent -> Msg
@@ -284,6 +362,9 @@ type Msg
     | OnAlert (List Alert)
     | ResultStreamDone
     | NoOp
+      --
+    | ForceTick Time.Posix
+    | TransitionTimeDelta Float
 
 
 type DataFilterMsg
@@ -395,6 +476,40 @@ update msg model =
 
         NoOp ->
             ( model, Cmd.none )
+
+        ForceTick t ->
+            case model.animation of
+                ForceAnimation forceState ->
+                    if Force.isCompleted forceState then
+                        ( { model | animation = NoAnimation }, Cmd.none )
+
+                    else
+                        let
+                            ( newForceState, newGraph ) =
+                                GF.forceTick forceState model.graph
+                        in
+                        ( { model
+                            | animation = ForceAnimation newForceState
+                            , timeList = t :: model.timeList |> List.take 42
+                            , graph = newGraph
+                          }
+                        , Cmd.none
+                        )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        TransitionTimeDelta timeDelta ->
+            case model.animation of
+                TransitionAnimation tA ->
+                    if Animation.hasFinished tA.transitionState then
+                        ( { model | animation = NoAnimation }, Cmd.none )
+
+                    else
+                        ( { model | animation = TransitionAnimation { tA | transitionState = Animation.update timeDelta tA.transitionState } }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
 
 
 updateDataFilter : DataFilterMsg -> DataFilter -> DataFilter
@@ -529,55 +644,17 @@ dataView theme data =
         ]
 
 
-graphView : Theme -> List DataValue -> E.Element Msg
-graphView theme data =
-    let
-        g =
-            Graph.fromNodesAndEdges
-                [ { id = 0
-                  , label = kitesDefaultVertexProp
-                  }
-                , { id = 1
-                  , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
-                  }
-                , { id = 2
-                  , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
-                  }
-                , { id = 3
-                  , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
-                  }
-                ]
-                [ { from = 0
-                  , to = 1
-                  , label = { kitesDefaultEdgeProp | color = Colors.blue }
-                  }
-                , { from = 1
-                  , to = 2
-                  , label = { kitesDefaultEdgeProp | color = Colors.blue }
-                  }
-                , { from = 2
-                  , to = 3
-                  , label = { kitesDefaultEdgeProp | color = Colors.blue }
-                  }
-                ]
-                |> Graph.Layout.circular { center = ( 300, 300 ), radius = 250 }
-
-        gf =
-            GF.new
-                { graph = g
-                , bags = Dict.empty
-                , defaultVertexProperties = kitesDefaultVertexProp
-                , defaultEdgeProperties = kitesDefaultEdgeProp
-                }
-    in
+graphView : Theme -> Model -> E.Element Msg
+graphView theme model =
     E.html <|
         S.svg
             [ SA.width "800" -- FIXME
             , SA.height "800" -- FIXMe
             , SA.viewBox "0 0 800 800"
             ]
-            [ viewVertices gf
-            , viewEdges gf ]
+            [ viewVertices model.graph
+            , viewEdges model.graph
+            ]
 
 
 emptySvgElement : Svg msg
@@ -1079,7 +1156,7 @@ view model =
                   in
                   case model.selectedTab of
                     Graph ->
-                        graphView model.theme data
+                        graphView model.theme model
 
                     Chart ->
                         histogram model.theme data
