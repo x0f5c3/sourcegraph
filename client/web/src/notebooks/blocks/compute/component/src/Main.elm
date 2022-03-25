@@ -3,23 +3,37 @@ port module Main exposing (..)
 import Browser
 import Chart as C
 import Chart.Attributes as CA
+import Circle2d
+import Colors
 import Dict exposing (Dict)
-import Element as E
+import Direction2d
+import Element as E exposing (Color)
 import Element.Background as Background
 import Element.Border as Border
 import Element.Events
 import Element.Font as F
 import Element.Input as I
 import File.Download
+import Geometry.Svg
+import Graph
+import Graph.Layout
+import GraphFile as GF exposing (EdgeId, kitesDefaultEdgeProp, kitesDefaultVertexProp)
 import Html exposing (Html, input, text)
 import Html.Attributes exposing (..)
 import Json.Decode as Decode exposing (Decoder, fail, field, maybe)
 import Json.Decode.Pipeline
+import LineSegment2d exposing (LineSegment2d)
+import Point2d exposing (Point2d)
 import Process
 import Set exposing (Set)
+import Svg as S exposing (Svg)
+import Svg.Attributes as SA
+import Svg.Keyed
 import Task
+import Triangle2d
 import Url.Builder
 import Url.Parser exposing (..)
+import Vector2d
 
 
 
@@ -158,7 +172,7 @@ init json =
 
                 _ ->
                     Dark
-      , selectedTab = experimentalOptions.activeTab
+      , selectedTab = Graph
       , debounce = 0
       , resultsMap = Dict.empty
       , alerts = []
@@ -515,6 +529,338 @@ dataView theme data =
         ]
 
 
+graphView : Theme -> List DataValue -> E.Element Msg
+graphView theme data =
+    let
+        g =
+            Graph.fromNodesAndEdges
+                [ { id = 0
+                  , label = kitesDefaultVertexProp
+                  }
+                , { id = 1
+                  , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
+                  }
+                , { id = 2
+                  , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
+                  }
+                , { id = 3
+                  , label = { kitesDefaultVertexProp | color = Colors.red, position = Point2d.fromCoordinates ( 100.0, 100.0 ) }
+                  }
+                ]
+                [ { from = 0
+                  , to = 1
+                  , label = { kitesDefaultEdgeProp | color = Colors.blue }
+                  }
+                , { from = 1
+                  , to = 2
+                  , label = { kitesDefaultEdgeProp | color = Colors.blue }
+                  }
+                , { from = 2
+                  , to = 3
+                  , label = { kitesDefaultEdgeProp | color = Colors.blue }
+                  }
+                ]
+                |> Graph.Layout.circular { center = ( 300, 300 ), radius = 250 }
+
+        gf =
+            GF.new
+                { graph = g
+                , bags = Dict.empty
+                , defaultVertexProperties = kitesDefaultVertexProp
+                , defaultEdgeProperties = kitesDefaultEdgeProp
+                }
+    in
+    E.html <|
+        S.svg
+            [ SA.width "800" -- FIXME
+            , SA.height "800" -- FIXMe
+            , SA.viewBox "0 0 800 800"
+            ]
+            [ viewVertices gf
+            , viewEdges gf ]
+
+
+emptySvgElement : Svg msg
+emptySvgElement =
+    S.g [] []
+
+
+arrow :
+    { lineSegment : LineSegment2d
+    , color : Color
+    , thickness : Float
+    , headWidth : Float
+    , headLength : Float
+    }
+    -> Html Msg
+arrow { lineSegment, color, thickness, headWidth, headLength } =
+    let
+        dir =
+            LineSegment2d.direction lineSegment
+                |> Maybe.withDefault Direction2d.positiveX
+
+        angle =
+            Direction2d.toAngle dir
+
+        vecFromOriginToEndPoint =
+            LineSegment2d.endPoint lineSegment
+                |> Point2d.coordinates
+                |> Vector2d.fromComponents
+
+        arrowHead =
+            Triangle2d.fromVertices
+                ( Point2d.fromCoordinates ( 0, -headWidth / 2 )
+                , Point2d.fromCoordinates ( 0, headWidth / 2 )
+                , Point2d.fromCoordinates ( headLength, 0 )
+                )
+                |> Triangle2d.rotateAround Point2d.origin angle
+                |> Triangle2d.translateBy vecFromOriginToEndPoint
+                |> Triangle2d.translateIn dir -headLength
+    in
+    S.g []
+        [ Geometry.Svg.lineSegment2d
+            [ SA.stroke (Colors.toString color)
+            , SA.strokeWidth (String.fromFloat thickness)
+            ]
+            (LineSegment2d.from
+                (LineSegment2d.startPoint lineSegment)
+                (LineSegment2d.endPoint lineSegment
+                    |> Point2d.translateIn dir -headLength
+                )
+            )
+        , Geometry.Svg.triangle2d
+            [ SA.fill (Colors.toString color)
+            ]
+            arrowHead
+        ]
+
+
+edgeIdToString : EdgeId -> String
+edgeIdToString ( from, to ) =
+    String.fromInt from ++ " → " ++ String.fromInt to
+
+
+viewEdges : GF.GraphFile -> Html Msg
+viewEdges graphFile =
+    let
+        labelDistance =
+            10
+
+        labelPosition : LineSegment2d -> Point2d
+        labelPosition edgeLine =
+            let
+                fromEdgeMidpointToLabelMidpoint =
+                    edgeLine
+                        |> LineSegment2d.perpendicularDirection
+                        |> Maybe.withDefault Direction2d.negativeY
+                        |> Direction2d.reverse
+                        |> Vector2d.withLength labelDistance
+            in
+            edgeLine
+                |> LineSegment2d.midpoint
+                |> Point2d.translateBy fromEdgeMidpointToLabelMidpoint
+
+        edgeWithKey { from, to, label } =
+            case ( GF.getVertexProperties from graphFile, GF.getVertexProperties to graphFile ) of
+                ( Just v, Just w ) ->
+                    let
+                        dir =
+                            Direction2d.from v.position w.position
+                                |> Maybe.withDefault Direction2d.positiveX
+
+                        edgeStart =
+                            v.position |> Point2d.translateIn dir v.radius
+
+                        edgeEnd =
+                            w.position |> Point2d.translateIn dir -w.radius
+
+                        edgeLine =
+                            LineSegment2d.from edgeStart edgeEnd
+
+                        lP =
+                            labelPosition edgeLine
+
+                        eL =
+                            S.text_
+                                [ SA.x
+                                    (String.fromFloat (Point2d.xCoordinate lP))
+                                , SA.y
+                                    (String.fromFloat (Point2d.yCoordinate lP))
+                                , SA.textAnchor "middle"
+                                , SA.fontSize (String.fromFloat label.labelSize)
+                                , SA.fill (Colors.toString label.labelColor)
+                                ]
+                                [ S.text label.label ]
+
+                        edgeLabel =
+                            if label.labelIsVisible then
+                                eL
+
+                            else
+                                emptySvgElement
+
+                        invisibleBackGroundHandle =
+                            Geometry.Svg.lineSegment2d
+                                [ SA.stroke "red"
+                                , SA.strokeOpacity "0"
+                                , SA.strokeWidth (String.fromFloat (label.thickness + 6))
+                                ]
+                                edgeLine
+                    in
+                    ( edgeIdToString ( from, to )
+                    , S.g
+                        [ SA.opacity (String.fromFloat label.opacity)
+
+                        {--
+                        , SE.onMouseDown (MouseDownOnEdge ( from, to ))
+                        , SE.onMouseUp (MouseUpOnEdge ( from, to ))
+                        , SE.onMouseOver (MouseOverEdge ( from, to ))
+                        , SE.onMouseOut (MouseOutEdge ( from, to ))
+-}
+                        ]
+                        [ invisibleBackGroundHandle
+                        , arrow
+                            { lineSegment = edgeLine
+                            , color = label.color
+                            , thickness = label.thickness
+                            , headWidth = 3 * label.thickness
+                            , headLength = 3 * label.thickness
+                            }
+                        , edgeLabel
+                        ]
+                    )
+
+                _ ->
+                    --Debug.todo "GUI ALLOWED SOMETHING IMPOSSIBLE" <|
+                    ( "", emptySvgElement )
+    in
+    Svg.Keyed.node "g" [] (graphFile |> GF.getEdges |> List.map edgeWithKey)
+
+
+viewVertices : GF.GraphFile -> Html Msg
+viewVertices graphFile =
+    let
+        pin fixed radius =
+            if fixed then
+                Geometry.Svg.circle2d
+                    [ SA.fill "red"
+                    , SA.stroke "white"
+                    ]
+                    (Point2d.origin |> Circle2d.withRadius (radius / 2))
+
+            else
+                emptySvgElement
+
+        viewVertex { id, label } =
+            let
+                ( x, y ) =
+                    Point2d.coordinates label.position
+
+                ( labelAnchor, labelX, labelY ) =
+                    case label.labelPosition of
+                        GF.LabelTopLeft ->
+                            ( "end"
+                            , -label.radius - 4
+                            , -label.radius - 4
+                            )
+
+                        GF.LabelTop ->
+                            ( "middle"
+                            , 0
+                            , -label.radius - 4
+                            )
+
+                        GF.LabelTopRight ->
+                            ( "start"
+                            , label.radius + 4
+                            , -label.radius - 4
+                            )
+
+                        GF.LabelCenter ->
+                            ( "middle"
+                            , 0
+                            , 0.39 * label.labelSize
+                            )
+
+                        GF.LabelLeft ->
+                            ( "end"
+                            , -label.radius - 4
+                            , 0.39 * label.labelSize
+                            )
+
+                        GF.LabelRight ->
+                            ( "start"
+                            , label.radius + 4
+                            , 0.39 * label.labelSize
+                            )
+
+                        GF.LabelBottomLeft ->
+                            ( "end"
+                            , -label.radius - 4
+                            , label.radius + label.labelSize
+                            )
+
+                        GF.LabelBottom ->
+                            ( "middle"
+                            , 0
+                            , label.radius + label.labelSize
+                            )
+
+                        GF.LabelBottomRight ->
+                            ( "start"
+                            , label.radius + 4
+                            , label.radius + label.labelSize
+                            )
+
+                vertexLabel =
+                    if label.labelIsVisible then
+                        S.text_
+                            [ SA.fill (Colors.toString label.labelColor)
+                            , SA.fontSize (String.fromFloat label.labelSize)
+                            , SA.textAnchor labelAnchor
+                            , SA.x (String.fromFloat labelX)
+                            , SA.y (String.fromFloat labelY)
+                            ]
+                            [ S.text label.label
+                            ]
+
+                    else
+                        emptySvgElement
+
+                circleSvg : Color -> Float -> Svg msg
+                circleSvg c r =
+                    Geometry.Svg.circle2d
+                        [ SA.fill (Colors.toString c) ]
+                        (Point2d.origin |> Circle2d.withRadius r)
+
+                backGroundCircleForBorder =
+                    circleSvg label.borderColor label.radius
+
+                innerCircle =
+                    circleSvg label.color (label.radius - label.borderWidth)
+            in
+            ( String.fromInt id
+            , S.g
+                [ SA.transform <| "translate(" ++ String.fromFloat x ++ "," ++ String.fromFloat y ++ ")"
+                , SA.opacity (String.fromFloat label.opacity)
+
+                {--TODO
+                , SE.onMouseDown (MouseDownOnVertex id)
+                , SE.onMouseUp (MouseUpOnVertex id)
+                , SE.onMouseOver (MouseOverVertex id)
+                , SE.onMouseOut (MouseOutVertex id)
+-}
+                ]
+                [ backGroundCircleForBorder
+                , innerCircle
+                , pin label.fixed label.radius
+                , vertexLabel
+                ]
+            )
+    in
+    Svg.Keyed.node "g" [] (graphFile |> GF.getVertices |> List.map viewVertex)
+
+
 viewDataFilter : Theme -> DataFilter -> E.Element DataFilterMsg
 viewDataFilter theme dataFilter =
     E.row [ E.paddingXY 0 10 ]
@@ -570,6 +916,7 @@ type Tab
     = Chart
     | Table
     | Data
+    | Graph
 
 
 tabFromString : String -> Tab
@@ -594,6 +941,9 @@ stringFromTab t =
         Chart ->
             "chart"
 
+        Graph ->
+            "graph"
+
         Table ->
             "table"
 
@@ -601,7 +951,7 @@ stringFromTab t =
             "data"
 
 
-color =
+tabColor =
     { skyBlue = E.rgb255 0x00 0xCB 0xEC
     , vividViolet = E.rgb255 0xA1 0x12 0xFF
     , vermillion = E.rgb255 0xFF 0x55 0x43
@@ -635,19 +985,25 @@ tab thisTab selectedTab =
             else
                 { topLeft = 0, topRight = 0, bottomLeft = 0, bottomRight = 0 }
 
-        tabColor =
+        color =
             case selectedTab of
+                Graph ->
+                    tabColor.vividViolet
+
                 Chart ->
-                    color.vividViolet
+                    tabColor.vividViolet
 
                 Table ->
-                    color.vermillion
+                    tabColor.vermillion
 
                 Data ->
-                    color.skyBlue
+                    tabColor.skyBlue
 
         text =
             case thisTab of
+                Graph ->
+                    "Graph"
+
                 Chart ->
                     "Chart"
 
@@ -660,7 +1016,7 @@ tab thisTab selectedTab =
     E.el
         [ Border.widthEach borderWidths
         , Border.roundEach corners
-        , Border.color tabColor
+        , Border.color color
         , Element.Events.onClick (OnTabSelected thisTab)
         , E.htmlAttribute (Html.Attributes.style "cursor" "pointer")
         , E.width E.fill
@@ -694,7 +1050,8 @@ outputAlerts alerts =
 outputRow : Tab -> E.Element Msg
 outputRow selectedTab =
     E.row [ E.centerX, E.width E.fill ]
-        [ tab Chart selectedTab
+        [ tab Graph selectedTab
+        , tab Chart selectedTab
         , tab Table selectedTab
         , tab Data selectedTab
         ]
@@ -721,6 +1078,9 @@ view model =
                             |> filterData model.dataFilter
                   in
                   case model.selectedTab of
+                    Graph ->
+                        graphView model.theme data
+
                     Chart ->
                         histogram model.theme data
 
