@@ -23,6 +23,7 @@ import Graph.Layout
 import GraphFile as GF exposing (EdgeId, kitesDefaultEdgeProp, kitesDefaultVertexProp)
 import Html exposing (Html, input, text)
 import Html.Attributes exposing (..)
+import IntDict
 import Json.Decode as Decode exposing (Decoder, fail, field, maybe)
 import Json.Decode.Pipeline
 import LineSegment2d exposing (LineSegment2d)
@@ -56,7 +57,7 @@ debounceQueryInputMillis =
 
 placeholderQuery : String
 placeholderQuery =
-    "repo:github\\.com/sourcegraph/sourcegraph$ content:output((.|\\n)* -> $author) type:commit after:\"1 month ago\" count:all"
+    "repo:github\\.com/sourcegraph/sourcegraph$ content:output((\\w+) -> $1,$author) type:commit after:\"1 month ago\" count:all"
 
 
 type alias Flags =
@@ -120,6 +121,7 @@ type alias Model =
     , dataFilter : DataFilter
     , selectedTab : Tab
     , resultsMap : Dict String DataValue
+    , topicalMap : Dict String (Dict String DataValue) -- Dict Topic (Dict (Author, count))
     , alerts : List Alert
     , theme : Theme
     , animation : Animation
@@ -192,6 +194,7 @@ init json =
       , selectedTab = Graph
       , debounce = 0
       , resultsMap = Dict.empty
+      , topicalMap = Dict.empty
       , alerts = []
       , serverless = False
       , animation = ForceAnimation Force.defaultForceState
@@ -464,7 +467,15 @@ update msg model =
                 )
 
         OnResults r ->
-            ( { model | resultsMap = List.foldl updateResultsMap model.resultsMap (parseResults r) }
+            let
+                parsedResults =
+                    parseResults r
+            in
+            ( { model
+                | resultsMap = List.foldl updateResultsMap model.resultsMap parsedResults
+                , topicalMap = List.foldl updateTopicalMap model.topicalMap parsedResults
+                , animation = ForceAnimation Force.defaultForceState
+              }
             , Cmd.none
             )
 
@@ -646,14 +657,67 @@ dataView theme data =
 
 graphView : Theme -> Model -> E.Element Msg
 graphView theme model =
+    let
+        graph_ =
+            model.graph
+
+        ( graph, _, _ ) =
+            model.topicalMap
+                |> Dict.toList
+                -- sort each author list per topic by count
+                |> List.map (\( topic, author ) -> ( topic, Dict.toList author |> List.sortBy (\( _, { value } ) -> value) |> List.reverse ))
+                -- sort overall list by using first author count of each topic
+                |> List.sortBy (\( _, authors ) -> List.length authors)
+                |> List.reverse
+                |> List.map (\( x, authors ) -> ( x, List.take 3 authors ))
+                |> List.take 1
+                |> List.map (\i -> Debug.log "hm" i)
+                |> List.foldl
+                    (\( topic, author ) ( g, lookup, i ) ->
+                        let
+                            newG =
+                                g
+                                    |> Graph.update i
+                                        (\context ->
+                                            case context of
+                                                Just c ->
+                                                    Just c
+
+                                                Nothing ->
+                                                    Just
+                                                        { node =
+                                                            { id = i
+                                                            , label =
+                                                                { kitesDefaultVertexProp
+                                                                    | label = topic
+                                                                    , position = Point2d.fromCoordinates ( 400.0, 400.0 )
+                                                                }
+                                                            }
+                                                        , incoming = IntDict.empty
+                                                        , outgoing = IntDict.empty
+                                                        }
+                                        )
+                        in
+                        ( newG, lookup, i + 1 )
+                    )
+                    ( Graph.empty, Dict.empty, 0 )
+
+        graphFile =
+            GF.new
+                { graph = Graph.Layout.circular { center = ( 400, 400 ), radius = 250 } graph
+                , bags = Dict.empty
+                , defaultVertexProperties = kitesDefaultVertexProp
+                , defaultEdgeProperties = kitesDefaultEdgeProp
+                }
+    in
     E.html <|
         S.svg
             [ SA.width "800" -- FIXME
             , SA.height "800" -- FIXMe
             , SA.viewBox "0 0 800 800"
             ]
-            [ viewVertices model.graph
-            , viewEdges model.graph
+            [ viewVertices graphFile
+            , viewEdges graphFile
             ]
 
 
@@ -1204,6 +1268,45 @@ updateResultsMap textResult =
                 Just existing ->
                     Just { existing | value = existing.value + 1 }
         )
+
+
+updateTopicalMap : String -> Dict String (Dict String DataValue) -> Dict String (Dict String DataValue)
+updateTopicalMap topicAuthorPair =
+    let
+        ( topic, author ) =
+            case String.split "," topicAuthorPair of
+                t :: a :: _ ->
+                    ( String.toLower t, a )
+
+                _ ->
+                    ( "nothing", "nothing" )
+    in
+    if Set.member topic stopWords then
+        identity
+
+    else
+        Dict.update
+            topic
+            (\v ->
+                case v of
+                    Nothing ->
+                        Just (Dict.fromList [ ( "author", { name = author, value = 1 } ) ])
+
+                    Just existingTopic ->
+                        Just
+                            (Dict.update
+                                author
+                                (\a ->
+                                    case a of
+                                        Nothing ->
+                                            Just { name = author, value = 1 }
+
+                                        Just existingAuthor ->
+                                            Just { existingAuthor | value = existingAuthor.value + 1 }
+                                )
+                                existingTopic
+                            )
+            )
 
 
 filterData : DataFilter -> List DataValue -> List DataValue
