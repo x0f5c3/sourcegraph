@@ -670,14 +670,45 @@ graphView theme model =
                 |> List.sortBy (\( _, authors ) -> List.length authors)
                 |> List.reverse
                 |> List.map (\( x, authors ) -> ( x, List.take 3 authors ))
+                -- NUMBER OF AUTHORS
                 |> List.take 1
+                -- NUMBER OF TOPICS
                 |> List.map (\i -> Debug.log "hm" i)
                 |> List.foldl
-                    (\( topic, author ) ( g, lookup, i ) ->
+                    (\( topic, authors ) ( g, lookup, i ) ->
                         let
+                            topicId =
+                                i
+
+                            ( newLookup, newIndex ) =
+                                List.foldl
+                                    (\a ( d, authorIndex ) ->
+                                        let
+                                            nextIndex =
+                                                authorIndex + 1
+                                        in
+                                        ( Dict.update a
+                                            (\id ->
+                                                case id of
+                                                    Just existing ->
+                                                        Just existing
+
+                                                    Nothing ->
+                                                        Just nextIndex
+                                            )
+                                            d
+                                        , nextIndex
+                                        )
+                                    )
+                                    ( lookup, i )
+                                    (List.map Tuple.first authors)
+
+                            nextId =
+                                newIndex + 1
+
                             newG =
                                 g
-                                    |> Graph.update i
+                                    |> Graph.update topicId
                                         (\context ->
                                             case context of
                                                 Just c ->
@@ -686,19 +717,30 @@ graphView theme model =
                                                 Nothing ->
                                                     Just
                                                         { node =
-                                                            { id = i
+                                                            { id = topicId
                                                             , label =
                                                                 { kitesDefaultVertexProp
                                                                     | label = topic
                                                                     , position = Point2d.fromCoordinates ( 400.0, 400.0 )
                                                                 }
                                                             }
-                                                        , incoming = IntDict.empty
+                                                        , incoming =
+                                                            List.foldl
+                                                                (\author d ->
+                                                                    case Dict.get author newLookup of
+                                                                        Just authorIndex ->
+                                                                            IntDict.insert authorIndex d
+
+                                                                        Nothing ->
+                                                                            d
+                                                                )
+                                                                IntDict.empty
+                                                                authors
                                                         , outgoing = IntDict.empty
                                                         }
                                         )
                         in
-                        ( newG, lookup, i + 1 )
+                        ( newG, newLookup, nextId )
                     )
                     ( Graph.empty, Dict.empty, 0 )
 
