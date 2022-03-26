@@ -655,6 +655,22 @@ dataView theme data =
         ]
 
 
+wantEdges : List String -> Dict String Int -> List ( Int, String )
+wantEdges authors lookup =
+    List.foldl
+        (\a l ->
+            case Dict.get a lookup of
+                Just exists ->
+                    ( exists, a ) :: l
+
+                Nothing ->
+                    -- invariant: it exists. this function just associates authors for a topic with their ids
+                    l
+        )
+        []
+        authors
+
+
 graphView : Theme -> Model -> E.Element Msg
 graphView theme model =
     let
@@ -669,9 +685,9 @@ graphView theme model =
                 -- sort overall list by using first author count of each topic
                 |> List.sortBy (\( _, authors ) -> List.length authors)
                 |> List.reverse
-                |> List.map (\( x, authors ) -> ( x, List.take 3 authors ))
+                |> List.map (\( x, authors ) -> ( x, List.take 10 authors ))
                 -- NUMBER OF AUTHORS
-                |> List.take 1
+                |> List.take 5
                 -- NUMBER OF TOPICS
                 |> List.map (\i -> Debug.log "hm" i)
                 |> List.foldl
@@ -680,9 +696,12 @@ graphView theme model =
                             topicId =
                                 i
 
-                            ( newLookup, newIndex ) =
+                            nextId =
+                                i + 1
+
+                            ( newLookup, freshIndex, newAuthorNodes ) =
                                 List.foldl
-                                    (\a ( d, authorIndex ) ->
+                                    (\a ( d, authorIndex, authorNodes ) ->
                                         let
                                             nextIndex =
                                                 authorIndex + 1
@@ -698,16 +717,54 @@ graphView theme model =
                                             )
                                             d
                                         , nextIndex
+                                        , case Dict.get a d of
+                                            Just _ ->
+                                                authorNodes
+
+                                            Nothing ->
+                                                a :: authorNodes
                                         )
                                     )
-                                    ( lookup, i )
+                                    ( lookup, nextId, [] )
                                     (List.map Tuple.first authors)
 
-                            nextId =
-                                newIndex + 1
+                            authorNodeEdges =
+                                wantEdges newAuthorNodes newLookup
+
+                            incomingEdges =
+                                List.foldl (\( authorId, _ ) d -> IntDict.insert authorId kitesDefaultEdgeProp d) IntDict.empty authorNodeEdges
+
+                            gg =
+                                List.foldl
+                                    (\( authorId, authorName ) innerG ->
+                                        innerG
+                                            |> Graph.update authorId
+                                                (\context ->
+                                                    case context of
+                                                        Just c ->
+                                                            Just c
+
+                                                        Nothing ->
+                                                            Just
+                                                                { node =
+                                                                    { id = authorId
+                                                                    , label =
+                                                                        { kitesDefaultVertexProp
+                                                                            | label = authorName
+                                                                            , position = Point2d.fromCoordinates ( 400.0, 400.0 )
+                                                                            , color = Colors.blue
+                                                                        }
+                                                                    }
+                                                                , incoming = IntDict.empty
+                                                                , outgoing = IntDict.empty
+                                                                }
+                                                )
+                                    )
+                                    g
+                                    authorNodeEdges
 
                             newG =
-                                g
+                                gg
                                     |> Graph.update topicId
                                         (\context ->
                                             case context of
@@ -721,26 +778,15 @@ graphView theme model =
                                                             , label =
                                                                 { kitesDefaultVertexProp
                                                                     | label = topic
-                                                                    , position = Point2d.fromCoordinates ( 400.0, 400.0 )
+                                                                    , position = Point2d.fromCoordinates ( 200.0, 200.0 )
                                                                 }
                                                             }
-                                                        , incoming =
-                                                            List.foldl
-                                                                (\author d ->
-                                                                    case Dict.get author newLookup of
-                                                                        Just authorIndex ->
-                                                                            IntDict.insert authorIndex d
-
-                                                                        Nothing ->
-                                                                            d
-                                                                )
-                                                                IntDict.empty
-                                                                authors
+                                                        , incoming = incomingEdges
                                                         , outgoing = IntDict.empty
                                                         }
                                         )
                         in
-                        ( newG, newLookup, nextId )
+                        ( newG, newLookup, freshIndex )
                     )
                     ( Graph.empty, Dict.empty, 0 )
 
