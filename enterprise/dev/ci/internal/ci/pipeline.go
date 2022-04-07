@@ -321,7 +321,7 @@ func withDefaultTimeout(s *bk.Step) {
 // steps are configured appropriately to run on the queue
 func withAgentQueueDefaults(s *bk.Step) {
 	if len(s.Agents) == 0 || s.Agents["queue"] == "" {
-		s.Agents["queue"] = bk.AgentQueueStateless
+		s.Agents["queue"] = bk.AgentQueueCached
 	}
 
 	if s.Agents["queue"] != bk.AgentQueueBaremetal {

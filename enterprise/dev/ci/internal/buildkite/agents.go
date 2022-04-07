@@ -5,4 +5,5 @@ const (
 	AgentQueueBaremetal = "baremetal"
 	// TODO eventually replace with 'standard'
 	AgentQueueStateless = "stateless"
+	AgentQueueCached    = "cached"
 )
