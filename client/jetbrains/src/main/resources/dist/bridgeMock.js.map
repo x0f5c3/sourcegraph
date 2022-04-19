@@ -1,0 +1,1 @@
+{"version":3,"file":"bridgeMock.js","mappings":";;;;;;;AAAA,OAAO,CAAC,GAAG,CAAC,0BAA0B,CAAC","sources":["webpack://@sourcegraph/jetbrains/src/home/philipp/dev/sourcegraph/client/jetbrains/webview/bridge-mock/index.ts"],"sourcesContent":["console.log('Oh hi i am mr jet brainz')\n"],"names":[],"sourceRoot":""}
