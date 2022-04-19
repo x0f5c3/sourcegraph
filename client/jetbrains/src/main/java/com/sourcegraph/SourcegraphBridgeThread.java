@@ -14,7 +14,6 @@ public class SourcegraphBridgeThread extends Thread{
     }
 
     public void run() {
-        /*
         System.out.println(this.webView.getCefBrowser().getFrameNames());
         System.out.println(this.webView.getCefBrowser().isLoading());
         // Wait for the website to load maybe?
@@ -37,8 +36,6 @@ public class SourcegraphBridgeThread extends Thread{
                 "", 0);
         System.out.println("----no more bridges");
         Disposer.register(bridge, this.webView);
-
-         */
     }
 
 }
