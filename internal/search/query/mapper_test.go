@@ -17,8 +17,11 @@ func TestMapOperator(t *testing.T) {
 		},
 	}
 	want := input
-	got := MapOperator(input, func(kind operatorKind, operands []Node) []Node {
-		return newOperator(newOperator(newOperator(operands, kind), And), Or)
+	got := MapOperator(input, func(kind operatorKind, operands []Node) Node {
+		return Operator{
+			Operands: newOperator(newOperator(newOperator(operands, kind), And), Or),
+			Kind:     And,
+		}
 	})
 	if diff := cmp.Diff(want, got); diff != "" {
 		t.Fatal(diff)
