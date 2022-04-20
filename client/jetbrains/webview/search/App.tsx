@@ -1,11 +1,12 @@
-import { SearchBox } from '@sourcegraph/search-ui'
 import React, { useCallback, useState } from 'react'
-import { SearchPatternType, QueryState } from '@sourcegraph/search'
 
+import { SearchPatternType, QueryState } from '@sourcegraph/search'
+import { SearchBox } from '@sourcegraph/search-ui'
+import { aggregateStreamingSearch, LATEST_VERSION } from '@sourcegraph/shared/src/search/stream'
 import { EMPTY_SETTINGS_CASCADE } from '@sourcegraph/shared/src/settings/settings'
 import { NOOP_TELEMETRY_SERVICE } from '@sourcegraph/shared/src/telemetry/telemetryService'
+
 import { EMPTY, NEVER, of } from 'rxjs'
-import { aggregateStreamingSearch, LATEST_VERSION } from '@sourcegraph/shared/src/search/stream'
 
 import { WildcardThemeContext } from '@sourcegraph/wildcard'
 
@@ -27,7 +28,7 @@ export const App = () => {
             patternType,
             caseSensitive,
             trace: undefined,
-            sourcegraphURL: 'https://sourcegraph.com',
+            sourcegraphURL: 'https://sourcegraph.com/.api',
             decorationContextLines: 0,
         }).subscribe(searchResults => {
             setResults(searchResults.results)
@@ -74,17 +75,15 @@ export const App = () => {
                         fetchSearchContexts={() => {
                             throw new Error('fetchSearchContexts')
                         }}
-                        fetchAutoDefinedSearchContexts={() => {
-                            return NEVER
-                        }}
-                        getUserSearchContextNamespaces={() => {
+                        fetchAutoDefinedSearchContexts={() => NEVER}
+                        getUserSearchContextNamespaces={() =>
                             // throw new Error('getUserSearchContextNamespaces')
-                            return []
-                        }}
-                        fetchStreamSuggestions={() => {
+                            []
+                        }
+                        fetchStreamSuggestions={() =>
                             // throw new Error('fetchStreamSuggestions')
-                            return NEVER
-                        }}
+                            NEVER
+                        }
                         settingsCascade={EMPTY_SETTINGS_CASCADE}
                         globbing={false}
                         isLightTheme={false}
@@ -92,8 +91,8 @@ export const App = () => {
                         platformContext={{
                             requestGraphQL: () => EMPTY,
                         }}
-                        className={''}
-                        containerClassName={''}
+                        className=""
+                        containerClassName=""
                         autoFocus={true}
                         editorComponent="monaco"
                     />
