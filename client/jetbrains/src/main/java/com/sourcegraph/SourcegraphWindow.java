@@ -25,7 +25,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import static java.lang.Integer.parseInt;
-
+344
 public class SourcegraphWindow {
     private Project project;
 
@@ -37,7 +37,6 @@ public class SourcegraphWindow {
 
         this.webView = JBCefBrowser.createBuilder()
                 .setUrl("chrome-extension://dgjhfomjieaadpoljlnidmbgkdffpack/html/index.html")
-                .setOffScreenRendering(true)
                 .createBrowser();
 
         CefApp
