@@ -638,6 +638,15 @@ func candidateImageStepKey(app string) string {
 	return strings.ReplaceAll(app, ".", "-") + ":candidate"
 }
 
+func retryCommand(command string, times int) string {
+	iters := make([]string, times)
+	for i := 0; i < times; i++ {
+		iters[i] = strconv.Itoa(i + 1)
+	}
+	return fmt.Sprintf("for i in %s; do %s && break || sleep 1; done",
+		strings.Join(iters, " "), command)
+}
+
 // Build a candidate docker image that will re-tagged with the final
 // tags once the e2e tests pass.
 //
@@ -679,7 +688,7 @@ func buildCandidateDockerImage(app, version, tag string) operations.Operation {
 			// Retag the local image for dev registry
 			bk.Cmd(fmt.Sprintf("docker tag %s %s", localImage, devImage)),
 			// Publish tagged image
-			bk.Cmd(fmt.Sprintf("docker push %s", devImage)),
+			bk.Cmd(retryCommand(fmt.Sprintf("docker push %s", devImage), 3)),
 		)
 
 		pipeline.AddStep(fmt.Sprintf(":docker: :construction: Build %s", app), cmds...)
