@@ -24,6 +24,7 @@ All notable changes to Sourcegraph are documented in this file.
 ### Changed
 
 - Sourcegraph's docker images are now based on Alpine Linux 3.14. [#34508](https://github.com/sourcegraph/sourcegraph/pull/34508)
+- Sourcegraph is now built with Go 1.18. [#34885](https://github.com/sourcegraph/sourcegraph/pull/34885)
 
 ### Fixed
 
