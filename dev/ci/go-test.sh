@@ -39,6 +39,7 @@ function go_test() {
   set +eo pipefail # so we still get the result if the test failed
   local test_exit_code
   # shellcheck disable=SC2086
+  set -x
   go test \
     -timeout 10m \
     -coverprofile=coverage.txt \
@@ -48,6 +49,7 @@ function go_test() {
     $test_packages #| tee "$tmpfile" # | richgo testfilter
   # Save the test exit code so we can return it after saving the test report
   test_exit_code=$? #"${PIPESTATUS[0]}"
+  set +x
   echo "--- Tests complete with status $test_exit_code"
   set -eo pipefail # resume being strict about errors
 
