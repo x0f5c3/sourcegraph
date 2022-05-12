@@ -45,14 +45,14 @@ function go_test() {
     -covermode=atomic \
     -race \
     -v \
-    $test_packages | tee "$tmpfile" # | richgo testfilter
+    $test_packages #| tee "$tmpfile" # | richgo testfilter
   # Save the test exit code so we can return it after saving the test report
-  test_exit_code="${PIPESTATUS[0]}"
+  test_exit_code=$? #"${PIPESTATUS[0]}"
   echo "--- Tests complete with status $test_exit_code"
   set -eo pipefail # resume being strict about errors
 
-  mkdir -p './test-reports'
-  go-junit-report <"$tmpfile" >>./test-reports/go-test-junit.xml
+  # mkdir -p './test-reports'
+  # go-junit-report <"$tmpfile" >>./test-reports/go-test-junit.xml
 
   # Create annotation from test failure
   if [ "$test_exit_code" -ne 0 ]; then
