@@ -1,6 +1,7 @@
 import classNames from 'classnames'
+import { escapeRegExp } from 'lodash'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 
 import { Link } from '@sourcegraph/shared/src/components/Link'
 import { scanSearchQuery } from '@sourcegraph/shared/src/search/query/scanner'
@@ -13,10 +14,12 @@ import { AuthenticatedUser } from '../../auth'
 import { SyntaxHighlightedSearchQuery } from '../../components/SyntaxHighlightedSearchQuery'
 import { EventLogResult } from '../backend'
 
+import { ActionButtonGroup } from './ActionButtonGroup'
 import { EmptyPanelContainer } from './EmptyPanelContainer'
 import { LoadingPanelView } from './LoadingPanelView'
 import { PanelContainer } from './PanelContainer'
 import { ShowMoreButton } from './ShowMoreButton'
+import { computeSuggestedRepositories } from './suggestedContent'
 
 interface Props extends TelemetryProps {
     className?: string
@@ -34,6 +37,12 @@ export const RepositoriesPanel: React.FunctionComponent<Props> = ({
     // be duplicated. Therefore, we fetch more searches to populate this panel.
     const pageSize = 50
     const [itemsToLoad, setItemsToLoad] = useState(pageSize)
+
+    const [repositoriesToShow, setRepositoriesToShow] = useState<'suggested' | 'recent'>('recent')
+
+    const suggestedRepositories = useObservable(useMemo(() =>
+        (authenticatedUser ? computeSuggestedRepositories(authenticatedUser) : of(undefined))
+    , [authenticatedUser]))
 
     const logRepoClicked = useCallback(() => telemetryService.log('RepositoriesPanelRepoFilterClicked'), [
         telemetryService,
@@ -92,7 +101,32 @@ export const RepositoriesPanel: React.FunctionComponent<Props> = ({
         telemetryService.log('RepositoriesPanelShowMoreClicked')
     }
 
-    const contentDisplay = (
+    const actionButtons =  (
+        <ActionButtonGroup>
+            <div className="btn-group btn-group-sm">
+                <button
+                    type="button"
+                    onClick={() => setRepositoriesToShow('recent')}
+                    className={classNames('btn btn-outline-secondary test-saved-search-panel-my-searches', {
+                        active: repositoriesToShow === 'recent',
+                    })}
+                >
+                    Recent
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setRepositoriesToShow('suggested')}
+                    className={classNames('btn btn-outline-secondary test-saved-search-panel-all-searches', {
+                        active: repositoriesToShow === 'suggested',
+                    })}
+                >
+                    Suggested
+                </button>
+            </div>
+        </ActionButtonGroup>
+    )
+
+    const contentDisplay = repositoriesToShow === 'recent' ? (repoFilterValues?.length ?? 0) > 0 ? (
         <div className="mt-2">
             <div className="d-flex mb-1">
                 <small>Search</small>
@@ -110,16 +144,32 @@ export const RepositoriesPanel: React.FunctionComponent<Props> = ({
                 <ShowMoreButton className="test-repositories-panel-show-more" onClick={loadMoreItems} />
             )}
         </div>
+    ) : emptyDisplay : (
+        <div className="mt-2">
+            {suggestedRepositories?.map((repo, index) => (
+                <dd key={`${repo}-${index}`} className="text-monospace text-break">
+                    <small>
+                        <Link to={`/${repo}`} onClick={logRepoClicked}>
+                            <SyntaxHighlightedSearchQuery query={`repo:^${escapeRegExp(repo)}$`} />
+                        </Link>
+                    </small>
+                </dd>
+            ))}
+            {searchEventLogs?.pageInfo.hasNextPage && (
+                <ShowMoreButton className="test-repositories-panel-show-more" onClick={loadMoreItems} />
+            )}
+        </div>
     )
 
     return (
         <PanelContainer
             className={classNames(className, 'repositories-panel')}
             title="Repositories"
-            state={repoFilterValues ? (repoFilterValues.length > 0 ? 'populated' : 'empty') : 'loading'}
+            state={repoFilterValues && suggestedRepositories ? ('populated') : 'loading'}
             loadingContent={loadingDisplay}
             populatedContent={contentDisplay}
             emptyContent={emptyDisplay}
+            actionButtons={actionButtons}
         />
     )
 }

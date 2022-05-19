@@ -1,7 +1,7 @@
 import classNames from 'classnames'
 import FileCodeIcon from 'mdi-react/FileCodeIcon'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 
 import { Link } from '@sourcegraph/shared/src/components/Link'
 import { TelemetryProps } from '@sourcegraph/shared/src/telemetry/telemetryService'
@@ -10,10 +10,12 @@ import { useObservable } from '@sourcegraph/shared/src/util/useObservable'
 import { AuthenticatedUser } from '../../auth'
 import { EventLogResult } from '../backend'
 
+import { ActionButtonGroup } from './ActionButtonGroup'
 import { EmptyPanelContainer } from './EmptyPanelContainer'
 import { LoadingPanelView } from './LoadingPanelView'
 import { PanelContainer } from './PanelContainer'
 import { ShowMoreButton } from './ShowMoreButton'
+import { computeSuggestedFiles } from './suggestedContent'
 
 interface Props extends TelemetryProps {
     className?: string
@@ -29,6 +31,8 @@ export const RecentFilesPanel: React.FunctionComponent<Props> = ({
 }) => {
     const pageSize = 20
 
+    const [filesToShow, setFilesToShow] = useState<'suggested' | 'visited'>('visited')
+
     const [itemsToLoad, setItemsToLoad] = useState(pageSize)
     const recentFiles = useObservable(
         useMemo(() => fetchRecentFileViews(authenticatedUser?.id || '', itemsToLoad), [
@@ -37,6 +41,10 @@ export const RecentFilesPanel: React.FunctionComponent<Props> = ({
             itemsToLoad,
         ])
     )
+
+    const computeRecentFiles = useObservable(useMemo(() =>
+        (authenticatedUser ? computeSuggestedFiles(authenticatedUser) : of(undefined))
+    , [authenticatedUser]))
 
     const [processedResults, setProcessedResults] = useState<RecentFile[] | null>(null)
 
@@ -75,14 +83,11 @@ export const RecentFilesPanel: React.FunctionComponent<Props> = ({
         telemetryService.log('RecentFilesPanelShowMoreClicked')
     }
 
-    const contentDisplay = (
+    const contentDisplay = filesToShow === 'visited' ? processedResults && processedResults.length > 0 ? (
         <div>
-            <div className="mb-1 mt-2">
-                <small>File</small>
-            </div>
             <dl className="list-group-flush">
-                {processedResults?.map((recentFile, index) => (
-                    <dd key={index} className="text-monospace">
+                {processedResults.map((recentFile, index) => (
+                    <dd key={index} className="text-monospace test-recent-files-item">
                         <small>
                             <Link to={recentFile.url} onClick={logFileClicked} data-testid="recent-files-item">
                                 {recentFile.repoName} › {recentFile.filePath}
@@ -97,16 +102,55 @@ export const RecentFilesPanel: React.FunctionComponent<Props> = ({
                 </div>
             )}
         </div>
-    )
+    ) : emptyDisplay : computeRecentFiles && computeRecentFiles.length > 0 ? (
+        <div>
+            <dl className="list-group-flush">
+                {computeRecentFiles.map((recentFile, index) => (
+                    <dd key={index} className="text-monospace test-recent-files-item">
+                        <small>
+                            <Link to={recentFile.url} onClick={logFileClicked}>
+                                {recentFile.repoName} › {recentFile.filePath}
+                            </Link>
+                        </small>
+                    </dd>
+                ))}
+            </dl>
+        </div>
+    ) : emptyDisplay
+
+    const actionButtons = computeRecentFiles && computeRecentFiles.length > 0 ? (
+        <ActionButtonGroup>
+            <div className="btn-group btn-group-sm">
+                <button
+                    type="button"
+                    onClick={() => setFilesToShow('visited')}
+                    className={classNames('btn btn-outline-secondary test-saved-search-panel-my-searches', {
+                        active: filesToShow === 'visited',
+                    })}
+                >
+                    Recent
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setFilesToShow('suggested')}
+                    className={classNames('btn btn-outline-secondary test-saved-search-panel-all-searches', {
+                        active: filesToShow === 'suggested',
+                    })}
+                >
+                    Suggested
+                </button>
+            </div>
+        </ActionButtonGroup>
+    ) : undefined
 
     return (
         <PanelContainer
             className={classNames(className, 'recent-files-panel')}
-            title="Recent files"
-            state={processedResults ? (processedResults.length > 0 ? 'populated' : 'empty') : 'loading'}
+            title="Files"
+            state={processedResults ? 'populated' : 'loading'}
             loadingContent={loadingDisplay}
             populatedContent={contentDisplay}
-            emptyContent={emptyDisplay}
+            actionButtons={actionButtons}
         />
     )
 }

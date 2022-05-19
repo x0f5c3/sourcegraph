@@ -1,6 +1,7 @@
 import classNames from 'classnames'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
-import { Observable } from 'rxjs'
+import { merge, Observable, of } from 'rxjs'
+import { reduce } from 'rxjs/operators'
 
 import { Link } from '@sourcegraph/shared/src/components/Link'
 import { TelemetryProps } from '@sourcegraph/shared/src/telemetry/telemetryService'
@@ -13,11 +14,13 @@ import { Timestamp } from '../../components/time/Timestamp'
 import { SearchPatternType } from '../../graphql-operations'
 import { EventLogResult } from '../backend'
 
+import { ActionButtonGroup } from './ActionButtonGroup'
 import { EmptyPanelContainer } from './EmptyPanelContainer'
 import { LoadingPanelView } from './LoadingPanelView'
 import { PanelContainer } from './PanelContainer'
 import styles from './RecentSearchesPanel.module.scss'
 import { ShowMoreButton } from './ShowMoreButton'
+import { computeCommitTopicSearches, computeDigramContentSearches, computeFunctionCallSearches, computeRegexPatternSearches } from './suggestedContent'
 
 interface RecentSearch {
     count: number
@@ -44,6 +47,8 @@ export const RecentSearchesPanel: React.FunctionComponent<Props> = ({
 }) => {
     const pageSize = 20
 
+    const [searchesToShow, setSearchesToShow] = useState<'suggested' | 'recent'>('recent')
+
     const [itemsToLoad, setItemsToLoad] = useState(pageSize)
     const recentSearches = useObservable(
         useMemo(() => fetchRecentSearches(authenticatedUser?.id || '', itemsToLoad), [
@@ -53,6 +58,16 @@ export const RecentSearchesPanel: React.FunctionComponent<Props> = ({
         ])
     )
     const [processedResults, setProcessedResults] = useState<RecentSearch[] | null>(null)
+
+    const computeSuggestedSearches = useObservable(useMemo(() =>
+        (authenticatedUser ? merge(computeCommitTopicSearches(authenticatedUser), computeDigramContentSearches(authenticatedUser), computeFunctionCallSearches(authenticatedUser), computeRegexPatternSearches(authenticatedUser)).pipe(
+            reduce((accumulator, values) => accumulator.concat(values), [] as {description: string; query: string}[])
+        ) : of(undefined))
+    , [authenticatedUser]))
+
+    useEffect(() => {
+        console.log(computeSuggestedSearches)
+    }, [computeSuggestedSearches])
 
     // Only update processed results when results are valid to prevent
     // flashing loading screen when "Show more" button is clicked
@@ -138,7 +153,32 @@ export const RecentSearchesPanel: React.FunctionComponent<Props> = ({
         telemetryService.log('RecentSearchesPanelShowMoreClicked')
     }
 
-    const contentDisplay = (
+    const actionButtons = (
+        <ActionButtonGroup>
+            <div className="btn-group btn-group-sm">
+                <button
+                    type="button"
+                    onClick={() => setSearchesToShow('recent')}
+                    className={classNames('btn btn-outline-secondary test-saved-search-panel-my-searches', {
+                        active: searchesToShow === 'recent',
+                    })}
+                >
+                    Recent
+                </button>
+                <button
+                    type="button"
+                    onClick={() => setSearchesToShow('suggested')}
+                    className={classNames('btn btn-outline-secondary test-saved-search-panel-all-searches', {
+                        active: searchesToShow === 'suggested',
+                    })}
+                >
+                    Suggested
+                </button>
+            </div>
+        </ActionButtonGroup>
+    )
+
+    const contentDisplay = searchesToShow === 'recent' ? (processedResults?.length ?? 0) > 0 ? (
         <>
             <table className={classNames('mt-2', styles.resultsTable)}>
                 <thead>
@@ -170,16 +210,31 @@ export const RecentSearchesPanel: React.FunctionComponent<Props> = ({
             </table>
             {recentSearches?.pageInfo.hasNextPage && <ShowMoreButton onClick={loadMoreItems} />}
         </>
+    ) : emptyDisplay : (
+        <div>
+            <dl className="list-group-flush">
+                {computeSuggestedSearches?.map(({description, query}, index) => (
+                    <dd key={index} className="text-monospace test-recent-files-item">
+                        <small>
+                            <Link to={`/search?q=${query}`} title={description}>
+                                {description}
+                            </Link>
+                        </small>
+                    </dd>
+                ))}
+            </dl>
+        </div>
     )
 
     return (
         <PanelContainer
             className={classNames(className, 'recent-searches-panel')}
-            title="Recent searches"
-            state={processedResults ? (processedResults.length > 0 ? 'populated' : 'empty') : 'loading'}
+            title="Searches"
+            state={processedResults && computeSuggestedSearches ? ('populated') : 'loading'}
             loadingContent={loadingDisplay}
             populatedContent={contentDisplay}
             emptyContent={emptyDisplay}
+            actionButtons={actionButtons}
         />
     )
 }
