@@ -41,11 +41,13 @@ public class FindService implements Disposable {
 
     synchronized public void showPopup() {
         if (popup == null || popup.isDisposed()) {
-            popup = createPopup();
-            popup.showCenteredInCurrentWindow(project);
+            NativeFindPopupPanel panel = new NativeFindPopupPanel();
+            panel.showUI();
+//            popup = createPopup();
+//            popup.showCenteredInCurrentWindow(project);
             registerOutsideClickListener();
         } else {
-            popup.setUiVisible(true);
+//            popup.setUiVisible(true);
         }
 
         // If the popup is already shown, hitting alt + a gain should behave the same as the native find in files
