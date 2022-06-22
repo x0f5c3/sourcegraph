@@ -227,4 +227,12 @@ public class ForkedFindPopupPanel extends JBPanel<ForkedFindPopupPanel> {
     private boolean canBeClosedImmediately() {
         return myDialog != null && canBeClosed();
     }
+
+    public void hidePopup() {
+        myDialog.getPeer().getWindow().setVisible(false);
+    }
+
+    public void showPopup() {
+        myDialog.show();
+    }
 }

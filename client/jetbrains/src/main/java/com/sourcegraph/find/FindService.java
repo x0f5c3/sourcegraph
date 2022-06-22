@@ -11,7 +11,6 @@ import com.intellij.openapi.ui.popup.ComponentPopupBuilder;
 import com.intellij.openapi.ui.popup.JBPopup;
 import com.intellij.openapi.ui.popup.JBPopupFactory;
 import com.intellij.openapi.wm.ex.WindowManagerEx;
-import com.intellij.ui.popup.AbstractPopup;
 import com.intellij.util.ui.UIUtil;
 import com.sourcegraph.Icons;
 import org.cef.browser.CefBrowser;
@@ -29,7 +28,8 @@ import static java.awt.event.WindowEvent.WINDOW_GAINED_FOCUS;
 public class FindService implements Disposable {
     private final Project project;
     private final FindContentPanel mainPanel;
-    private JBPopup popup;
+    //    private JBPopup popup;
+    private ForkedFindPopupPanel popup;
     private static final Logger logger = Logger.getInstance(FindService.class);
 
     public FindService(@NotNull Project project) {
@@ -40,12 +40,15 @@ public class FindService implements Disposable {
     }
 
     synchronized public void showPopup() {
-//        if (popup == null || popup.isDisposed()) {
-        ForkedFindPopupPanel panel = new ForkedFindPopupPanel(project, this.mainPanel);
-        panel.showUI();
+        if (popup == null) {
+            popup = new ForkedFindPopupPanel(project, this.mainPanel);
+            popup.showUI();
+        } else {
+            popup.showPopup();
+        }
 //            popup = createPopup();
 //            popup.showCenteredInCurrentWindow(project);
-//            registerOutsideClickListener();
+        registerOutsideClickListener();
 //        } else {
 //            popup.setUiVisible(true);
 //        }
@@ -58,7 +61,8 @@ public class FindService implements Disposable {
     }
 
     public void hidePopup() {
-        popup.setUiVisible(false);
+        popup.hidePopup();
+//        popup.setUiVisible(false);
         hideMaterialUiOverlay();
     }
 
@@ -93,14 +97,14 @@ public class FindService implements Disposable {
     }
 
     private void registerGlobalKeyListeners() {
-        KeyboardFocusManager.getCurrentKeyboardFocusManager()
-            .addKeyEventDispatcher(e -> {
-                if (e.getID() != KeyEvent.KEY_PRESSED || popup.isDisposed() || !popup.isVisible() || !popup.isFocused()) {
-                    return false;
-                }
-
-                return handleKeyPress(false, e.getKeyCode(), e.getModifiersEx());
-            });
+//        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+//            .addKeyEventDispatcher(e -> {
+//                if (e.getID() != KeyEvent.KEY_PRESSED || popup.isDisposed() || !popup.isVisible() || !popup.isFocused()) {
+//                    return false;
+//                }
+//
+//                return handleKeyPress(false, e.getKeyCode(), e.getModifiersEx());
+//            });
     }
 
     private void registerJBCefClientKeyListeners() {
@@ -158,18 +162,19 @@ public class FindService implements Disposable {
                 }
 
                 // Detect if we're focusing the Sourcegraph popup
-                if (popup instanceof AbstractPopup) {
-                    Window sourcegraphPopupWindow = ((AbstractPopup) popup).getPopupWindow();
-
-                    if (windowEvent.getWindow().equals(sourcegraphPopupWindow)) {
-                        return;
-                    }
-                }
+//                if (popup instanceof AbstractPopup) {
+//                    Window sourcegraphPopupWindow = ((AbstractPopup) popup).getPopupWindow();
+//
+//                    if (windowEvent.getWindow().equals(sourcegraphPopupWindow)) {
+//                        return;
+//                    }
+//                }
 
                 // Detect if the newly focused window is a parent of the project root window
                 Window currentProjectParentWindow = getParentWindow(windowEvent.getComponent());
                 if (currentProjectParentWindow.equals(projectParentWindow)) {
-                    hidePopup();
+                    this.
+                        hidePopup();
                 }
             }
         }, AWTEvent.WINDOW_EVENT_MASK);
@@ -191,7 +196,7 @@ public class FindService implements Disposable {
     @Override
     public void dispose() {
         if (popup != null) {
-            popup.dispose();
+//            popup.dispose();
         }
 
         mainPanel.dispose();
