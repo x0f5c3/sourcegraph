@@ -6,7 +6,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.ui.jcef.JBCefJSQuery;
 import com.sourcegraph.config.ConfigUtil;
 import com.sourcegraph.config.ThemeUtil;
-import com.sourcegraph.find.FindPopupPanel;
+import com.sourcegraph.find.FindContentPanel;
 import com.sourcegraph.find.PreviewContent;
 import com.sourcegraph.find.Search;
 import org.jetbrains.annotations.NotNull;
@@ -20,11 +20,11 @@ import java.util.Date;
 
 public class JSToJavaBridgeRequestHandler {
     private final Project project;
-    private final FindPopupPanel findPopupPanel;
+    private final FindContentPanel findContentPanel;
 
-    public JSToJavaBridgeRequestHandler(@NotNull Project project, @NotNull FindPopupPanel findPopupPanel) {
+    public JSToJavaBridgeRequestHandler(@NotNull Project project, @NotNull FindContentPanel findContentPanel) {
         this.project = project;
-        this.findPopupPanel = findPopupPanel;
+        this.findContentPanel = findContentPanel;
     }
 
     public JBCefJSQuery.Response handle(@NotNull JsonObject request) {
@@ -76,18 +76,18 @@ public class JSToJavaBridgeRequestHandler {
                             Thread.sleep(300);
                         } catch (InterruptedException ignored) {
                         }
-                        ApplicationManager.getApplication().invokeLater(() -> findPopupPanel.indicateLoadingIfInTime(Date.from(
+                        ApplicationManager.getApplication().invokeLater(() -> findContentPanel.indicateLoadingIfInTime(Date.from(
                             Instant.from(DateTimeFormatter.ISO_INSTANT.parse(arguments.get("timeAsISOString").getAsString())))));
                     }).start();
                     return createSuccessResponse(null);
                 case "preview":
                     arguments = request.getAsJsonObject("arguments");
                     previewContent = PreviewContent.fromJson(project, arguments);
-                    ApplicationManager.getApplication().invokeLater(() -> findPopupPanel.setPreviewContentIfInTime(previewContent));
+                    ApplicationManager.getApplication().invokeLater(() -> findContentPanel.setPreviewContentIfInTime(previewContent));
                     return createSuccessResponse(null);
                 case "clearPreview":
                     arguments = request.getAsJsonObject("arguments");
-                    ApplicationManager.getApplication().invokeLater(() -> findPopupPanel.clearPreviewContentIfInTime(Date.from(
+                    ApplicationManager.getApplication().invokeLater(() -> findContentPanel.clearPreviewContentIfInTime(Date.from(
                         Instant.from(DateTimeFormatter.ISO_INSTANT.parse(arguments.get("timeAsISOString").getAsString())))));
                     return createSuccessResponse(null);
                 case "open":
@@ -100,7 +100,7 @@ public class JSToJavaBridgeRequestHandler {
                     }
                     return createSuccessResponse(null);
                 case "indicateFinishedLoading":
-                    findPopupPanel.setBrowserVisible(true);
+                    findContentPanel.setBrowserVisible(true);
                     return createSuccessResponse(null);
                 default:
                     return createErrorResponse("Unknown action: '" + action + "'.", "No stack trace");

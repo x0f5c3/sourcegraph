@@ -21,14 +21,14 @@ import java.util.Date;
 /**
  * Inspired by <a href="https://sourcegraph.com/github.com/JetBrains/intellij-community/-/blob/platform/lang-impl/src/com/intellij/find/impl/FindPopupPanel.java">FindPopupPanel.java</a>
  */
-public class FindPopupPanel extends JBPanel<FindPopupPanel> implements Disposable {
+public class FindContentPanel extends JBPanel<FindContentPanel> implements Disposable {
     private final SourcegraphJBCefBrowser browser;
     private final PreviewPanel previewPanel;
     private final BrowserAndLoadingPanel browserAndLoadingPanel;
     private final SelectionMetadataPanel selectionMetadataPanel;
     private Date lastPreviewUpdate;
 
-    public FindPopupPanel(@NotNull Project project) {
+    public FindContentPanel(@NotNull Project project) {
         super(new BorderLayout());
 
         setPreferredSize(JBUI.size(1200, 800));

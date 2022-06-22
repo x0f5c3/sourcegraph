@@ -28,7 +28,7 @@ import static java.awt.event.WindowEvent.WINDOW_GAINED_FOCUS;
 
 public class FindService implements Disposable {
     private final Project project;
-    private final FindPopupPanel mainPanel;
+    private final FindContentPanel mainPanel;
     private JBPopup popup;
     private static final Logger logger = Logger.getInstance(FindService.class);
 
@@ -36,25 +36,25 @@ public class FindService implements Disposable {
         this.project = project;
 
         // Create main panel
-        mainPanel = new FindPopupPanel(project);
+        mainPanel = new FindContentPanel(project);
     }
 
     synchronized public void showPopup() {
-        if (popup == null || popup.isDisposed()) {
-            NativeFindPopupPanel panel = new NativeFindPopupPanel();
-            panel.showUI();
+//        if (popup == null || popup.isDisposed()) {
+        ForkedFindPopupPanel panel = new ForkedFindPopupPanel(project, this.mainPanel);
+        panel.showUI();
 //            popup = createPopup();
 //            popup.showCenteredInCurrentWindow(project);
-            registerOutsideClickListener();
-        } else {
+//            registerOutsideClickListener();
+//        } else {
 //            popup.setUiVisible(true);
-        }
+//        }
 
         // If the popup is already shown, hitting alt + a gain should behave the same as the native find in files
         // feature and focus the search field.
-        if (mainPanel.getBrowser() != null) {
-            mainPanel.getBrowser().focus();
-        }
+//        if (mainPanel.getBrowser() != null) {
+//            mainPanel.getBrowser().focus();
+//        }
     }
 
     public void hidePopup() {
