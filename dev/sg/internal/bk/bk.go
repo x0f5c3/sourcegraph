@@ -3,6 +3,7 @@ package bk
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
@@ -173,6 +174,7 @@ func (c *Client) GetJobAnnotationByBuildNumber(ctx context.Context, pipeline str
 	var result JobAnnotations = make(JobAnnotations, 0)
 	for _, a := range artifacts {
 		if strings.Contains(*a.Dirname, "annotations") && strings.HasSuffix(*a.Filename, "-annotation.md") {
+			fmt.Printf("annotation artifact [%s] for job: %s\n", *a.Filename, *a.JobID)
 			var buf bytes.Buffer
 			_, err := c.bk.Artifacts.DownloadArtifactByURL(*a.DownloadURL, &buf)
 			if err != nil {
