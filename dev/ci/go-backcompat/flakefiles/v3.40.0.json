@@ -11,11 +11,6 @@
   },
   {
     "path": "internal/database",
-    "prefix": "TestIterateRepoGitserverStatus",
-    "reason": "Database semantics changed: every created repo has a corresponding gitserver_repo entry right after being inserted in repo table (https://github.com/sourcegraph/sourcegraph/pull/35633)"
-  },
-  {
-    "path": "internal/database",
     "prefix": "TestSetRepoSize",
     "reason": "Database semantics changed: every created repo has a corresponding gitserver_repo entry right after being inserted in repo table (https://github.com/sourcegraph/sourcegraph/pull/35633)"
   },
