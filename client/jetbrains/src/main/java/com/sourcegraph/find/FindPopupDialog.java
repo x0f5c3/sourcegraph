@@ -23,6 +23,7 @@ import com.intellij.ui.awt.RelativePoint;
 import com.intellij.util.ui.JBUI;
 import com.intellij.util.ui.UIUtil;
 import com.sourcegraph.Icons;
+import com.sourcegraph.authentication.AuthenticationDialog;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -74,11 +75,17 @@ public class FindPopupDialog extends DialogWrapper {
         TitlePanel titlePanel = new TitlePanel(new ActiveIcon(Icons.Logo).getRegular(), new ActiveIcon(Icons.Logo).getInactive());
         titlePanel.setText(getTitle());
 
+        JButton button = new JButton("Auth");
+        button.addActionListener(e -> {
+            new AuthenticationDialog(this.project, getWindow()).showAndGet();
+        });
+
         addMoveListeners(titlePanel);
 
         // Adding the center panel
         return JBUI.Panels.simplePanel()
             .addToTop(titlePanel)
+            .addToBottom(button)
             .addToCenter(mainPanel);
     }
 
