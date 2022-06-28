@@ -67,7 +67,6 @@ Flags:
 * `--crit, -c="<value>"`: Services to set at info crit level.
 * `--debug, -d="<value>"`: Services to set at debug log level.
 * `--error, -e="<value>"`: Services to set at info error level.
-* `--feedback`: provide feedback about this command by opening up a Github discussion
 * `--info, -i="<value>"`: Services to set at info log level.
 * `--warn, -w="<value>"`: Services to set at warn log level.
 
@@ -178,7 +177,6 @@ $ sg ci build --help
 
 Flags:
 
-* `--feedback`: provide feedback about this command by opening up a Github discussion
 
 ### sg ci preview
 
@@ -187,7 +185,6 @@ Preview the pipeline that would be run against the currently checked out branch.
 
 Flags:
 
-* `--feedback`: provide feedback about this command by opening up a Github discussion
 
 ### sg ci status
 
