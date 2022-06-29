@@ -419,7 +419,6 @@ $ sg --verbose generate ... # Enable verbose output
 
 Flags:
 
-* `--feedback`: provide feedback about this command by opening up a Github discussion
 * `--quiet, -q`: Suppress all output but errors from generate tasks
 
 ### sg generate go
