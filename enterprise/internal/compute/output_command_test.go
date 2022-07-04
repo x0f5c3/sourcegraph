@@ -112,6 +112,11 @@ func TestRun(t *testing.T) {
 		"bob: (1)\nbob: (2)\nbob: (3)\n").
 		Equal(t, test(`content:output((\d) -> $author: ($1))`, commitMatch("a 1 b 2 c 3")))
 
+	autogold.Want(
+		"case-sensitivity",
+		"sup\n").
+		Equal(t, test(`content:output(historical -> sup)`, fileMatch("Historical historical")))
+
 	// If we are not on CI skip the test if comby is not installed.
 	if os.Getenv("CI") == "" && !comby.Exists() {
 		t.Skip("comby is not installed on the PATH. Try running 'bash <(curl -sL get.comby.dev)'.")

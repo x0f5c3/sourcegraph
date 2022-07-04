@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/grafana/regexp"
+	"github.com/inconshreveable/log15"
 
 	"github.com/sourcegraph/sourcegraph/internal/authz"
 	"github.com/sourcegraph/sourcegraph/internal/comby"
@@ -45,6 +46,7 @@ func output(ctx context.Context, fragment string, matchPattern MatchPattern, rep
 	var err error
 	switch match := matchPattern.(type) {
 	case *Regexp:
+		log15.Info("", "f", fragment, "m", match.Value, "r", replacePattern)
 		newContent = substituteRegexp(fragment, match.Value, replacePattern, separator)
 	case *Comby:
 		newContent, err = comby.Outputs(ctx, comby.Args{
@@ -59,6 +61,9 @@ func output(ctx context.Context, fragment string, matchPattern MatchPattern, rep
 			return nil, err
 		}
 
+	}
+	if newContent == "" {
+		log15.Info("empty")
 	}
 	return &Text{Value: newContent, Kind: "output"}, nil
 }
@@ -97,7 +102,14 @@ func resultContent(ctx context.Context, db database.DB, r result.Match, onlyPath
 	}
 }
 
-func toTextResult(ctx context.Context, content string, matchPattern MatchPattern, outputPattern, separator, selector string) (Result, error) {
+func toTextResult(
+	ctx context.Context,
+	content string,
+	matchPattern MatchPattern,
+	outputPattern,
+	separator,
+	selector string,
+) (Result, error) {
 	if selector != "" {
 		// Don't run the search pattern over the search result content
 		// when there's an explicit `select:` value.
