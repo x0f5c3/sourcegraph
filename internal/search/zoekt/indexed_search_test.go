@@ -120,21 +120,22 @@ func TestIndexedSearch(t *testing.T) {
 						Branches:     []string{"HEAD"},
 						Version:      "1",
 						FileName:     "baz.go",
-						LineMatches: []zoekt.LineMatch{
-							{
-								Line: []byte("I'm like 1.5+ hours into writing this test :'("),
-								LineFragments: []zoekt.LineFragmentMatch{
-									{LineOffset: 0, MatchLength: 5},
-								},
-							},
-							{
-								Line: []byte("I'm ready for the rain to stop."),
-								LineFragments: []zoekt.LineFragmentMatch{
-									{LineOffset: 0, MatchLength: 5},
-									{LineOffset: 5, MatchLength: 10},
-								},
-							},
-						},
+						ChunkMatches: []zoekt.ChunkMatch{{
+							Content: []byte("I'm like 1.5+ hours into writing this test :'("),
+							Ranges: []zoekt.Range{{
+								Start: zoekt.Location{ByteOffset: 0, LineNumber: 1, Column: 1},
+								End:   zoekt.Location{ByteOffset: 5, LineNumber: 1, Column: 6},
+							}},
+						}, {
+							Content: []byte("I'm ready for the rain to stop."),
+							Ranges: []zoekt.Range{{
+								Start: zoekt.Location{ByteOffset: 0, LineNumber: 1, Column: 1},
+								End:   zoekt.Location{ByteOffset: 5, LineNumber: 1, Column: 6},
+							}, {
+								Start: zoekt.Location{ByteOffset: 5, LineNumber: 1, Column: 6},
+								End:   zoekt.Location{ByteOffset: 15, LineNumber: 1, Column: 16},
+							}},
+						}},
 					},
 					{
 						Repository:   "foo/foobar",
@@ -142,15 +143,16 @@ func TestIndexedSearch(t *testing.T) {
 						Branches:     []string{"HEAD"},
 						Version:      "2",
 						FileName:     "baz.go",
-						LineMatches: []zoekt.LineMatch{
-							{
-								Line: []byte("s/rain/pain"),
-								LineFragments: []zoekt.LineFragmentMatch{
-									{LineOffset: 0, MatchLength: 5},
-									{LineOffset: 5, MatchLength: 2},
-								},
-							},
-						},
+						ChunkMatches: []zoekt.ChunkMatch{{
+							Content: []byte("s/rain/pain"),
+							Ranges: []zoekt.Range{{
+								Start: zoekt.Location{ByteOffset: 0, LineNumber: 1, Column: 1},
+								End:   zoekt.Location{ByteOffset: 5, LineNumber: 1, Column: 6},
+							}, {
+								Start: zoekt.Location{ByteOffset: 5, LineNumber: 1, Column: 6},
+								End:   zoekt.Location{ByteOffset: 7, LineNumber: 1, Column: 8},
+							}},
+						}},
 					},
 				},
 				since: func(time.Time) time.Duration { return 0 },
@@ -587,31 +589,36 @@ func TestZoektFileMatchToSymbolResults(t *testing.T) {
 		Repository: "foo",
 		Language:   "go",
 		Version:    "deadbeef",
-		LineMatches: []zoekt.LineMatch{{
+		ChunkMatches: []zoekt.ChunkMatch{{
 			// Skips missing symbol info (shouldn't happen in practice).
-			Line:          []byte(""),
-			LineNumber:    5,
-			LineFragments: []zoekt.LineFragmentMatch{{}},
+			Content:      []byte(""),
+			ContentStart: zoekt.Location{LineNumber: 5},
+			Ranges: []zoekt.Range{{
+				Start: zoekt.Location{LineNumber: 5},
+			}},
 		}, {
-			Line:       []byte("symbol a symbol b"),
-			LineNumber: 10,
-			LineFragments: []zoekt.LineFragmentMatch{{
-				SymbolInfo: symbolInfo("a"),
+			Content:      []byte("symbol a symbol b"),
+			ContentStart: zoekt.Location{LineNumber: 10},
+			Ranges: []zoekt.Range{{
+				Start: zoekt.Location{LineNumber: 10},
 			}, {
-				SymbolInfo: symbolInfo("b"),
+				Start: zoekt.Location{LineNumber: 10},
 			}},
+			SymbolInfo: []*zoekt.Symbol{symbolInfo("a"), symbolInfo("b")},
 		}, {
-			Line:       []byte("symbol c"),
-			LineNumber: 15,
-			LineFragments: []zoekt.LineFragmentMatch{{
-				SymbolInfo: symbolInfo("c"),
+			Content:      []byte("symbol c"),
+			ContentStart: zoekt.Location{LineNumber: 15},
+			Ranges: []zoekt.Range{{
+				Start: zoekt.Location{LineNumber: 15},
 			}},
+			SymbolInfo: []*zoekt.Symbol{symbolInfo("c")},
 		}, {
-			Line:       []byte(`bar() { var regex = /.*\//; function baz() { }  } `),
-			LineNumber: 20,
-			LineFragments: []zoekt.LineFragmentMatch{{
-				SymbolInfo: symbolInfo("baz"),
+			Content:      []byte(`bar() { var regex = /.*\//; function baz() { }  } `),
+			ContentStart: zoekt.Location{LineNumber: 20},
+			Ranges: []zoekt.Range{{
+				Start: zoekt.Location{LineNumber: 20},
 			}},
+			SymbolInfo: []*zoekt.Symbol{symbolInfo("baz")},
 		}},
 	}
 
@@ -819,23 +826,22 @@ func TestZoektFileMatchToMultilineMatches(t *testing.T) {
 		output result.ChunkMatches
 	}{{
 		input: &zoekt.FileMatch{
-			LineMatches: []zoekt.LineMatch{{
-				Line:       []byte("testing 1 2 3"),
-				LineNumber: 1,
-				LineStart:  0,
-				LineEnd:    len("testing 1 2 3"),
-				LineFragments: []zoekt.LineFragmentMatch{{
-					LineOffset:  8,
-					Offset:      8,
-					MatchLength: 1,
+			ChunkMatches: []zoekt.ChunkMatch{{
+				Content: []byte("testing 1 2 3"),
+				ContentStart: zoekt.Location{
+					ByteOffset: 0,
+					LineNumber: 1,
+					Column:     1,
+				},
+				Ranges: []zoekt.Range{{
+					Start: zoekt.Location{ByteOffset: 8, LineNumber: 1, Column: 9},
+					End:   zoekt.Location{ByteOffset: 9, LineNumber: 1, Column: 10},
 				}, {
-					LineOffset:  10,
-					Offset:      10,
-					MatchLength: 1,
+					Start: zoekt.Location{ByteOffset: 10, LineNumber: 1, Column: 11},
+					End:   zoekt.Location{ByteOffset: 11, LineNumber: 1, Column: 12},
 				}, {
-					LineOffset:  12,
-					Offset:      12,
-					MatchLength: 1,
+					Start: zoekt.Location{ByteOffset: 12, LineNumber: 1, Column: 13},
+					End:   zoekt.Location{ByteOffset: 13, LineNumber: 1, Column: 14},
 				}},
 			}},
 		},

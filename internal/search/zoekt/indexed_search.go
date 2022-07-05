@@ -445,32 +445,7 @@ func zoektFileMatchToSymbolResults(repoName types.MinimalRepo, inputRev string, 
 		InputRev: &inputRev,
 	}
 
-	symbols := make([]*result.SymbolMatch, 0, len(file.LineMatches))
-	for _, l := range file.LineMatches {
-		if l.FileName {
-			continue
-		}
-
-		for _, m := range l.LineFragments {
-			if m.SymbolInfo == nil {
-				continue
-			}
-
-			symbols = append(symbols, result.NewSymbolMatch(
-				newFile,
-				l.LineNumber,
-				-1, // -1 means infer the column
-				m.SymbolInfo.Sym,
-				m.SymbolInfo.Kind,
-				m.SymbolInfo.Parent,
-				m.SymbolInfo.ParentKind,
-				file.Language,
-				string(l.Line),
-				false,
-			))
-		}
-	}
-
+	symbols := make([]*result.SymbolMatch, 0, len(file.ChunkMatches))
 	for _, cm := range file.ChunkMatches {
 		if cm.FileName || len(cm.SymbolInfo) == 0 {
 			continue
