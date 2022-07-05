@@ -2,6 +2,9 @@ package compute
 
 import (
 	"fmt"
+	"strings"
+
+	"github.com/inconshreveable/log15"
 
 	"github.com/grafana/regexp"
 
@@ -130,6 +133,15 @@ func parseArrowSyntax(args string) (string, string, error) {
 	return parts[0], parts[1], nil
 }
 
+func parsePipelineInput(args string) (string, string, error) {
+	parts := strings.Split(args, ", ")
+	if len(parts) != 2 {
+		return "", "", errors.New("invalid pipeline input statement, no comma on left side of `->`")
+	}
+
+	return parts[0], strings.TrimPrefix(parts[1], " "), nil
+}
+
 func parseReplace(q *query.Basic) (Command, bool, error) {
 	pattern, err := extractPattern(q)
 	if err != nil {
@@ -153,6 +165,7 @@ func parseReplace(q *query.Basic) (Command, bool, error) {
 		if err != nil {
 			return nil, false, errors.Wrap(err, "replace command")
 		}
+
 	case "replace.structural":
 		// structural search doesn't do any match pattern validation
 		matchPattern = &Comby{Value: left}
@@ -179,17 +192,30 @@ func parseOutput(q *query.Basic) (Command, bool, error) {
 		return nil, false, err
 	}
 
-	var matchPattern MatchPattern
+	firstLeft, secondLeft, err := parsePipelineInput(left)
+	if err != nil {
+		return nil, false, err
+	}
+
+	log15.Info("compute pipeline", "searchPattern", firstLeft, "filterPattern", secondLeft)
+
+	var searchPattern MatchPattern
+	var filterPattern MatchPattern
+
 	switch name {
 	case "output", "output.regexp", "output.extra":
 		var err error
-		matchPattern, err = toRegexpPattern(left)
+		searchPattern, err = toRegexpPattern(firstLeft)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "output command")
 		}
+		filterPattern, err = toRegexpPattern(secondLeft)
+		if err != nil {
+			return nil, false, errors.Wrap(err, "replace command filter pattern")
+		}
 	case "output.structural":
 		// structural search doesn't do any match pattern validation
-		matchPattern = &Comby{Value: left}
+		searchPattern = &Comby{Value: left}
 
 	default:
 		// unrecognized name
@@ -208,12 +234,13 @@ func parseOutput(q *query.Basic) (Command, bool, error) {
 
 	// The default separator is newline and cannot be changed currently.
 	return &Output{
-		SearchPattern: matchPattern,
+		SearchPattern: searchPattern,
 		OutputPattern: right,
 		Separator:     "\n",
 		TypeValue:     typeValue,
 		Selector:      selector,
 		Kind:          name,
+		FilterPattern: filterPattern,
 	}, true, nil
 }
 

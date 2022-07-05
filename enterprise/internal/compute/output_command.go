@@ -15,6 +15,7 @@ import (
 )
 
 type Output struct {
+	FilterPattern MatchPattern
 	SearchPattern MatchPattern
 	OutputPattern string
 	Separator     string
@@ -130,7 +131,7 @@ func (c *Output) Run(ctx context.Context, db database.DB, r result.Match) (Resul
 		return nil, err
 	}
 
-	result, err := toTextResult(ctx, content, c.SearchPattern, outputPattern, c.Separator, c.Selector)
+	result, err := toTextResult(ctx, content, c.FilterPattern, outputPattern, c.Separator, c.Selector)
 	if err != nil {
 		return nil, err
 	}
