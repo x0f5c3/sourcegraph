@@ -25,7 +25,7 @@ export const setQueryParseOptions = StateEffect.define<{
 export const parsedQuery = Facet.define<ParsedQuery, ParsedQuery>({
     combine(input) {
         // There will always only be one extension which parses this query
-        return input[0] ?? { patternType: SearchPatternType.literal, tokens: [] }
+        return input[0] ?? { patternType: SearchPatternType.standard, tokens: [] }
     },
 })
 
