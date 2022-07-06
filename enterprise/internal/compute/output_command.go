@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/inconshreveable/log15"
+
 	"github.com/grafana/regexp"
 
 	"github.com/sourcegraph/sourcegraph/internal/authz"
@@ -15,7 +17,7 @@ import (
 )
 
 type Output struct {
-	FilterPattern MatchPattern
+	Filters       []ComputeFilter
 	SearchPattern MatchPattern
 	OutputPattern string
 	Separator     string
@@ -125,13 +127,34 @@ func (c *Output) Run(ctx context.Context, db database.DB, r result.Match) (Resul
 	if !ok {
 		return nil, nil
 	}
+
+	log15.Info("before filters")
+
+	for _, filter := range c.Filters {
+		pattern, err := regexp.Compile(filter.pattern)
+		if err != nil {
+			return nil, err
+		}
+		if !pattern.MatchString(content) && !filter.negated {
+			// skip this
+			log15.Info("filtering not negated not matching", "pattern", filter.pattern)
+			return nil, nil
+		} else if pattern.MatchString(content) && filter.negated {
+			// skip this
+			log15.Info("filtering negated and matching", "pattern", filter.pattern)
+			return nil, nil
+		}
+	}
+
+	log15.Info("gogogoogogog")
+
 	env := NewMetaEnvironment(r, content)
 	outputPattern, err := substituteMetaVariables(c.OutputPattern, env)
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := toTextResult(ctx, content, c.FilterPattern, outputPattern, c.Separator, c.Selector)
+	result, err := toTextResult(ctx, content, c.SearchPattern, outputPattern, c.Separator, c.Selector)
 	if err != nil {
 		return nil, err
 	}

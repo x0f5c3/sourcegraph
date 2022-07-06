@@ -125,12 +125,52 @@ func parseContentPredicate(pattern *query.Pattern) (string, string, bool) {
 
 var arrowSyntax = lazyregexp.New(`\s*->\s*`)
 
-func parseArrowSyntax(args string) (string, string, error) {
+func parseArrowSyntax(args string) (string, string, []ComputeFilter, error) {
 	parts := arrowSyntax.Split(args, 2)
 	if len(parts) != 2 {
-		return "", "", errors.New("invalid arrow statement, no left and right hand sides of `->`")
+		return "", "", nil, errors.New("invalid arrow statement, no left and right hand sides of `->`")
 	}
-	return parts[0], parts[1], nil
+	log15.Info("parseArrowSyntax", "left", parts[0], "right", parts[1])
+	ff := strings.SplitN(parts[1], ", ", 2)
+	log15.Info("parseArrowSyntaxExtra", "ff[0]", ff[0], "ff[1]", ff[1])
+	filters, err := parseFilters(ff[1])
+	if err != nil {
+		return "", "", nil, err
+	}
+	return parts[0], ff[0], filters, nil
+}
+
+type ComputeFilter struct {
+	negated bool
+	pattern string
+}
+
+var withSyntax = lazyregexp.New(`with\((.+)\)`)
+var withoutSyntax = lazyregexp.New(`without\((.+)\)`)
+
+func parseFilters(args string) (filters []ComputeFilter, _ error) {
+	tokens := strings.Split(args, ",")
+	for _, token := range tokens {
+		trimmed := strings.TrimSpace(token)
+		log15.Info("trimmed", "t", trimmed)
+		if withSyntax.MatchString(trimmed) {
+			val := withSyntax.FindStringSubmatch(trimmed)
+			log15.Info("with command found", "args", val[1])
+			filters = append(filters, ComputeFilter{
+				negated: false,
+				pattern: val[1],
+			})
+		} else if withoutSyntax.MatchString(trimmed) {
+			val := withoutSyntax.FindStringSubmatch(trimmed)
+			log15.Info("without command found", "args", val[1])
+
+			filters = append(filters, ComputeFilter{
+				negated: true,
+				pattern: val[1],
+			})
+		}
+	}
+	return
 }
 
 func parsePipelineInput(args string) (string, string, error) {
@@ -152,7 +192,7 @@ func parseReplace(q *query.Basic) (Command, bool, error) {
 	if !ok {
 		return nil, false, nil
 	}
-	left, right, err := parseArrowSyntax(args)
+	left, right, _, err := parseArrowSyntax(args)
 	if err != nil {
 		return nil, false, err
 	}
@@ -187,31 +227,26 @@ func parseOutput(q *query.Basic) (Command, bool, error) {
 	if !ok {
 		return nil, false, nil
 	}
-	left, right, err := parseArrowSyntax(args)
+	left, right, filters, err := parseArrowSyntax(args)
 	if err != nil {
 		return nil, false, err
 	}
 
-	firstLeft, secondLeft, err := parsePipelineInput(left)
-	if err != nil {
-		return nil, false, err
-	}
+	// firstLeft, secondLeft, err := parsePipelineInput(left)
+	// if err != nil {
+	// 	return nil, false, err
+	// }
 
-	log15.Info("compute pipeline", "searchPattern", firstLeft, "filterPattern", secondLeft)
+	// log15.Info("compute pipeline", "searchPattern", firstLeft, "filterPattern", secondLeft)
 
 	var searchPattern MatchPattern
-	var filterPattern MatchPattern
 
 	switch name {
 	case "output", "output.regexp", "output.extra":
 		var err error
-		searchPattern, err = toRegexpPattern(firstLeft)
+		searchPattern, err = toRegexpPattern(left)
 		if err != nil {
 			return nil, false, errors.Wrap(err, "output command")
-		}
-		filterPattern, err = toRegexpPattern(secondLeft)
-		if err != nil {
-			return nil, false, errors.Wrap(err, "replace command filter pattern")
 		}
 	case "output.structural":
 		// structural search doesn't do any match pattern validation
@@ -240,7 +275,7 @@ func parseOutput(q *query.Basic) (Command, bool, error) {
 		TypeValue:     typeValue,
 		Selector:      selector,
 		Kind:          name,
-		FilterPattern: filterPattern,
+		Filters:       filters,
 	}, true, nil
 }
 

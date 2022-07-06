@@ -23,14 +23,18 @@ func toComputeResult(ctx context.Context, db database.DB, cmd compute.Command, m
 			if err != nil {
 				return nil, err
 			}
-			out = append(out, result)
+			if result != nil {
+				out = append(out, result)
+			}
 		}
 	} else {
 		result, err := cmd.Run(ctx, db, match)
 		if err != nil {
 			return nil, err
 		}
-		out = append(out, result)
+		if result != nil {
+			out = append(out, result)
+		}
 	}
 	return out, nil
 }
