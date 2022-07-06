@@ -29,6 +29,8 @@ type resolvedRepos struct {
 	unindexed []*search.RepositoryRevisions
 }
 
+// reposPartialJob is a partial job that needs a set of resolved repos
+// in order to construct a complete job.
 type reposPartialJob struct {
 	inner job.Job
 }
