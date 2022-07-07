@@ -84,8 +84,8 @@ func LogEvents(ctx context.Context, db database.DB, events []Event) error {
 
 	if envvar.SourcegraphDotComMode() {
 		go func() {
-			if err := publishSourcegraphDotComEvents(events); err != nil {
-				log15.Error("publishSourcegraphDotComEvents failed", "err", err)
+			if err := PublishSourcegraphDotComEvents(events); err != nil {
+				log15.Error("PublishSourcegraphDotComEvents failed", "err", err)
 			}
 		}()
 	}
@@ -115,8 +115,8 @@ type bigQueryEvent struct {
 	InsertID        *string `json:"insert_id,omitempty"`
 }
 
-// publishSourcegraphDotComEvents publishes Sourcegraph.com events to BigQuery.
-func publishSourcegraphDotComEvents(events []Event) error {
+// PublishSourcegraphDotComEvents publishes Sourcegraph.com events to BigQuery.
+func PublishSourcegraphDotComEvents(events []Event) error {
 	if !envvar.SourcegraphDotComMode() {
 		return nil
 	}
