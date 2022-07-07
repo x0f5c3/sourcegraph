@@ -82,14 +82,13 @@ func LogEvents(ctx context.Context, db database.DB, events []Event) error {
 		return nil
 	}
 
-	if envvar.SourcegraphDotComMode() {
+	if envvar.SourcegraphDotComMode() || envvar.ExportRawTelemetry() {
 		go func() {
 			if err := publishSourcegraphDotComEvents(events); err != nil {
 				log15.Error("publishSourcegraphDotComEvents failed", "err", err)
 			}
 		}()
 	}
-
 	if err := logLocalEvents(ctx, db, events); err != nil {
 		return err
 	}
