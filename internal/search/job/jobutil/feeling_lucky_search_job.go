@@ -3,6 +3,8 @@ package jobutil
 import (
 	"context"
 	"fmt"
+	"net/url"
+	"regexp"
 	"strings"
 
 	"github.com/go-enry/go-enry/v2"
@@ -398,6 +400,197 @@ func typePatterns(b query.Basic) *query.Basic {
 	}
 }
 
+var lookup = map[string]struct{}{
+	"github.com": struct{}{},
+	"gitlab.com": struct{}{},
+}
+
+// patternToCodeHostFilters checks if a pattern contains a code host URL and
+// extracts the org/repo/branch and path and lifts these to filters, as
+// applicable.
+func patternToCodeHostFilters(v string, negated bool) *[]query.Node {
+	if !strings.HasPrefix(v, "https://") {
+		// normalize v with https:// prefix.
+		v = "https://" + v
+	}
+
+	u, err := url.Parse(v)
+	if err != nil {
+		return nil
+	}
+
+	domain := strings.TrimPrefix(u.Host, "www.")
+	if _, ok := lookup[domain]; !ok {
+		return nil
+	}
+
+	var value string
+	path := strings.Trim(u.Path, "/")
+	pathElems := strings.Split(path, "/")
+	if len(pathElems) == 0 {
+		value = regexp.QuoteMeta(domain)
+		value = fmt.Sprintf("^%s", value)
+
+		return &[]query.Node{
+			query.Parameter{
+				Field:      query.FieldRepo,
+				Value:      value,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			}}
+	} else if len(pathElems) == 1 {
+		value = regexp.QuoteMeta(domain)
+		value = fmt.Sprintf("^%s/%s", value, strings.Join(pathElems, "/"))
+
+		return &[]query.Node{
+			query.Parameter{
+				Field:      query.FieldRepo,
+				Value:      value,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			}}
+	} else if len(pathElems) == 2 {
+		value = regexp.QuoteMeta(domain)
+		value = fmt.Sprintf("^%s/%s$", value, strings.Join(pathElems, "/"))
+
+		return &[]query.Node{
+			query.Parameter{
+				Field:      query.FieldRepo,
+				Value:      value,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			}}
+	} else if len(pathElems) >= 5 {
+		repoValue := regexp.QuoteMeta(domain)
+		repoValue = fmt.Sprintf("^%s/%s$", repoValue, strings.Join(pathElems[:2], "/"))
+
+		revision := pathElems[3]
+
+		pathValue := strings.Join(pathElems[4:], "/")
+		pathValue = regexp.QuoteMeta(pathValue)
+
+		if pathElems[2] == "blob" {
+			pathValue = fmt.Sprintf("^%s$", pathValue)
+		} else if pathElems[2] == "tree" {
+			pathValue = fmt.Sprintf("^%s", pathValue)
+		} else {
+			// Don't know what this is.
+			return nil
+		}
+
+		return &[]query.Node{
+			query.Parameter{
+				Field:      query.FieldRepo,
+				Value:      repoValue,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			},
+			query.Parameter{
+				Field:      query.FieldRev,
+				Value:      revision,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			},
+			query.Parameter{
+				Field:      query.FieldFile,
+				Value:      pathValue,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			},
+		}
+	}
+
+	return nil
+}
+
+// patternToPathLikeFilter checks if a pattern contains a `/` and promotes
+// it to the respective filter (`path` or `repo`) if applicable.
+func patternToPathLikeFilter(value string, negated bool) *[]query.Node {
+	value = strings.Trim(value, "/")
+	if !strings.Contains(value, "/") {
+		return nil
+	}
+
+	node := query.NewOperator(
+		[]query.Node{
+			query.Parameter{
+				Field:      query.FieldRepo,
+				Value:      value,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			},
+			query.Parameter{
+				Field:      query.FieldFile,
+				Value:      value,
+				Negated:    negated,
+				Annotation: query.Annotation{},
+			},
+		}, query.Or)
+
+	return &node
+}
+
+// patternsAsPathFilters converts patterns to `repo` or `path` filters if they
+// can be interpreted as URIs.
+func patternsAsPathFilters(b query.Basic) *query.Basic {
+	rawPatternTree, err := query.Parse(query.StringHuman([]query.Node{b.Pattern}), query.SearchTypeStandard)
+	if err != nil {
+		return nil
+	}
+
+	filterParams := []query.Node{}
+	changed := false
+	newParseTree := query.MapPattern(rawPatternTree, func(value string, negated bool, annotation query.Annotation) query.Node {
+		if params := patternToCodeHostFilters(value, negated); params != nil {
+			changed = true
+			filterParams = append(filterParams, *params...)
+			// Collect the param and delete pattern. We're going to
+			// add those parameters after. We can't map patterns
+			// in-place because that might create parameters in
+			// concat nodes.
+			return nil
+		}
+
+		if params := patternToPathLikeFilter(value, negated); params != nil {
+			fmt.Printf("bingo: %s\n", value)
+			changed = true
+			fmt.Printf("new params: %s\n", query.StringHuman(*params))
+			filterParams = append(filterParams, *params...)
+			// Collect the param and delete pattern. We're going to
+			// add those parameters after. We can't map patterns
+			// in-place because that might create parameters in
+			// concat nodes.
+			return nil
+		}
+
+		return query.Pattern{
+			Value:      value,
+			Negated:    negated,
+			Annotation: annotation,
+		}
+	})
+
+	if !changed {
+		return nil
+	}
+
+	newParseTree = query.NewOperator(append(newParseTree, filterParams...), query.And) // Reduce with NewOperator to obtain valid partitioning.
+	fmt.Printf("generated: %s\n", query.StringHuman(newParseTree))
+	newNodes, err := query.Sequence(query.For(query.SearchTypeStandard))(newParseTree)
+	if err != nil {
+		fmt.Printf("err 1")
+		return nil
+	}
+
+	newBasic, err := query.ToBasicQuery(newNodes)
+	if err != nil {
+		fmt.Printf("err 2: %s\n", err.Error())
+		return nil
+	}
+
+	return &newBasic
+}
+
 func NewGeneratedSearchJob(inputs *run.SearchInputs, autoQ *autoQuery) (job.Job, error) {
 	child, err := NewBasicJob(inputs, autoQ.query)
 	if err != nil {
@@ -495,6 +688,10 @@ var rulesNarrow = []rule{
 	{
 		description: "apply language filter for pattern",
 		transform:   transform{langPatterns},
+	},
+	{
+		description: "expand URL to filters",
+		transform:   transform{patternsAsPathFilters},
 	},
 }
 
