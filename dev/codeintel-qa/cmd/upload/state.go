@@ -74,7 +74,7 @@ func monitor(ctx context.Context, repoNames []string, uploads []uploadMeta) erro
 						fmt.Printf("[%5s] %s Finished processing index for %s@%s\n", internal.TimeSince(start), internal.EmojiSuccess, repoName, uploadState.upload.commit[:7])
 					}
 				} else if uploadState.state != "QUEUED" && uploadState.state != "PROCESSING" {
-					return errors.Newf("unexpected state '%s' for %s@%s", uploadState.state, uploadState.upload.repoName, uploadState.upload.commit[:7])
+					return errors.Newf("unexpected state '%s' for %s@%s\nAudit Logs:\n%s", uploadState.state, uploadState.upload.repoName, uploadState.upload.commit[:7], uploadState.auditLogs)
 				}
 			}
 
@@ -116,9 +116,55 @@ type repoState struct {
 }
 
 type uploadState struct {
-	upload  uploadMeta
-	state   string
-	failure string
+	upload    uploadMeta
+	state     string
+	failure   string
+	auditLogs auditLogs
+}
+
+type auditLogs []auditLog
+
+type auditLog struct {
+	logTimestamp   time.Time
+	reason         string
+	operation      string
+	changedColumns []auditLogChangedColumn
+}
+
+type auditLogChangedColumn struct {
+	old    *string
+	new    *string
+	column string
+}
+
+func (a auditLogs) String() string {
+	var s strings.Builder
+
+	for _, log := range a {
+		s.WriteString("Time: ")
+		s.WriteString(log.logTimestamp.String())
+		s.Write([]byte("\n\t"))
+		s.WriteString("Operation: ")
+		s.WriteString(log.operation)
+		s.Write([]byte("\n\t"))
+		if log.reason != "" {
+			s.WriteString(log.reason)
+			s.Write([]byte("\n\t\t"))
+		}
+		for _, change := range log.changedColumns {
+			s.WriteString(fmt.Sprintf("Column: '%s', Old: '%s', New: '%s'", change.column, ptrPrint(change.old), ptrPrint(change.new)))
+			s.Write([]byte("\n\t\t"))
+		}
+	}
+
+	return s.String()
+}
+
+func ptrPrint(s *string) string {
+	if s == nil {
+		return "NULL"
+	}
+	return *s
 }
 
 // queryRepoState makes a GraphQL request for the given repositories and uploads and
@@ -155,14 +201,37 @@ func queryRepoState(_ context.Context, repoNames []string, uploads []uploadMeta)
 			index, _ := strconv.Atoi(name[1:])
 			upload := uploads[index]
 
-			state[upload.repoName] = repoState{
-				stale: state[upload.repoName].stale,
-				uploadStates: append(state[upload.repoName].uploadStates, uploadState{
-					upload:  upload,
-					state:   data.State,
-					failure: data.Failure,
-				}),
+			uState := uploadState{
+				upload:    upload,
+				state:     data.State,
+				failure:   data.Failure,
+				auditLogs: []auditLog{},
 			}
+
+			for _, log := range data.AuditLogs {
+				aLog := auditLog{
+					logTimestamp: log.LogTimestamp,
+					reason:       log.Reason,
+					operation:    log.Operation,
+				}
+
+				for _, change := range log.ChangedColumns {
+					aLog.changedColumns = append(aLog.changedColumns, auditLogChangedColumn{
+						old:    change.Old,
+						new:    change.New,
+						column: change.Column,
+					})
+				}
+
+				uState.auditLogs = append(uState.auditLogs, aLog)
+			}
+
+			repoState := repoState{
+				stale:        state[upload.repoName].stale,
+				uploadStates: append(state[upload.repoName].uploadStates, uState),
+			}
+
+			state[upload.repoName] = repoState
 		}
 	}
 
@@ -195,13 +264,32 @@ const uploadQueryFragment = `
 		... on LSIFUpload {
 			state
 			failure
+			auditLogs {
+				logTimestamp
+				reason
+				operation
+				changedColumns {
+					old
+					new
+				}
+			}
 		}
 	}
 `
 
 type jsonUploadResult struct {
-	State       string                `json:"state"`
-	Failure     string                `json:"failure"`
+	State     string `json:"state"`
+	Failure   string `json:"failure"`
+	AuditLogs []struct {
+		LogTimestamp   time.Time `json:"logTimestamp"`
+		Reason         string    `json:"reason"`
+		Operation      string    `json:"operation"`
+		ChangedColumns []struct {
+			Old    *string `json:"old"`
+			New    *string `json:"new"`
+			Column string  `json:"column"`
+		} `json:"changedColumns"`
+	} `json:"auditLogs"`
 	CommitGraph jsonCommitGraphResult `json:"codeIntelligenceCommitGraph"`
 }
 
