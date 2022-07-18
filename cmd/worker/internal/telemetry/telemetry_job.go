@@ -49,23 +49,28 @@ func NewTelemetryUploader(db database.DB) goroutine.BackgroundRoutine {
 	}
 	operation := observationContext.Operation(observation.Op{}) // todo
 
-	return goroutine.NewPeriodicGoroutineWithMetrics(context.Background(), time.Minute*30, &telemetryHandler{}, operation)
+	return goroutine.NewPeriodicGoroutineWithMetrics(context.Background(), time.Minute*1, &telemetryHandler{}, operation)
 }
 
 type telemetryHandler struct {
 	db database.DB
 }
 
-const MAX_EVENTS_COUNT = 5000 // todo setting
+const MAX_EVENTS_COUNT_DEFAULT = 5000 // todo setting
 
 func (t *telemetryHandler) Handle(ctx context.Context) error {
+	// first check if we are still allowed to collect this telemetry
+	// ie. has the value of the setting changed since we started up?
+
+	// load the latest configuration for max event count, or default to above
+
 	last, err := t.fetchBookmark(ctx)
 	if err != nil {
 		return err
 	}
 
 	// todo transaction
-	events, err := t.fetchEvents(ctx, last, MAX_EVENTS_COUNT)
+	events, err := t.fetchEvents(ctx, last, MAX_EVENTS_COUNT_DEFAULT)
 	if err != nil {
 		return err
 	}
