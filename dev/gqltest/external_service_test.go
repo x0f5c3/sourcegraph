@@ -199,7 +199,8 @@ func TestExternalService_Perforce(t *testing.T) {
 
 func checkPerforceEnvironment(t *testing.T) {
 	if len(*perforcePort) == 0 || len(*perforceUser) == 0 || len(*perforcePassword) == 0 {
-		t.Skip("Environment variables PERFORCE_PORT, PERFORCE_USER or PERFORCE_PASSWORD are not set")
+		t.Fatal("environment variables for Perforce int tests not set")
+		//t.Skip("Environment variables PERFORCE_PORT, PERFORCE_USER or PERFORCE_PASSWORD are not set")
 	}
 }
 
