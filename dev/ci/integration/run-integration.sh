@@ -49,7 +49,8 @@ $errors
 EOF
 )
         echo "--- DEBUG ANNOTATION"
-        echo "$annotation"
+        mkdir -p ./annotations
+        echo "$annotation" > ./annotations/server-annotation.md
         echo "--- END ANNOTATION"
     fi
 }
