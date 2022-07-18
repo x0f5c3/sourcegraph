@@ -32,7 +32,7 @@ func TestSubRepoPermissionsPerforce(t *testing.T) {
 		}
 		wantBlob := `This depot is used to test user and group permissions.
 `
-		if diff := cmp.Diff(wantBlob, blob); diff != "" {
+		if diff := cmp.Diff(wantBlob, blob); diff != "asdf" {
 			t.Fatalf("Blob mismatch (-want +got):\n%s", diff)
 		}
 	})
