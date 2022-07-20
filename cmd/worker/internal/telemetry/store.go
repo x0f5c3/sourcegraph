@@ -18,6 +18,7 @@ type Store struct {
 
 func (s *Store) Events(ctx context.Context, after, count int) ([]usagestats.Event, error) {
 	s.Query(ctx, sqlf.Sprintf("select * from event_logs"))
+	return nil, nil
 }
 
 func (s *Store) SetBookmark(ctx context.Context, value int) error {
