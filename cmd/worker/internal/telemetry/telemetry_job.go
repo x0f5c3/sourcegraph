@@ -4,7 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/sourcegraph/sourcegraph/internal/usagestats"
+	"github.com/sourcegraph/sourcegraph/lib/errors"
+
+	"github.com/sourcegraph/sourcegraph/internal/conf"
 
 	workerdb "github.com/sourcegraph/sourcegraph/cmd/worker/shared/init/db"
 
@@ -20,82 +22,65 @@ import (
 
 type telemetryJob struct{}
 
+func NewTelemetryJob() *telemetryJob {
+	return &telemetryJob{}
+}
+
 func (t *telemetryJob) Description() string {
-	// TODO implement me
-	panic("implement me")
+	return "A background routine that exports usage telemetry to Sourcegraph"
 }
 
 func (t *telemetryJob) Config() []env.Config {
-	// TODO implement me
-	panic("implement me")
+	return nil
 }
 
 func (t *telemetryJob) Routines(ctx context.Context, logger log.Logger) ([]goroutine.BackgroundRoutine, error) {
+	if !isEnabled() {
+		return nil, nil
+	}
+	logger.Info("Usage telemetry export enabled - initializing background routine")
+
 	db, err := workerdb.Init()
 	if err != nil {
 		return nil, err
 	}
 
 	return []goroutine.BackgroundRoutine{
-		NewTelemetryUploader(database.NewDB(logger, db)),
+		newBackgroundTelemetryJob(database.NewDB(logger, db), logger),
 	}, nil
 }
 
-func NewTelemetryUploader(db database.DB) goroutine.BackgroundRoutine {
-
+func newBackgroundTelemetryJob(db database.DB, logger log.Logger) goroutine.BackgroundRoutine {
 	observationContext := &observation.Context{
 		Tracer:     &trace.Tracer{Tracer: opentracing.GlobalTracer()},
 		Registerer: prometheus.NewRegistry(),
 	}
-	operation := observationContext.Operation(observation.Op{}) // todo
+	operation := observationContext.Operation(observation.Op{})
 
-	return goroutine.NewPeriodicGoroutineWithMetrics(context.Background(), time.Minute*1, &telemetryHandler{}, operation)
+	return goroutine.NewPeriodicGoroutineWithMetrics(context.Background(), time.Minute*1, &telemetryHandler{db: db, logger: logger}, operation)
 }
 
 type telemetryHandler struct {
-	db database.DB
+	db     database.DB
+	logger log.Logger
 }
 
-const MAX_EVENTS_COUNT_DEFAULT = 5000 // todo setting
+var disabledErr = errors.New("Usage telemetry export is disabled, but the background job is attempting to execute. This means the configuration was disabled without restarting the worker service. This job is aborting, and no telemetry will be exported.")
 
 func (t *telemetryHandler) Handle(ctx context.Context) error {
-	// first check if we are still allowed to collect this telemetry
-	// ie. has the value of the setting changed since we started up?
-
-	// load the latest configuration for max event count, or default to above
-
-	last, err := t.fetchBookmark(ctx)
-	if err != nil {
-		return err
+	if !isEnabled() {
+		return disabledErr
 	}
 
-	// todo transaction
-	events, err := t.fetchEvents(ctx, last, MAX_EVENTS_COUNT_DEFAULT)
-	if err != nil {
-		return err
-	}
-	if len(events) == 0 {
-		return nil
-	}
-	if err = usagestats.PublishSourcegraphDotComEvents(events); err != nil {
-		return err
-	}
-	newLast := *events[len(events)-1].EventID // todo verify this is the correct field
-	if err := t.stampBookmark(ctx, int(newLast)); err != nil {
-		return err
-	}
-
+	t.logger.Info("telemetryHandler executed")
 	return nil
 }
 
-func (t *telemetryHandler) fetchBookmark(ctx context.Context) (int, error) {
+func isEnabled() bool {
+	ptr := conf.Get().ExportUsageTelemetry
+	if ptr != nil {
+		return ptr.Enabled
+	}
 
-}
-
-func (t *telemetryHandler) stampBookmark(ctx context.Context, last int) error {
-
-}
-
-func (t *telemetryHandler) fetchEvents(ctx context.Context, after, count int) ([]usagestats.Event, error) {
-
+	return false
 }
