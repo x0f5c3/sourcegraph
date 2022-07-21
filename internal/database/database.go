@@ -40,6 +40,7 @@ type DB interface {
 	RepoKVPs() RepoKVPStore
 	SavedSearches() SavedSearchStore
 	SearchContexts() SearchContextsStore
+	Services() ServicesStore
 	Settings() SettingsStore
 	SubRepoPerms() SubRepoPermsStore
 	TemporarySettings() TemporarySettingsStore
@@ -209,6 +210,10 @@ func (d *db) UserPublicRepos() UserPublicRepoStore {
 
 func (d *db) Users() UserStore {
 	return UsersWith(d.logger, d.Store)
+}
+
+func (d *db) Services() ServicesStore {
+	return ServicesWith(d.logger, d.Store)
 }
 
 func (d *db) WebhookLogs(key encryption.Key) WebhookLogStore {
