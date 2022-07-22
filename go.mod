@@ -197,7 +197,10 @@ require (
 	sigs.k8s.io/yaml v1.3.0
 )
 
-require go.opentelemetry.io/contrib/propagators/jaeger v1.7.0
+require (
+	github.com/gfleury/go-bitbucket-v1 v0.0.0-20220418082332-711d7d5e805f
+	go.opentelemetry.io/contrib/propagators/jaeger v1.7.0
+)
 
 require (
 	bitbucket.org/creachadair/shell v0.0.7 // indirect
@@ -338,7 +341,7 @@ require (
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/mitchellh/mapstructure v1.5.0 // indirect
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/moby/term v0.0.0-20210619224110-3f7ff695adc6 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
