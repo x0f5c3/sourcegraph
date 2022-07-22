@@ -50,6 +50,19 @@ var (
 	})
 )
 
+/*
+Sample program arguments:
+-admin <your bitbucket user>
+-password  <your bitbucket user's password>
+-baseURL http://ec2-54-187-175-80.us-west-2.compute.amazonaws.com/
+-deleteProjects=false
+-numSimultaneousPushes 1
+-numSimultaneousClones 1
+-numWorkers 1
+-cloneRepoTimeout 1h
+-scratchDir clones
+./internal/cmd/bb-feeder-1.0/repos.txt
+*/
 func main() {
 	admin := flag.String("admin", "", "(required) destination bb admin name")
 	token := flag.String("token", os.Getenv("BITBUCKET_TOKEN"), "(required) Bitbucket personal access token for the destination BB instance")
