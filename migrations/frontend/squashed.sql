@@ -761,6 +761,7 @@ CREATE TABLE batch_specs (
     allow_unsupported boolean DEFAULT false NOT NULL,
     allow_ignored boolean DEFAULT false NOT NULL,
     no_cache boolean DEFAULT false NOT NULL,
+    batch_change_id bigint,
     CONSTRAINT batch_specs_has_1_namespace CHECK (((namespace_user_id IS NULL) <> (namespace_org_id IS NULL)))
 );
 
@@ -3090,6 +3091,31 @@ CREATE TABLE versions (
     first_version text NOT NULL
 );
 
+CREATE SEQUENCE webhook_build_jobs_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+CREATE TABLE webhook_build_jobs (
+    repo_id integer,
+    repo_name text,
+    extsvc_kind text,
+    queued_at timestamp with time zone DEFAULT now(),
+    id integer DEFAULT nextval('webhook_build_jobs_id_seq'::regclass) NOT NULL,
+    state text DEFAULT 'queued'::text NOT NULL,
+    failure_message text,
+    started_at timestamp with time zone,
+    finished_at timestamp with time zone,
+    process_after timestamp with time zone,
+    num_resets integer DEFAULT 0 NOT NULL,
+    num_failures integer DEFAULT 0 NOT NULL,
+    execution_logs json[],
+    last_heartbeat_at timestamp with time zone,
+    worker_hostname text DEFAULT ''::text NOT NULL
+);
+
 CREATE TABLE webhook_logs (
     id bigint NOT NULL,
     received_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -3879,6 +3905,8 @@ CREATE INDEX users_created_at_idx ON users USING btree (created_at);
 
 CREATE UNIQUE INDEX users_username ON users USING btree (username) WHERE (deleted_at IS NULL);
 
+CREATE INDEX webhook_build_jobs_queued_at_idx ON webhook_build_jobs USING btree (queued_at);
+
 CREATE INDEX webhook_logs_external_service_id_idx ON webhook_logs USING btree (external_service_id);
 
 CREATE INDEX webhook_logs_received_at_idx ON webhook_logs USING btree (received_at);
@@ -3956,6 +3984,9 @@ ALTER TABLE ONLY batch_spec_workspaces
 
 ALTER TABLE ONLY batch_spec_workspaces
     ADD CONSTRAINT batch_spec_workspaces_repo_id_fkey FOREIGN KEY (repo_id) REFERENCES repo(id) DEFERRABLE;
+
+ALTER TABLE ONLY batch_specs
+    ADD CONSTRAINT batch_specs_batch_change_id_fkey FOREIGN KEY (batch_change_id) REFERENCES batch_changes(id) ON DELETE SET NULL DEFERRABLE;
 
 ALTER TABLE ONLY batch_specs
     ADD CONSTRAINT batch_specs_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL DEFERRABLE;
