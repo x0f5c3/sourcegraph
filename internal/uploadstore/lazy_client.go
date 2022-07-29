@@ -30,6 +30,14 @@ func (s *lazyStore) Get(ctx context.Context, key string) (io.ReadCloser, error) 
 	return s.store.Get(ctx, key)
 }
 
+func (s *lazyStore) GetFromOffset(ctx context.Context, key string, byteOffset int64) ([]byte, error) {
+	if err := s.initOnce(ctx); err != nil {
+		return nil, err
+	}
+
+	return s.store.GetFromOffset(ctx, key, byteOffset)
+}
+
 func (s *lazyStore) Upload(ctx context.Context, key string, r io.Reader) (int64, error) {
 	if err := s.initOnce(ctx); err != nil {
 		return 0, err

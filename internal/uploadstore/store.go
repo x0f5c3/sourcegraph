@@ -16,6 +16,9 @@ type Store interface {
 	// Get returns a reader that streams the content of the object at the given key.
 	Get(ctx context.Context, key string) (io.ReadCloser, error)
 
+	// GetFromOffset returns the bytes
+	GetFromOffset(ctx context.Context, key string, byteOffset int64) (b []byte, err error)
+
 	// Upload writes the content in the given reader to the object at the given key.
 	Upload(ctx context.Context, key string, r io.Reader) (int64, error)
 

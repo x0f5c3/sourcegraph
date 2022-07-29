@@ -94,6 +94,23 @@ func (s *gcsStore) Get(ctx context.Context, key string) (_ io.ReadCloser, err er
 	return rc, nil
 }
 
+func (s *gcsStore) GetFromOffset(ctx context.Context, key string, byteOffset int64) (b []byte, err error) {
+	ctx, _, endObservation := s.operations.GetFromOffset.With(ctx, &err, observation.Args{LogFields: []log.Field{
+		log.String("key", key),
+	}})
+	defer endObservation(1, observation.Args{})
+
+	rc, err := s.client.Bucket(s.bucket).Object(key).NewRangeReader(ctx, -1, byteOffset)
+	if err != nil {
+		return nil, errors.Wrap(err, "failed to get object")
+	}
+	defer rc.Close()
+
+	b, err = io.ReadAll(rc)
+
+	return b, errors.Wrap(err, "failed to read object bytes")
+}
+
 func (s *gcsStore) Upload(ctx context.Context, key string, r io.Reader) (_ int64, err error) {
 	ctx, _, endObservation := s.operations.Upload.With(ctx, &err, observation.Args{LogFields: []log.Field{
 		log.String("key", key),

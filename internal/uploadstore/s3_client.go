@@ -1,6 +1,7 @@
 package uploadstore
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -123,6 +124,23 @@ func (s *s3Store) Get(ctx context.Context, key string) (_ io.ReadCloser, err err
 	return io.NopCloser(reader), nil
 }
 
+func (s *s3Store) GetFromOffset(ctx context.Context, key string, byteOffset int64) (b []byte, err error) {
+	ctx, _, endObservation := s.operations.Get.With(ctx, &err, observation.Args{LogFields: []log.Field{
+		log.String("key", key),
+		log.Int64("offset", byteOffset),
+	}})
+	defer func() {
+		endObservation(1, observation.Args{
+			LogFields: []log.Field{log.Int("readAmount", len(b))},
+		})
+	}()
+
+	var buf bytes.Buffer
+	_, err = s.readObjectInto(ctx, &buf, key, byteOffset)
+
+	return buf.Bytes(), err
+}
+
 // ioCopyHook is a pointer to io.Copy. This function is replaced in unit tests so that we can
 // easily inject errors when reading from the backing S3 store.
 var ioCopyHook = io.Copy
@@ -133,6 +151,8 @@ func (s *s3Store) readObjectInto(ctx context.Context, w io.Writer, key string, b
 	var bytesRange *string
 	if byteOffset > 0 {
 		bytesRange = aws.String(fmt.Sprintf("bytes=%d-", byteOffset))
+	} else if byteOffset < 0 {
+		bytesRange = aws.String(fmt.Sprintf("bytes=%d", byteOffset))
 	}
 
 	resp, err := s.client.GetObject(ctx, &s3.GetObjectInput{

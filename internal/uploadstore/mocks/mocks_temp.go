@@ -27,6 +27,9 @@ type MockStore struct {
 	// GetFunc is an instance of a mock function object controlling the
 	// behavior of the method Get.
 	GetFunc *StoreGetFunc
+	// GetFromOffsetFunc is an instance of a mock function object
+	// controlling the behavior of the method GetFromOffset.
+	GetFromOffsetFunc *StoreGetFromOffsetFunc
 	// InitFunc is an instance of a mock function object controlling the
 	// behavior of the method Init.
 	InitFunc *StoreInitFunc
@@ -51,6 +54,11 @@ func NewMockStore() *MockStore {
 		},
 		GetFunc: &StoreGetFunc{
 			defaultHook: func(context.Context, string) (r0 io.ReadCloser, r1 error) {
+				return
+			},
+		},
+		GetFromOffsetFunc: &StoreGetFromOffsetFunc{
+			defaultHook: func(context.Context, string, int64) (r0 []byte, r1 error) {
 				return
 			},
 		},
@@ -86,6 +94,11 @@ func NewStrictMockStore() *MockStore {
 				panic("unexpected invocation of MockStore.Get")
 			},
 		},
+		GetFromOffsetFunc: &StoreGetFromOffsetFunc{
+			defaultHook: func(context.Context, string, int64) ([]byte, error) {
+				panic("unexpected invocation of MockStore.GetFromOffset")
+			},
+		},
 		InitFunc: &StoreInitFunc{
 			defaultHook: func(context.Context) error {
 				panic("unexpected invocation of MockStore.Init")
@@ -111,6 +124,9 @@ func NewMockStoreFrom(i uploadstore.Store) *MockStore {
 		},
 		GetFunc: &StoreGetFunc{
 			defaultHook: i.Get,
+		},
+		GetFromOffsetFunc: &StoreGetFromOffsetFunc{
+			defaultHook: i.GetFromOffset,
 		},
 		InitFunc: &StoreInitFunc{
 			defaultHook: i.Init,
@@ -446,6 +462,116 @@ func (c StoreGetFuncCall) Args() []interface{} {
 // Results returns an interface slice containing the results of this
 // invocation.
 func (c StoreGetFuncCall) Results() []interface{} {
+	return []interface{}{c.Result0, c.Result1}
+}
+
+// StoreGetFromOffsetFunc describes the behavior when the GetFromOffset
+// method of the parent MockStore instance is invoked.
+type StoreGetFromOffsetFunc struct {
+	defaultHook func(context.Context, string, int64) ([]byte, error)
+	hooks       []func(context.Context, string, int64) ([]byte, error)
+	history     []StoreGetFromOffsetFuncCall
+	mutex       sync.Mutex
+}
+
+// GetFromOffset delegates to the next hook function in the queue and stores
+// the parameter and result values of this invocation.
+func (m *MockStore) GetFromOffset(v0 context.Context, v1 string, v2 int64) ([]byte, error) {
+	r0, r1 := m.GetFromOffsetFunc.nextHook()(v0, v1, v2)
+	m.GetFromOffsetFunc.appendCall(StoreGetFromOffsetFuncCall{v0, v1, v2, r0, r1})
+	return r0, r1
+}
+
+// SetDefaultHook sets function that is called when the GetFromOffset method
+// of the parent MockStore instance is invoked and the hook queue is empty.
+func (f *StoreGetFromOffsetFunc) SetDefaultHook(hook func(context.Context, string, int64) ([]byte, error)) {
+	f.defaultHook = hook
+}
+
+// PushHook adds a function to the end of hook queue. Each invocation of the
+// GetFromOffset method of the parent MockStore instance invokes the hook at
+// the front of the queue and discards it. After the queue is empty, the
+// default hook function is invoked for any future action.
+func (f *StoreGetFromOffsetFunc) PushHook(hook func(context.Context, string, int64) ([]byte, error)) {
+	f.mutex.Lock()
+	f.hooks = append(f.hooks, hook)
+	f.mutex.Unlock()
+}
+
+// SetDefaultReturn calls SetDefaultHook with a function that returns the
+// given values.
+func (f *StoreGetFromOffsetFunc) SetDefaultReturn(r0 []byte, r1 error) {
+	f.SetDefaultHook(func(context.Context, string, int64) ([]byte, error) {
+		return r0, r1
+	})
+}
+
+// PushReturn calls PushHook with a function that returns the given values.
+func (f *StoreGetFromOffsetFunc) PushReturn(r0 []byte, r1 error) {
+	f.PushHook(func(context.Context, string, int64) ([]byte, error) {
+		return r0, r1
+	})
+}
+
+func (f *StoreGetFromOffsetFunc) nextHook() func(context.Context, string, int64) ([]byte, error) {
+	f.mutex.Lock()
+	defer f.mutex.Unlock()
+
+	if len(f.hooks) == 0 {
+		return f.defaultHook
+	}
+
+	hook := f.hooks[0]
+	f.hooks = f.hooks[1:]
+	return hook
+}
+
+func (f *StoreGetFromOffsetFunc) appendCall(r0 StoreGetFromOffsetFuncCall) {
+	f.mutex.Lock()
+	f.history = append(f.history, r0)
+	f.mutex.Unlock()
+}
+
+// History returns a sequence of StoreGetFromOffsetFuncCall objects
+// describing the invocations of this function.
+func (f *StoreGetFromOffsetFunc) History() []StoreGetFromOffsetFuncCall {
+	f.mutex.Lock()
+	history := make([]StoreGetFromOffsetFuncCall, len(f.history))
+	copy(history, f.history)
+	f.mutex.Unlock()
+
+	return history
+}
+
+// StoreGetFromOffsetFuncCall is an object that describes an invocation of
+// method GetFromOffset on an instance of MockStore.
+type StoreGetFromOffsetFuncCall struct {
+	// Arg0 is the value of the 1st argument passed to this method
+	// invocation.
+	Arg0 context.Context
+	// Arg1 is the value of the 2nd argument passed to this method
+	// invocation.
+	Arg1 string
+	// Arg2 is the value of the 3rd argument passed to this method
+	// invocation.
+	Arg2 int64
+	// Result0 is the value of the 1st result returned from this method
+	// invocation.
+	Result0 []byte
+	// Result1 is the value of the 2nd result returned from this method
+	// invocation.
+	Result1 error
+}
+
+// Args returns an interface slice containing the arguments of this
+// invocation.
+func (c StoreGetFromOffsetFuncCall) Args() []interface{} {
+	return []interface{}{c.Arg0, c.Arg1, c.Arg2}
+}
+
+// Results returns an interface slice containing the results of this
+// invocation.
+func (c StoreGetFromOffsetFuncCall) Results() []interface{} {
 	return []interface{}{c.Result0, c.Result1}
 }
 

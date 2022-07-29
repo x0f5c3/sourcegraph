@@ -3,6 +3,7 @@ package worker
 import (
 	"compress/gzip"
 	"context"
+	"encoding/binary"
 	"fmt"
 	"io"
 	"sync/atomic"
@@ -11,6 +12,7 @@ import (
 	"github.com/jackc/pgconn"
 	"github.com/keegancsmith/sqlf"
 	otlog "github.com/opentracing/opentracing-go/log"
+	"github.com/prometheus/client_golang/prometheus"
 
 	"github.com/sourcegraph/log"
 
@@ -38,6 +40,11 @@ type handler struct {
 	handleOp        *observation.Operation
 	budgetRemaining int64
 	enableBudget    bool
+	// Map of upload ID to uncompressed size. Uploads are deleted before
+	// PostHandle, so we store it here.
+	// Should only contain entries for processing in-progress uploads.
+	uncompressedSizes map[int]uint64
+	uploadSizeGuage   prometheus.Gauge
 }
 
 var (
@@ -82,20 +89,60 @@ func (h *handler) PreDequeue(ctx context.Context, logger log.Logger) (bool, any,
 	return true, []*sqlf.Query{sqlf.Sprintf("(upload_size IS NULL OR upload_size <= %s)", budgetRemaining)}, nil
 }
 
+const gzipSizeHintLimit = ^uint32(0)
+
 func (h *handler) PreHandle(ctx context.Context, logger log.Logger, record workerutil.Record) {
-	atomic.AddInt64(&h.budgetRemaining, -h.getSize(record))
+	gzipSize := h.getCompressedSize(record)
+
+	uncompressedSize := h.getUncompressedSize(ctx, record, gzipSize)
+	h.uploadSizeGuage.Add(float64(uncompressedSize))
+
+	atomic.AddInt64(&h.budgetRemaining, -gzipSize)
 }
 
 func (h *handler) PostHandle(ctx context.Context, logger log.Logger, record workerutil.Record) {
-	atomic.AddInt64(&h.budgetRemaining, +h.getSize(record))
+	gzipSize := h.getCompressedSize(record)
+
+	uncompressedSize := h.getUncompressedSize(ctx, record, gzipSize)
+	h.uploadSizeGuage.Sub(float64(uncompressedSize))
+
+	atomic.AddInt64(&h.budgetRemaining, +gzipSize)
 }
 
-func (h *handler) getSize(record workerutil.Record) int64 {
+func (h *handler) getCompressedSize(record workerutil.Record) int64 {
 	if size := record.(store.Upload).UploadSize; size != nil {
 		return *size
 	}
 
 	return 0
+}
+
+func (h *handler) getUncompressedSize(ctx context.Context, record workerutil.Record, compressedSize int64) uint64 {
+	if size, ok := h.uncompressedSizes[record.RecordID()]; ok {
+		delete(h.uncompressedSizes, record.RecordID())
+		return size
+	}
+
+	uploadFilename := fmt.Sprintf("upload-%d.lsif.gz", record.RecordID())
+
+	if b, err := h.uploadStore.GetFromOffset(ctx, uploadFilename, -4); err == nil {
+		// this number is limited to 2^32, so we do a guess that if the compressed size is greater
+		// than the reported uncompressed size, it hit the 2^32 limit and was modulo'd,
+		// as per RFC 1952 Section 2.3.1 https://datatracker.ietf.org/doc/html/rfc1952#page-6&:~:text=ISIZE%20(Input%20SIZE)
+		uncompressedSize := uint64(binary.LittleEndian.Uint32(b))
+		fmt.Println(uncompressedSize, compressedSize)
+		if uncompressedSize < uint64(compressedSize) {
+			uncompressedSize += uint64(gzipSizeHintLimit)
+		}
+		fmt.Println(uncompressedSize, compressedSize)
+		h.uncompressedSizes[record.RecordID()] = uncompressedSize
+
+		return uncompressedSize
+	}
+
+	// return compressed size instead of 0, failure to get uncompressed size
+	// is noted in the error rate panel for GetFromOffset
+	return uint64(compressedSize)
 }
 
 // handle converts a raw upload into a dump within the given transaction context. Returns true if the
