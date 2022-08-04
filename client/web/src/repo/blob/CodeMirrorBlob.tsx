@@ -83,6 +83,7 @@ export const Blob: React.FunctionComponent<BlobProps> = props => {
         // Reference panel specific props
         disableStatusBar,
         disableDecorations,
+        'data-testid': dataTestId,
     } = props
 
     const [container, setContainer] = useState<HTMLDivElement | null>(null)
@@ -246,7 +247,16 @@ export const Blob: React.FunctionComponent<BlobProps> = props => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [position, hasPin])
 
-    return <div ref={setContainer} aria-label={ariaLabel} role={role} className={`${className} overflow-hidden`} />
+    return (
+        <div
+            ref={setContainer}
+            data-testid={dataTestId}
+            aria-label={ariaLabel}
+            role={role}
+            className={`${className} overflow-hidden`}
+            data-editor="codemirror6"
+        />
+    )
 }
 
 /**
