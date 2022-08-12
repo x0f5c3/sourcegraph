@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -167,6 +168,7 @@ func (p *Provider) FetchUserPerms(ctx context.Context, account *extsvc.Account, 
 
 	// -u User : Displays protection lines that apply to the named user. This option
 	// requires super access.
+	fmt.Printf("XXXXXX Fetching protects output for user %s XXXXXX\n", user.Username)
 	rc, _, err := p.p4Execer.P4Exec(ctx, p.host, p.user, p.password, "protects", "-u", user.Username)
 	if err != nil {
 		return nil, errors.Wrap(err, "list ACLs by user")
@@ -176,11 +178,13 @@ func (p *Provider) FetchUserPerms(ctx context.Context, account *extsvc.Account, 
 	// Pull permissions from protects file.
 	perms := &authz.ExternalUserPermissions{}
 	if len(p.depots) == 0 {
+		fmt.Println("XXXXXXX No Depots Specified XXXXXX")
 		err = errors.Wrap(scanProtects(rc, repoIncludesExcludesScanner(perms)), "repoIncludesExcludesScanner")
 	} else {
 		// SubRepoPermissions-enabled code path
 		perms.SubRepoPermissions = make(map[extsvc.RepoID]*authz.SubRepoPermissions, len(p.depots))
 		err = errors.Wrap(scanProtects(rc, fullRepoPermsScanner(perms, p.depots)), "fullRepoPermsScanner")
+		fmt.Printf("XXXXXX Sub Repo Perms: %v XXXXXX\n", perms.SubRepoPermissions[p.depots[0]])
 	}
 
 	// As per interface definition for this method, implementation should return
