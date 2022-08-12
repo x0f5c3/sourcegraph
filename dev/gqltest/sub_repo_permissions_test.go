@@ -25,6 +25,11 @@ func TestSubRepoPermissionsPerforce(t *testing.T) {
 
 	aliceUserID := userClient.AuthenticatedUserID()
 	fmt.Printf("authenticated user: %s\n", aliceUserID)
+	permsInfo, err := client.RepositoryPermissionsInfo(repoName)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Printf("unrestricted?: %v\n", permsInfo.Unrestricted)
 	// Test cases
 
 	t.Run("can read README.md", func(t *testing.T) {
