@@ -23,6 +23,8 @@ func TestSubRepoPermissionsPerforce(t *testing.T) {
 	createPerforceExternalService(t)
 	userClient, repoName := createTestUserAndWaitForRepo(t)
 
+	aliceUserID := userClient.AuthenticatedUserID()
+	fmt.Printf("authenticated user: %s\n", aliceUserID)
 	// Test cases
 
 	t.Run("can read README.md", func(t *testing.T) {
@@ -204,9 +206,10 @@ func TestSubRepoPermissionsSearch(t *testing.T) {
 		}
 		// Alice should have access to only 1 commit at the moment (other 2 commits modify hack.sh which is
 		// inaccessible for Alice)
+		// TODO: Alice now has access to 2 commits with recent code changes to update the filtering of commits when sub-repo perms are enabled
 		commitsNumber := len(results.Results)
-		if commitsNumber != 1 {
-			t.Fatalf("Should have access to 1 commit but got %d", commitsNumber)
+		if commitsNumber != 2 {
+			t.Fatalf("Should have access to 2 commits but got %d", commitsNumber)
 		}
 	})
 
@@ -216,6 +219,7 @@ func TestSubRepoPermissionsSearch(t *testing.T) {
 		hasAccess bool
 	}{
 		{
+			// I'm not seeing this commit at all in the commit history. Is it just a commit that doesn't exist at all?
 			name:     "direct access to inaccessible commit",
 			revision: "87440329a7bae580b90280aaaafdc14ee7c1f8ef",
 		},
@@ -224,10 +228,13 @@ func TestSubRepoPermissionsSearch(t *testing.T) {
 			revision:  "36d7eda16b9a881ef153126a4036efc4f6afb0c1",
 			hasAccess: true,
 		},
-		{
-			name:     "direct access to inaccessible commit-2",
-			revision: "d9d835aa4b08e1dcb06a21a6dffe6e44f0a141d1",
-		},
+		// TODO: this commit now can be accessed since we've updated our handling of commit filtering to show commits that modify _any_ file the user has access to
+		// we just filter out the files the user doesn't have access to when showing the diff. The todo is to add a new commit that modifies _only_ a file that the user
+		// doesn't have access to, and add that here instead.
+		//{
+		//	name:     "direct access to inaccessible commit-2",
+		//	revision: "d9d835aa4b08e1dcb06a21a6dffe6e44f0a141d1",
+		//},
 	}
 
 	for _, test := range commitAccessTests {
