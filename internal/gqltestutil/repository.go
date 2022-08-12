@@ -2,6 +2,7 @@ package gqltestutil
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/sourcegraph/sourcegraph/lib/errors"
@@ -114,7 +115,9 @@ func (c *Client) waitForReposByQuery(query string, repos ...string) ([]string, e
 	for _, repo := range repos {
 		repoSet[repo] = struct{}{}
 	}
+	fmt.Printf("authenticated user: %s\n", c.AuthenticatedUserID())
 	for _, node := range resp.Data.Repositories.Nodes {
+		fmt.Printf("found repo: %s\n", node)
 		delete(repoSet, node.Name)
 	}
 	if len(repoSet) > 0 {

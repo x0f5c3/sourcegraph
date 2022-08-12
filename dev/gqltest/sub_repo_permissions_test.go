@@ -23,13 +23,6 @@ func TestSubRepoPermissionsPerforce(t *testing.T) {
 	createPerforceExternalService(t)
 	userClient, repoName := createTestUserAndWaitForRepo(t)
 
-	aliceUserID := userClient.AuthenticatedUserID()
-	fmt.Printf("authenticated user: %s\n", aliceUserID)
-	permsInfo, err := client.RepositoryPermissionsInfo(repoName)
-	if err != nil {
-		t.Error(err)
-	}
-	fmt.Printf("unrestricted?: %v\n", permsInfo.Unrestricted)
 	// Test cases
 
 	t.Run("can read README.md", func(t *testing.T) {
@@ -297,6 +290,7 @@ func createTestUserAndWaitForRepo(t *testing.T) (*gqltestutil.Client, string) {
 	}
 
 	aliceID := userClient.AuthenticatedUserID()
+	fmt.Printf("alice id: %s\n", aliceID)
 	t.Cleanup(func() {
 		if err := client.DeleteUser(aliceID, true); err != nil {
 			t.Fatal(err)
