@@ -16515,7 +16515,7 @@
       "Columns": [
         {
           "Name": "health_check_path",
-          "Index": 4,
+          "Index": 5,
           "TypeName": "text",
           "IsNullable": false,
           "Default": "",
@@ -16525,6 +16525,19 @@
           "IsGenerated": "NEVER",
           "GenerationExpression": "",
           "Comment": "(Optional) A path such that ip:port/health_check_path serves a health check"
+        },
+        {
+          "Name": "hostname",
+          "Index": 3,
+          "TypeName": "text",
+          "IsNullable": false,
+          "Default": "",
+          "CharacterMaximumLength": 0,
+          "IsIdentity": false,
+          "IdentityGeneration": "",
+          "IsGenerated": "NEVER",
+          "GenerationExpression": "",
+          "Comment": ""
         },
         {
           "Name": "ip",
@@ -16541,7 +16554,7 @@
         },
         {
           "Name": "last_heartbeat",
-          "Index": 5,
+          "Index": 6,
           "TypeName": "timestamp with time zone",
           "IsNullable": true,
           "Default": "now()",
@@ -16567,7 +16580,7 @@
         },
         {
           "Name": "service",
-          "Index": 3,
+          "Index": 4,
           "TypeName": "text",
           "IsNullable": false,
           "Default": "",

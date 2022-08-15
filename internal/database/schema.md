@@ -2562,6 +2562,7 @@ Contains security-relevant events with a long time horizon for storage.
 -------------------+--------------------------+-----------+----------+---------
  ip                | text                     |           | not null | 
  port              | integer                  |           | not null | 
+ hostname          | text                     |           | not null | 
  service           | text                     |           | not null | 
  health_check_path | text                     |           | not null | 
  last_heartbeat    | timestamp with time zone |           |          | now()

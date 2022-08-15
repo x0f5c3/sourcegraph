@@ -2948,6 +2948,7 @@ ALTER SEQUENCE security_event_logs_id_seq OWNED BY security_event_logs.id;
 CREATE TABLE service_registry (
     ip text NOT NULL,
     port integer NOT NULL,
+    hostname text NOT NULL,
     service text NOT NULL,
     health_check_path text NOT NULL,
     last_heartbeat timestamp with time zone DEFAULT now()
