@@ -291,6 +291,11 @@ func createTestUserAndWaitForRepo(t *testing.T) (*gqltestutil.Client, string) {
 
 	aliceID := userClient.AuthenticatedUserID()
 	fmt.Printf("alice id: %s\n", aliceID)
+	alicePerms, err := client.UserPermissions("alice")
+	if err != nil {
+		fmt.Printf("error getting alice's perms: %s", err)
+	}
+	fmt.Printf("alice perms: %s\n", alicePerms)
 	t.Cleanup(func() {
 		if err := client.DeleteUser(aliceID, true); err != nil {
 			t.Fatal(err)
