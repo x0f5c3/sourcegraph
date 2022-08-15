@@ -41,6 +41,7 @@ func TestServiceRegistry(t *testing.T) {
 	id1, err := store.Register(ctx, service, ServiceArgs{
 		IP:              addr,
 		Port:            1234,
+		Hostname:        "host1",
 		HealthCheckPath: "/foo/bar",
 	})
 	if err != nil {
@@ -50,6 +51,7 @@ func TestServiceRegistry(t *testing.T) {
 	_, err = store.Register(ctx, service, ServiceArgs{
 		IP:              addr,
 		Port:            1235,
+		Hostname:        "host2",
 		HealthCheckPath: "/foo/bar",
 	})
 	if err != nil {
@@ -80,6 +82,10 @@ func TestServiceRegistry(t *testing.T) {
 	}
 	if len(instances) != 1 {
 		t.Fatal("expected 1 instance")
+	}
+
+	if got := instances[0].Hostname; got != "host2" {
+		t.Fatalf("want %q, got %q", "host2", got)
 	}
 
 	err = store.Invalidate(ctx, 0*time.Second)

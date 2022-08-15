@@ -166,6 +166,11 @@ func newServiceRegisterHandler(db database.DB) func(w http.ResponseWriter, r *ht
 			http.Error(w, "missing port", http.StatusBadRequest)
 			return
 		}
+
+		if args.Hostname == "" {
+			http.Error(w, "missing hostname", http.StatusBadRequest)
+		}
+
 		args.IP = ip
 
 		id, err := db.Services().Register(r.Context(), vars["name"], args)

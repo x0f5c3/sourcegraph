@@ -19,7 +19,9 @@ type ServiceArgs struct {
 
 	// Required
 	// Valid ports are >0.
-	Port uint16 `json:"port" json:"port"`
+	Port uint16 `json:"port"`
+	// The self-reported hostname of the server.
+	Hostname string `json:"hostname"`
 
 	// Optional
 	HealthCheckPath string `json:"health_check_path" json:"health_check_path"`
@@ -50,11 +52,11 @@ var _ ServicesStore = (*servicesStore)(nil)
 
 const registerFmtStr = `
 -- source: /internal/database/service_registry.go:Register
-INSERT INTO service_registry (service, ip, port, health_check_path)
-VALUES (%s, %s, %d, %s)`
+INSERT INTO service_registry (service, ip, port, hostname, health_check_path)
+VALUES (%s, %s, %d, %s, %s)`
 
 func (s servicesStore) Register(ctx context.Context, service string, args ServiceArgs) (string, error) {
-	err := s.Exec(ctx, sqlf.Sprintf(registerFmtStr, service, args.IP.String(), args.Port, args.HealthCheckPath))
+	err := s.Exec(ctx, sqlf.Sprintf(registerFmtStr, service, args.IP.String(), args.Port, args.Hostname, args.HealthCheckPath))
 	if err != nil {
 		return "", err
 	}
@@ -120,7 +122,7 @@ func (e NotFoundError) NotFound() bool {
 
 const getByServiceFmtStr = `
 -- source: /internal/database/service_registry.go:GetByService
-SELECT ip, port, health_check_path FROM service_registry where service = %s`
+SELECT ip, port, hostname, health_check_path FROM service_registry where service = %s`
 
 func (s servicesStore) GetByService(ctx context.Context, service string) (instances []ServiceArgs, err error) {
 	rows, err := s.Query(ctx, sqlf.Sprintf(getByServiceFmtStr, service))
@@ -135,6 +137,7 @@ func (s servicesStore) GetByService(ctx context.Context, service string) (instan
 		if err := rows.Scan(
 			&ipStr,
 			&instance.Port,
+			&instance.Hostname,
 			&instance.HealthCheckPath,
 		); err != nil {
 			return nil, err

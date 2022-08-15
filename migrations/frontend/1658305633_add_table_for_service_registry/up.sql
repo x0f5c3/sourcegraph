@@ -2,6 +2,7 @@ CREATE TABLE IF NOT EXISTS service_registry
 (
     ip                text,
     port              integer NOT NULL,
+    hostname          text    NOT NULL,
     service           text    NOT NULL,
     health_check_path text    NOT NULL,
     last_heartbeat    timestamp with time zone DEFAULT now(),
