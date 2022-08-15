@@ -493,7 +493,7 @@ func (c *clientImplementor) lStat(ctx context.Context, checker authz.SubRepoPerm
 	// Applying sub-repo permissions
 	a := actor.FromContext(ctx)
 	include, filteringErr := authz.FilterActorFileInfo(ctx, checker, a, repo, fis[0])
-	fmt.Printf("should include? %s\n", include)
+	fmt.Printf("should include? %v\n", include)
 	if include && filteringErr == nil {
 		return fis[0], nil
 	} else {
