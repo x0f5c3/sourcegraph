@@ -440,7 +440,7 @@ Query: `sum(increase(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourc
 
 #### frontend: codeintel_resolvers_error_rate
 
-<p class="subtitle">Aggregate graphql operation error rate over 5m</p>
+<p class="subtitle">Aggregate graphql operation error rate</p>
 
 This panel has no related alerts.
 
@@ -451,7 +451,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100303`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_resolvers_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_resolvers_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -516,7 +516,7 @@ Query: `sum by (op)(increase(src_codeintel_resolvers_errors_total{job=~"^(fronte
 
 #### frontend: codeintel_resolvers_error_rate
 
-<p class="subtitle">Graphql operation error rate over 5m</p>
+<p class="subtitle">Graphql operation error rate</p>
 
 This panel has no related alerts.
 
@@ -527,7 +527,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100313`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_resolvers_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_resolvers_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_resolvers_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -594,7 +594,7 @@ Query: `sum(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(front
 
 #### frontend: codeintel_autoindex_enqueuer_error_rate
 
-<p class="subtitle">Aggregate enqueuer operation error rate over 5m</p>
+<p class="subtitle">Aggregate enqueuer operation error rate</p>
 
 This panel has no related alerts.
 
@@ -605,7 +605,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100403`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_autoindex_enqueuer_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_autoindex_enqueuer_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -670,7 +670,7 @@ Query: `sum by (op)(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~
 
 #### frontend: codeintel_autoindex_enqueuer_error_rate
 
-<p class="subtitle">Enqueuer operation error rate over 5m</p>
+<p class="subtitle">Enqueuer operation error rate</p>
 
 This panel has no related alerts.
 
@@ -681,7 +681,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100413`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_autoindex_enqueuer_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_autoindex_enqueuer_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_autoindex_enqueuer_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -748,7 +748,7 @@ Query: `sum(increase(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourceg
 
 #### frontend: codeintel_dbstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -759,7 +759,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100503`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -824,7 +824,7 @@ Query: `sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^(frontend
 
 #### frontend: codeintel_dbstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -835,7 +835,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100513`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -902,7 +902,7 @@ Query: `sum(increase(src_workerutil_dbworker_store_codeintel_index_errors_total{
 
 #### frontend: workerutil_dbworker_store_codeintel_index_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -913,7 +913,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100603`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_workerutil_dbworker_store_codeintel_index_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_workerutil_dbworker_store_codeintel_index_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_workerutil_dbworker_store_codeintel_index_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_workerutil_dbworker_store_codeintel_index_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_workerutil_dbworker_store_codeintel_index_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_workerutil_dbworker_store_codeintel_index_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -980,7 +980,7 @@ Query: `sum(increase(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourc
 
 #### frontend: codeintel_lsifstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -991,7 +991,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100703`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_lsifstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_lsifstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1056,7 +1056,7 @@ Query: `sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^(fronte
 
 #### frontend: codeintel_lsifstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1067,7 +1067,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100713`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_lsifstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_lsifstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_lsifstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1134,7 +1134,7 @@ Query: `sum(increase(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourc
 
 #### frontend: codeintel_gitserver_error_rate
 
-<p class="subtitle">Aggregate client operation error rate over 5m</p>
+<p class="subtitle">Aggregate client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1145,7 +1145,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100803`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_gitserver_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_gitserver_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1210,7 +1210,7 @@ Query: `sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^(fronte
 
 #### frontend: codeintel_gitserver_error_rate
 
-<p class="subtitle">Client operation error rate over 5m</p>
+<p class="subtitle">Client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1221,7 +1221,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100813`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_gitserver_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_gitserver_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_gitserver_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1288,7 +1288,7 @@ Query: `sum(increase(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sou
 
 #### frontend: codeintel_repoupdater_error_rate
 
-<p class="subtitle">Aggregate client operation error rate over 5m</p>
+<p class="subtitle">Aggregate client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1299,7 +1299,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100903`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_repoupdater_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_repoupdater_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1364,7 +1364,7 @@ Query: `sum by (op)(increase(src_codeintel_repoupdater_errors_total{job=~"^(fron
 
 #### frontend: codeintel_repoupdater_error_rate
 
-<p class="subtitle">Client operation error rate over 5m</p>
+<p class="subtitle">Client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1375,7 +1375,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=100913`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_repoupdater_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_repoupdater_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_repoupdater_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1442,7 +1442,7 @@ Query: `sum(increase(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sou
 
 #### frontend: codeintel_uploadstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1453,7 +1453,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101003`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_uploadstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_uploadstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1518,7 +1518,7 @@ Query: `sum by (op)(increase(src_codeintel_uploadstore_errors_total{job=~"^(fron
 
 #### frontend: codeintel_uploadstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1529,7 +1529,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101013`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_uploadstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_uploadstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_uploadstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1596,7 +1596,7 @@ Query: `sum(increase(src_codeintel_dependencies_errors_total{job=~"^(frontend|so
 
 #### frontend: codeintel_dependencies_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1607,7 +1607,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101103`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_dependencies_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_dependencies_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1672,7 +1672,7 @@ Query: `sum by (op)(increase(src_codeintel_dependencies_errors_total{job=~"^(fro
 
 #### frontend: codeintel_dependencies_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1683,7 +1683,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101113`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_dependencies_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_dependencies_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_dependencies_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1750,7 +1750,7 @@ Query: `sum(increase(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourc
 
 #### frontend: codeintel_lockfiles_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1761,7 +1761,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101203`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_codeintel_lockfiles_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_codeintel_lockfiles_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1826,7 +1826,7 @@ Query: `sum by (op)(increase(src_codeintel_lockfiles_errors_total{job=~"^(fronte
 
 #### frontend: codeintel_lockfiles_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1837,7 +1837,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101213`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_codeintel_lockfiles_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_codeintel_lockfiles_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_codeintel_lockfiles_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1904,7 +1904,7 @@ Query: `sum(increase(src_gitserver_client_errors_total{job=~"^(frontend|sourcegr
 
 #### frontend: gitserver_client_error_rate
 
-<p class="subtitle">Aggregate graphql operation error rate over 5m</p>
+<p class="subtitle">Aggregate graphql operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1915,7 +1915,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101303`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_gitserver_client_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_gitserver_client_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -1980,7 +1980,7 @@ Query: `sum by (op)(increase(src_gitserver_client_errors_total{job=~"^(frontend|
 
 #### frontend: gitserver_client_error_rate
 
-<p class="subtitle">Graphql operation error rate over 5m</p>
+<p class="subtitle">Graphql operation error rate</p>
 
 This panel has no related alerts.
 
@@ -1991,7 +1991,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101313`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_gitserver_client_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_gitserver_client_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_gitserver_client_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -2058,7 +2058,7 @@ Query: `sum(increase(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegra
 
 #### frontend: batches_dbstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -2069,7 +2069,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101403`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_batches_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_batches_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -2134,7 +2134,7 @@ Query: `sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^(frontend|s
 
 #### frontend: batches_dbstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -2145,7 +2145,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101413`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_batches_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_batches_dbstore_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_batches_dbstore_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -2212,7 +2212,7 @@ Query: `sum(increase(src_batches_service_errors_total{job=~"^(frontend|sourcegra
 
 #### frontend: batches_service_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -2223,7 +2223,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101503`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_batches_service_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_batches_service_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -2288,7 +2288,7 @@ Query: `sum by (op)(increase(src_batches_service_errors_total{job=~"^(frontend|s
 
 #### frontend: batches_service_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -2299,7 +2299,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101513`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_batches_service_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_batches_service_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_batches_service_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -2366,7 +2366,7 @@ Query: `sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_
 
 #### frontend: workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -2377,7 +2377,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101603`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum by (op)(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^(frontend|sourcegraph-frontend).*"}) / (sum by (op)(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_total{job=~"^(frontend|sourcegraph-frontend).*"}) + sum by (op)(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -2444,7 +2444,7 @@ Query: `sum(increase(src_oobmigration_errors_total{op="up",job=~"^(frontend|sour
 
 #### frontend: oobmigration_error_rate
 
-<p class="subtitle">Migration handler operation error rate over 5m</p>
+<p class="subtitle">Migration handler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -2455,7 +2455,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101703`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_oobmigration_errors_total{op="up",job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_oobmigration_total{op="up",job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_oobmigration_errors_total{op="up",job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_oobmigration_errors_total{op="up",job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_oobmigration_total{op="up",job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_oobmigration_errors_total{op="up",job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -2522,7 +2522,7 @@ Query: `sum(increase(src_oobmigration_errors_total{op="down",job=~"^(frontend|so
 
 #### frontend: oobmigration_error_rate
 
-<p class="subtitle">Migration handler operation error rate over 5m</p>
+<p class="subtitle">Migration handler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -2533,7 +2533,7 @@ To see this panel, visit `/-/debug/grafana/d/frontend/frontend?viewPanel=101803`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_oobmigration_errors_total{op="down",job=~"^(frontend|sourcegraph-frontend).*"}[5m])) / (sum(increase(src_oobmigration_total{op="down",job=~"^(frontend|sourcegraph-frontend).*"}[5m])) + sum(increase(src_oobmigration_errors_total{op="down",job=~"^(frontend|sourcegraph-frontend).*"}[5m]))) * 100`
+Query: `sum(src_oobmigration_errors_total{op="down",job=~"^(frontend|sourcegraph-frontend).*"}) / (sum(src_oobmigration_total{op="down",job=~"^(frontend|sourcegraph-frontend).*"}) + sum(src_oobmigration_errors_total{op="down",job=~"^(frontend|sourcegraph-frontend).*"})) * 100`
 
 </details>
 
@@ -4499,7 +4499,7 @@ Query: `sum(increase(src_gitserver_api_errors_total{job=~"^gitserver.*"}[5m]))`
 
 #### gitserver: gitserver_api_error_rate
 
-<p class="subtitle">Aggregate graphql operation error rate over 5m</p>
+<p class="subtitle">Aggregate graphql operation error rate</p>
 
 This panel has no related alerts.
 
@@ -4510,7 +4510,7 @@ To see this panel, visit `/-/debug/grafana/d/gitserver/gitserver?viewPanel=10010
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_gitserver_api_errors_total{job=~"^gitserver.*"}[5m])) / (sum(increase(src_gitserver_api_total{job=~"^gitserver.*"}[5m])) + sum(increase(src_gitserver_api_errors_total{job=~"^gitserver.*"}[5m]))) * 100`
+Query: `sum(src_gitserver_api_errors_total{job=~"^gitserver.*"}) / (sum(src_gitserver_api_total{job=~"^gitserver.*"}) + sum(src_gitserver_api_errors_total{job=~"^gitserver.*"})) * 100`
 
 </details>
 
@@ -4575,7 +4575,7 @@ Query: `sum by (op)(increase(src_gitserver_api_errors_total{job=~"^gitserver.*"}
 
 #### gitserver: gitserver_api_error_rate
 
-<p class="subtitle">Graphql operation error rate over 5m</p>
+<p class="subtitle">Graphql operation error rate</p>
 
 This panel has no related alerts.
 
@@ -4586,7 +4586,7 @@ To see this panel, visit `/-/debug/grafana/d/gitserver/gitserver?viewPanel=10011
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_gitserver_api_errors_total{job=~"^gitserver.*"}[5m])) / (sum by (op)(increase(src_gitserver_api_total{job=~"^gitserver.*"}[5m])) + sum by (op)(increase(src_gitserver_api_errors_total{job=~"^gitserver.*"}[5m]))) * 100`
+Query: `sum by (op)(src_gitserver_api_errors_total{job=~"^gitserver.*"}) / (sum by (op)(src_gitserver_api_total{job=~"^gitserver.*"}) + sum by (op)(src_gitserver_api_errors_total{job=~"^gitserver.*"})) * 100`
 
 </details>
 
@@ -5121,7 +5121,7 @@ Query: `sum(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"
 
 #### gitserver: codeintel_coursier_error_rate
 
-<p class="subtitle">Aggregate invocations operation error rate over 5m</p>
+<p class="subtitle">Aggregate invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -5132,7 +5132,7 @@ To see this panel, visit `/-/debug/grafana/d/gitserver/gitserver?viewPanel=10060
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) / (sum(increase(src_codeintel_coursier_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) + sum(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"}) / (sum(src_codeintel_coursier_total{op!="RunCommand",job=~"^gitserver.*"}) + sum(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"})) * 100`
 
 </details>
 
@@ -5197,7 +5197,7 @@ Query: `sum by (op)(increase(src_codeintel_coursier_errors_total{op!="RunCommand
 
 #### gitserver: codeintel_coursier_error_rate
 
-<p class="subtitle">Invocations operation error rate over 5m</p>
+<p class="subtitle">Invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -5208,7 +5208,7 @@ To see this panel, visit `/-/debug/grafana/d/gitserver/gitserver?viewPanel=10061
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) / (sum by (op)(increase(src_codeintel_coursier_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) + sum by (op)(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"}) / (sum by (op)(src_codeintel_coursier_total{op!="RunCommand",job=~"^gitserver.*"}) + sum by (op)(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^gitserver.*"})) * 100`
 
 </details>
 
@@ -5275,7 +5275,7 @@ Query: `sum(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gits
 
 #### gitserver: codeintel_npm_error_rate
 
-<p class="subtitle">Aggregate invocations operation error rate over 5m</p>
+<p class="subtitle">Aggregate invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -5286,7 +5286,7 @@ To see this panel, visit `/-/debug/grafana/d/gitserver/gitserver?viewPanel=10070
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) / (sum(increase(src_codeintel_npm_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) + sum(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"}) / (sum(src_codeintel_npm_total{op!="RunCommand",job=~"^gitserver.*"}) + sum(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"})) * 100`
 
 </details>
 
@@ -5351,7 +5351,7 @@ Query: `sum by (op)(increase(src_codeintel_npm_errors_total{op!="RunCommand",job
 
 #### gitserver: codeintel_npm_error_rate
 
-<p class="subtitle">Invocations operation error rate over 5m</p>
+<p class="subtitle">Invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -5362,7 +5362,7 @@ To see this panel, visit `/-/debug/grafana/d/gitserver/gitserver?viewPanel=10071
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) / (sum by (op)(increase(src_codeintel_npm_total{op!="RunCommand",job=~"^gitserver.*"}[5m])) + sum by (op)(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"}) / (sum by (op)(src_codeintel_npm_total{op!="RunCommand",job=~"^gitserver.*"}) + sum by (op)(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^gitserver.*"})) * 100`
 
 </details>
 
@@ -6694,7 +6694,7 @@ Query: `sum(increase(src_codeintel_upload_processor_errors_total{job=~"^precise-
 
 #### precise-code-intel-worker: codeintel_upload_processor_error_rate
 
-<p class="subtitle">Handler operation error rate over 5m</p>
+<p class="subtitle">Handler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -6705,7 +6705,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_upload_processor_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum(increase(src_codeintel_upload_processor_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum(increase(src_codeintel_upload_processor_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_upload_processor_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum(src_codeintel_upload_processor_total{job=~"^precise-code-intel-worker.*"}) + sum(src_codeintel_upload_processor_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -6772,7 +6772,7 @@ Query: `sum(increase(src_codeintel_dbstore_errors_total{job=~"^precise-code-inte
 
 #### precise-code-intel-worker: codeintel_dbstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -6783,7 +6783,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum(increase(src_codeintel_dbstore_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum(increase(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum(src_codeintel_dbstore_total{job=~"^precise-code-intel-worker.*"}) + sum(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -6848,7 +6848,7 @@ Query: `sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^precise-c
 
 #### precise-code-intel-worker: codeintel_dbstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -6859,7 +6859,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_dbstore_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum by (op)(src_codeintel_dbstore_total{job=~"^precise-code-intel-worker.*"}) + sum by (op)(src_codeintel_dbstore_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -6926,7 +6926,7 @@ Query: `sum(increase(src_codeintel_lsifstore_errors_total{job=~"^precise-code-in
 
 #### precise-code-intel-worker: codeintel_lsifstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -6937,7 +6937,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum(increase(src_codeintel_lsifstore_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum(increase(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum(src_codeintel_lsifstore_total{job=~"^precise-code-intel-worker.*"}) + sum(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -7002,7 +7002,7 @@ Query: `sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^precise
 
 #### precise-code-intel-worker: codeintel_lsifstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -7013,7 +7013,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_lsifstore_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum by (op)(src_codeintel_lsifstore_total{job=~"^precise-code-intel-worker.*"}) + sum by (op)(src_codeintel_lsifstore_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -7080,7 +7080,7 @@ Query: `sum(increase(src_workerutil_dbworker_store_codeintel_upload_errors_total
 
 #### precise-code-intel-worker: workerutil_dbworker_store_codeintel_upload_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -7091,7 +7091,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_workerutil_dbworker_store_codeintel_upload_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum(increase(src_workerutil_dbworker_store_codeintel_upload_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum(increase(src_workerutil_dbworker_store_codeintel_upload_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum(src_workerutil_dbworker_store_codeintel_upload_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum(src_workerutil_dbworker_store_codeintel_upload_total{job=~"^precise-code-intel-worker.*"}) + sum(src_workerutil_dbworker_store_codeintel_upload_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -7158,7 +7158,7 @@ Query: `sum(increase(src_codeintel_gitserver_errors_total{job=~"^precise-code-in
 
 #### precise-code-intel-worker: codeintel_gitserver_error_rate
 
-<p class="subtitle">Aggregate client operation error rate over 5m</p>
+<p class="subtitle">Aggregate client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -7169,7 +7169,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum(increase(src_codeintel_gitserver_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum(increase(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum(src_codeintel_gitserver_total{job=~"^precise-code-intel-worker.*"}) + sum(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -7234,7 +7234,7 @@ Query: `sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^precise
 
 #### precise-code-intel-worker: codeintel_gitserver_error_rate
 
-<p class="subtitle">Client operation error rate over 5m</p>
+<p class="subtitle">Client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -7245,7 +7245,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_gitserver_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum by (op)(src_codeintel_gitserver_total{job=~"^precise-code-intel-worker.*"}) + sum by (op)(src_codeintel_gitserver_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -7312,7 +7312,7 @@ Query: `sum(increase(src_codeintel_uploadstore_errors_total{job=~"^precise-code-
 
 #### precise-code-intel-worker: codeintel_uploadstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -7323,7 +7323,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum(increase(src_codeintel_uploadstore_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum(increase(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum(src_codeintel_uploadstore_total{job=~"^precise-code-intel-worker.*"}) + sum(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -7388,7 +7388,7 @@ Query: `sum by (op)(increase(src_codeintel_uploadstore_errors_total{job=~"^preci
 
 #### precise-code-intel-worker: codeintel_uploadstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -7399,7 +7399,7 @@ To see this panel, visit `/-/debug/grafana/d/precise-code-intel-worker/precise-c
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_uploadstore_total{job=~"^precise-code-intel-worker.*"}[5m])) + sum by (op)(increase(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"}) / (sum by (op)(src_codeintel_uploadstore_total{job=~"^precise-code-intel-worker.*"}) + sum by (op)(src_codeintel_uploadstore_errors_total{job=~"^precise-code-intel-worker.*"})) * 100`
 
 </details>
 
@@ -8426,7 +8426,7 @@ Query: `sum(increase(src_codeintel_commit_graph_processor_errors_total{job=~"^wo
 
 #### worker: codeintel_commit_graph_processor_error_rate
 
-<p class="subtitle">Update operation error rate over 5m</p>
+<p class="subtitle">Update operation error rate</p>
 
 This panel has no related alerts.
 
@@ -8437,7 +8437,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100303` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_commit_graph_processor_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_commit_graph_processor_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_commit_graph_processor_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_commit_graph_processor_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_commit_graph_processor_total{job=~"^worker.*"}) + sum(src_codeintel_commit_graph_processor_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -8588,7 +8588,7 @@ Query: `sum(increase(src_codeintel_dependency_index_processor_errors_total{job=~
 
 #### worker: codeintel_dependency_index_processor_error_rate
 
-<p class="subtitle">Handler operation error rate over 5m</p>
+<p class="subtitle">Handler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -8599,7 +8599,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100513` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_dependency_index_processor_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_dependency_index_processor_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_dependency_index_processor_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_dependency_index_processor_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_dependency_index_processor_total{job=~"^worker.*"}) + sum(src_codeintel_dependency_index_processor_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -8878,7 +8878,7 @@ Query: `sum(increase(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"
 
 #### worker: codeintel_index_scheduler_error_rate
 
-<p class="subtitle">Aggregate scheduler operation error rate over 5m</p>
+<p class="subtitle">Aggregate scheduler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -8889,7 +8889,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100703` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_index_scheduler_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_index_scheduler_total{job=~"^worker.*"}) + sum(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -8954,7 +8954,7 @@ Query: `sum by (op)(increase(src_codeintel_index_scheduler_errors_total{job=~"^w
 
 #### worker: codeintel_index_scheduler_error_rate
 
-<p class="subtitle">Scheduler operation error rate over 5m</p>
+<p class="subtitle">Scheduler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -8965,7 +8965,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100713` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_index_scheduler_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"}) / (sum by (op)(src_codeintel_index_scheduler_total{job=~"^worker.*"}) + sum by (op)(src_codeintel_index_scheduler_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9032,7 +9032,7 @@ Query: `sum(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker
 
 #### worker: codeintel_autoindex_enqueuer_error_rate
 
-<p class="subtitle">Aggregate enqueuer operation error rate over 5m</p>
+<p class="subtitle">Aggregate enqueuer operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9043,7 +9043,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100803` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_autoindex_enqueuer_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_autoindex_enqueuer_total{job=~"^worker.*"}) + sum(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9108,7 +9108,7 @@ Query: `sum by (op)(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~
 
 #### worker: codeintel_autoindex_enqueuer_error_rate
 
-<p class="subtitle">Enqueuer operation error rate over 5m</p>
+<p class="subtitle">Enqueuer operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9119,7 +9119,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100813` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_autoindex_enqueuer_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"}) / (sum by (op)(src_codeintel_autoindex_enqueuer_total{job=~"^worker.*"}) + sum by (op)(src_codeintel_autoindex_enqueuer_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9186,7 +9186,7 @@ Query: `sum(increase(src_codeintel_dbstore_errors_total{job=~"^worker.*"}[5m]))`
 
 #### worker: codeintel_dbstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9197,7 +9197,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100903` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_dbstore_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_dbstore_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_dbstore_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_dbstore_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_dbstore_total{job=~"^worker.*"}) + sum(src_codeintel_dbstore_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9262,7 +9262,7 @@ Query: `sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^worker.*"
 
 #### worker: codeintel_dbstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9273,7 +9273,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=100913` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_dbstore_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_codeintel_dbstore_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_dbstore_errors_total{job=~"^worker.*"}) / (sum by (op)(src_codeintel_dbstore_total{job=~"^worker.*"}) + sum by (op)(src_codeintel_dbstore_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9340,7 +9340,7 @@ Query: `sum(increase(src_codeintel_lsifstore_errors_total{job=~"^worker.*"}[5m])
 
 #### worker: codeintel_lsifstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9351,7 +9351,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101003` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_lsifstore_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_lsifstore_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_lsifstore_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_lsifstore_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_lsifstore_total{job=~"^worker.*"}) + sum(src_codeintel_lsifstore_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9416,7 +9416,7 @@ Query: `sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^worker.
 
 #### worker: codeintel_lsifstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9427,7 +9427,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101013` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_lsifstore_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_codeintel_lsifstore_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_lsifstore_errors_total{job=~"^worker.*"}) / (sum by (op)(src_codeintel_lsifstore_total{job=~"^worker.*"}) + sum by (op)(src_codeintel_lsifstore_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9494,7 +9494,7 @@ Query: `sum(increase(src_workerutil_dbworker_store_codeintel_dependency_index_er
 
 #### worker: workerutil_dbworker_store_codeintel_dependency_index_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9505,7 +9505,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101103` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_workerutil_dbworker_store_codeintel_dependency_index_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_workerutil_dbworker_store_codeintel_dependency_index_total{job=~"^worker.*"}[5m])) + sum(increase(src_workerutil_dbworker_store_codeintel_dependency_index_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_workerutil_dbworker_store_codeintel_dependency_index_errors_total{job=~"^worker.*"}) / (sum(src_workerutil_dbworker_store_codeintel_dependency_index_total{job=~"^worker.*"}) + sum(src_workerutil_dbworker_store_codeintel_dependency_index_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9572,7 +9572,7 @@ Query: `sum(increase(src_codeintel_gitserver_errors_total{job=~"^worker.*"}[5m])
 
 #### worker: codeintel_gitserver_error_rate
 
-<p class="subtitle">Aggregate client operation error rate over 5m</p>
+<p class="subtitle">Aggregate client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9583,7 +9583,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101203` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_gitserver_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_gitserver_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_gitserver_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_gitserver_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_gitserver_total{job=~"^worker.*"}) + sum(src_codeintel_gitserver_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9648,7 +9648,7 @@ Query: `sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^worker.
 
 #### worker: codeintel_gitserver_error_rate
 
-<p class="subtitle">Client operation error rate over 5m</p>
+<p class="subtitle">Client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9659,7 +9659,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101213` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_gitserver_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_codeintel_gitserver_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_gitserver_errors_total{job=~"^worker.*"}) / (sum by (op)(src_codeintel_gitserver_total{job=~"^worker.*"}) + sum by (op)(src_codeintel_gitserver_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9726,7 +9726,7 @@ Query: `sum(increase(src_codeintel_repoupdater_errors_total{job=~"^worker.*"}[5m
 
 #### worker: codeintel_repoupdater_error_rate
 
-<p class="subtitle">Aggregate client operation error rate over 5m</p>
+<p class="subtitle">Aggregate client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9737,7 +9737,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101303` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_repoupdater_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_repoupdater_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_repoupdater_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_repoupdater_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_repoupdater_total{job=~"^worker.*"}) + sum(src_codeintel_repoupdater_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9802,7 +9802,7 @@ Query: `sum by (op)(increase(src_codeintel_repoupdater_errors_total{job=~"^worke
 
 #### worker: codeintel_repoupdater_error_rate
 
-<p class="subtitle">Client operation error rate over 5m</p>
+<p class="subtitle">Client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9813,7 +9813,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101313` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_repoupdater_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_codeintel_repoupdater_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_codeintel_repoupdater_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_repoupdater_errors_total{job=~"^worker.*"}) / (sum by (op)(src_codeintel_repoupdater_total{job=~"^worker.*"}) + sum by (op)(src_codeintel_repoupdater_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9880,7 +9880,7 @@ Query: `sum(increase(src_codeintel_dependency_repos_errors_total{job=~"^worker.*
 
 #### worker: codeintel_dependency_repos_error_rate
 
-<p class="subtitle">Aggregate insert operation error rate over 5m</p>
+<p class="subtitle">Aggregate insert operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9891,7 +9891,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101403` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_codeintel_dependency_repos_total{job=~"^worker.*"}[5m])) + sum(increase(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"}) / (sum(src_codeintel_dependency_repos_total{job=~"^worker.*"}) + sum(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -9956,7 +9956,7 @@ Query: `sum by (scheme,new)(increase(src_codeintel_dependency_repos_errors_total
 
 #### worker: codeintel_dependency_repos_error_rate
 
-<p class="subtitle">Insert operation error rate over 5m</p>
+<p class="subtitle">Insert operation error rate</p>
 
 This panel has no related alerts.
 
@@ -9967,7 +9967,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101413` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (scheme,new)(increase(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"}[5m])) / (sum by (scheme,new)(increase(src_codeintel_dependency_repos_total{job=~"^worker.*"}[5m])) + sum by (scheme,new)(increase(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (scheme,new)(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"}) / (sum by (scheme,new)(src_codeintel_dependency_repos_total{job=~"^worker.*"}) + sum by (scheme,new)(src_codeintel_dependency_repos_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10034,7 +10034,7 @@ Query: `sum(increase(src_batches_dbstore_errors_total{job=~"^worker.*"}[5m]))`
 
 #### worker: batches_dbstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10045,7 +10045,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101503` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_batches_dbstore_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_batches_dbstore_total{job=~"^worker.*"}[5m])) + sum(increase(src_batches_dbstore_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_batches_dbstore_errors_total{job=~"^worker.*"}) / (sum(src_batches_dbstore_total{job=~"^worker.*"}) + sum(src_batches_dbstore_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10110,7 +10110,7 @@ Query: `sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^worker.*"}[
 
 #### worker: batches_dbstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10121,7 +10121,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101513` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_batches_dbstore_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_batches_dbstore_errors_total{job=~"^worker.*"}) / (sum by (op)(src_batches_dbstore_total{job=~"^worker.*"}) + sum by (op)(src_batches_dbstore_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10188,7 +10188,7 @@ Query: `sum(increase(src_batches_service_errors_total{job=~"^worker.*"}[5m]))`
 
 #### worker: batches_service_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10199,7 +10199,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101603` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_batches_service_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_batches_service_total{job=~"^worker.*"}[5m])) + sum(increase(src_batches_service_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_batches_service_errors_total{job=~"^worker.*"}) / (sum(src_batches_service_total{job=~"^worker.*"}) + sum(src_batches_service_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10264,7 +10264,7 @@ Query: `sum by (op)(increase(src_batches_service_errors_total{job=~"^worker.*"}[
 
 #### worker: batches_service_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10275,7 +10275,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101613` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_batches_service_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_batches_service_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_batches_service_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_batches_service_errors_total{job=~"^worker.*"}) / (sum by (op)(src_batches_service_total{job=~"^worker.*"}) + sum by (op)(src_batches_service_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10342,7 +10342,7 @@ Query: `sum by (op)(increase(src_workerutil_dbworker_store_batch_changes_batch_s
 
 #### worker: workerutil_dbworker_store_batch_changes_batch_spec_resolution_worker_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10353,7 +10353,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101703` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_workerutil_dbworker_store_batch_changes_batch_spec_resolution_worker_store_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_workerutil_dbworker_store_batch_changes_batch_spec_resolution_worker_store_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_workerutil_dbworker_store_batch_changes_batch_spec_resolution_worker_store_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_workerutil_dbworker_store_batch_changes_batch_spec_resolution_worker_store_errors_total{job=~"^worker.*"}) / (sum by (op)(src_workerutil_dbworker_store_batch_changes_batch_spec_resolution_worker_store_total{job=~"^worker.*"}) + sum by (op)(src_workerutil_dbworker_store_batch_changes_batch_spec_resolution_worker_store_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10420,7 +10420,7 @@ Query: `sum by (op)(increase(src_workerutil_dbworker_store_batches_bulk_worker_s
 
 #### worker: workerutil_dbworker_store_batches_bulk_worker_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10431,7 +10431,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101803` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_workerutil_dbworker_store_batches_bulk_worker_store_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_workerutil_dbworker_store_batches_bulk_worker_store_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_workerutil_dbworker_store_batches_bulk_worker_store_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_workerutil_dbworker_store_batches_bulk_worker_store_errors_total{job=~"^worker.*"}) / (sum by (op)(src_workerutil_dbworker_store_batches_bulk_worker_store_total{job=~"^worker.*"}) + sum by (op)(src_workerutil_dbworker_store_batches_bulk_worker_store_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10498,7 +10498,7 @@ Query: `sum by (op)(increase(src_workerutil_dbworker_store_batches_reconciler_wo
 
 #### worker: workerutil_dbworker_store_batches_reconciler_worker_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10509,7 +10509,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=101903` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_workerutil_dbworker_store_batches_reconciler_worker_store_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_workerutil_dbworker_store_batches_reconciler_worker_store_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_workerutil_dbworker_store_batches_reconciler_worker_store_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_workerutil_dbworker_store_batches_reconciler_worker_store_errors_total{job=~"^worker.*"}) / (sum by (op)(src_workerutil_dbworker_store_batches_reconciler_worker_store_total{job=~"^worker.*"}) + sum by (op)(src_workerutil_dbworker_store_batches_reconciler_worker_store_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10576,7 +10576,7 @@ Query: `sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_
 
 #### worker: workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10587,7 +10587,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=102003` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^worker.*"}) / (sum by (op)(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_total{job=~"^worker.*"}) + sum by (op)(src_workerutil_dbworker_store_batch_spec_workspace_execution_worker_store_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -10896,7 +10896,7 @@ Query: `sum(increase(src_query_runner_worker_processor_errors_total{job=~"^worke
 
 #### worker: query_runner_worker_processor_error_rate
 
-<p class="subtitle">Handler operation error rate over 5m</p>
+<p class="subtitle">Handler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -10907,7 +10907,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=102513` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_query_runner_worker_processor_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_query_runner_worker_processor_total{job=~"^worker.*"}[5m])) + sum(increase(src_query_runner_worker_processor_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_query_runner_worker_processor_errors_total{job=~"^worker.*"}) / (sum(src_query_runner_worker_processor_total{job=~"^worker.*"}) + sum(src_query_runner_worker_processor_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -11033,7 +11033,7 @@ Query: `sum(increase(src_workerutil_dbworker_store_insights_query_runner_jobs_st
 
 #### worker: workerutil_dbworker_store_insights_query_runner_jobs_store_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -11044,7 +11044,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=102703` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_workerutil_dbworker_store_insights_query_runner_jobs_store_total{job=~"^worker.*"}[5m])) + sum(increase(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"}) / (sum(src_workerutil_dbworker_store_insights_query_runner_jobs_store_total{job=~"^worker.*"}) + sum(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -11109,7 +11109,7 @@ Query: `sum by (op)(increase(src_workerutil_dbworker_store_insights_query_runner
 
 #### worker: workerutil_dbworker_store_insights_query_runner_jobs_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -11120,7 +11120,7 @@ To see this panel, visit `/-/debug/grafana/d/worker/worker?viewPanel=102713` on 
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_workerutil_dbworker_store_insights_query_runner_jobs_store_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"}) / (sum by (op)(src_workerutil_dbworker_store_insights_query_runner_jobs_store_total{job=~"^worker.*"}) + sum by (op)(src_workerutil_dbworker_store_insights_query_runner_jobs_store_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -12432,7 +12432,7 @@ Query: `sum(increase(src_batches_dbstore_errors_total{job=~"^repo-updater.*"}[5m
 
 #### repo-updater: batches_dbstore_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12443,7 +12443,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_batches_dbstore_errors_total{job=~"^repo-updater.*"}[5m])) / (sum(increase(src_batches_dbstore_total{job=~"^repo-updater.*"}[5m])) + sum(increase(src_batches_dbstore_errors_total{job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum(src_batches_dbstore_errors_total{job=~"^repo-updater.*"}) / (sum(src_batches_dbstore_total{job=~"^repo-updater.*"}) + sum(src_batches_dbstore_errors_total{job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -12508,7 +12508,7 @@ Query: `sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^repo-update
 
 #### repo-updater: batches_dbstore_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12519,7 +12519,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^repo-updater.*"}[5m])) / (sum by (op)(increase(src_batches_dbstore_total{job=~"^repo-updater.*"}[5m])) + sum by (op)(increase(src_batches_dbstore_errors_total{job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum by (op)(src_batches_dbstore_errors_total{job=~"^repo-updater.*"}) / (sum by (op)(src_batches_dbstore_total{job=~"^repo-updater.*"}) + sum by (op)(src_batches_dbstore_errors_total{job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -12586,7 +12586,7 @@ Query: `sum(increase(src_batches_service_errors_total{job=~"^repo-updater.*"}[5m
 
 #### repo-updater: batches_service_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12597,7 +12597,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_batches_service_errors_total{job=~"^repo-updater.*"}[5m])) / (sum(increase(src_batches_service_total{job=~"^repo-updater.*"}[5m])) + sum(increase(src_batches_service_errors_total{job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum(src_batches_service_errors_total{job=~"^repo-updater.*"}) / (sum(src_batches_service_total{job=~"^repo-updater.*"}) + sum(src_batches_service_errors_total{job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -12662,7 +12662,7 @@ Query: `sum by (op)(increase(src_batches_service_errors_total{job=~"^repo-update
 
 #### repo-updater: batches_service_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12673,7 +12673,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_batches_service_errors_total{job=~"^repo-updater.*"}[5m])) / (sum by (op)(increase(src_batches_service_total{job=~"^repo-updater.*"}[5m])) + sum by (op)(increase(src_batches_service_errors_total{job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum by (op)(src_batches_service_errors_total{job=~"^repo-updater.*"}) / (sum by (op)(src_batches_service_total{job=~"^repo-updater.*"}) + sum by (op)(src_batches_service_errors_total{job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -12740,7 +12740,7 @@ Query: `sum(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"
 
 #### repo-updater: codeintel_coursier_error_rate
 
-<p class="subtitle">Aggregate invocations operation error rate over 5m</p>
+<p class="subtitle">Aggregate invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12751,7 +12751,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) / (sum(increase(src_codeintel_coursier_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) + sum(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"}) / (sum(src_codeintel_coursier_total{op!="RunCommand",job=~"^repo-updater.*"}) + sum(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -12816,7 +12816,7 @@ Query: `sum by (op)(increase(src_codeintel_coursier_errors_total{op!="RunCommand
 
 #### repo-updater: codeintel_coursier_error_rate
 
-<p class="subtitle">Invocations operation error rate over 5m</p>
+<p class="subtitle">Invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12827,7 +12827,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) / (sum by (op)(increase(src_codeintel_coursier_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) + sum by (op)(increase(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"}) / (sum by (op)(src_codeintel_coursier_total{op!="RunCommand",job=~"^repo-updater.*"}) + sum by (op)(src_codeintel_coursier_errors_total{op!="RunCommand",job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -12894,7 +12894,7 @@ Query: `sum(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo
 
 #### repo-updater: codeintel_npm_error_rate
 
-<p class="subtitle">Aggregate invocations operation error rate over 5m</p>
+<p class="subtitle">Aggregate invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12905,7 +12905,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) / (sum(increase(src_codeintel_npm_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) + sum(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"}) / (sum(src_codeintel_npm_total{op!="RunCommand",job=~"^repo-updater.*"}) + sum(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -12970,7 +12970,7 @@ Query: `sum by (op)(increase(src_codeintel_npm_errors_total{op!="RunCommand",job
 
 #### repo-updater: codeintel_npm_error_rate
 
-<p class="subtitle">Invocations operation error rate over 5m</p>
+<p class="subtitle">Invocations operation error rate</p>
 
 This panel has no related alerts.
 
@@ -12981,7 +12981,7 @@ To see this panel, visit `/-/debug/grafana/d/repo-updater/repo-updater?viewPanel
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) / (sum by (op)(increase(src_codeintel_npm_total{op!="RunCommand",job=~"^repo-updater.*"}[5m])) + sum by (op)(increase(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"}) / (sum by (op)(src_codeintel_npm_total{op!="RunCommand",job=~"^repo-updater.*"}) + sum by (op)(src_codeintel_npm_errors_total{op!="RunCommand",job=~"^repo-updater.*"})) * 100`
 
 </details>
 
@@ -14063,7 +14063,7 @@ Query: `sum(increase(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"}[5
 
 #### symbols: codeintel_symbols_api_error_rate
 
-<p class="subtitle">Aggregate API operation error rate over 5m</p>
+<p class="subtitle">Aggregate API operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14074,7 +14074,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100003` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"}[5m])) / (sum(increase(src_codeintel_symbols_api_total{job=~"^symbols.*"}[5m])) + sum(increase(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"}) / (sum(src_codeintel_symbols_api_total{job=~"^symbols.*"}) + sum(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -14139,7 +14139,7 @@ Query: `sum by (op,parseAmount)(increase(src_codeintel_symbols_api_errors_total{
 
 #### symbols: codeintel_symbols_api_error_rate
 
-<p class="subtitle">API operation error rate over 5m</p>
+<p class="subtitle">API operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14150,7 +14150,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100013` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op,parseAmount)(increase(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"}[5m])) / (sum by (op,parseAmount)(increase(src_codeintel_symbols_api_total{job=~"^symbols.*"}[5m])) + sum by (op,parseAmount)(increase(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum by (op,parseAmount)(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"}) / (sum by (op,parseAmount)(src_codeintel_symbols_api_total{job=~"^symbols.*"}) + sum by (op,parseAmount)(src_codeintel_symbols_api_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -14293,7 +14293,7 @@ Query: `sum(increase(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"
 
 #### symbols: codeintel_symbols_parser_error_rate
 
-<p class="subtitle">Aggregate parser operation error rate over 5m</p>
+<p class="subtitle">Aggregate parser operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14304,7 +14304,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100113` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"}[5m])) / (sum(increase(src_codeintel_symbols_parser_total{job=~"^symbols.*"}[5m])) + sum(increase(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"}) / (sum(src_codeintel_symbols_parser_total{job=~"^symbols.*"}) + sum(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -14369,7 +14369,7 @@ Query: `sum by (op)(increase(src_codeintel_symbols_parser_errors_total{job=~"^sy
 
 #### symbols: codeintel_symbols_parser_error_rate
 
-<p class="subtitle">Parser operation error rate over 5m</p>
+<p class="subtitle">Parser operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14380,7 +14380,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100123` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"}[5m])) / (sum by (op)(increase(src_codeintel_symbols_parser_total{job=~"^symbols.*"}[5m])) + sum by (op)(increase(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"}) / (sum by (op)(src_codeintel_symbols_parser_total{job=~"^symbols.*"}) + sum by (op)(src_codeintel_symbols_parser_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -14550,7 +14550,7 @@ Query: `sum(increase(src_codeintel_symbols_repository_fetcher_errors_total{job=~
 
 #### symbols: codeintel_symbols_repository_fetcher_error_rate
 
-<p class="subtitle">Aggregate fetcher operation error rate over 5m</p>
+<p class="subtitle">Aggregate fetcher operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14561,7 +14561,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100313` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"}[5m])) / (sum(increase(src_codeintel_symbols_repository_fetcher_total{job=~"^symbols.*"}[5m])) + sum(increase(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"}) / (sum(src_codeintel_symbols_repository_fetcher_total{job=~"^symbols.*"}) + sum(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -14626,7 +14626,7 @@ Query: `sum by (op)(increase(src_codeintel_symbols_repository_fetcher_errors_tot
 
 #### symbols: codeintel_symbols_repository_fetcher_error_rate
 
-<p class="subtitle">Fetcher operation error rate over 5m</p>
+<p class="subtitle">Fetcher operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14637,7 +14637,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100323` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"}[5m])) / (sum by (op)(increase(src_codeintel_symbols_repository_fetcher_total{job=~"^symbols.*"}[5m])) + sum by (op)(increase(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"}) / (sum by (op)(src_codeintel_symbols_repository_fetcher_total{job=~"^symbols.*"}) + sum by (op)(src_codeintel_symbols_repository_fetcher_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -14704,7 +14704,7 @@ Query: `sum(increase(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols
 
 #### symbols: codeintel_symbols_gitserver_error_rate
 
-<p class="subtitle">Aggregate gitserver client operation error rate over 5m</p>
+<p class="subtitle">Aggregate gitserver client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14715,7 +14715,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100403` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"}[5m])) / (sum(increase(src_codeintel_symbols_gitserver_total{job=~"^symbols.*"}[5m])) + sum(increase(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"}) / (sum(src_codeintel_symbols_gitserver_total{job=~"^symbols.*"}) + sum(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -14780,7 +14780,7 @@ Query: `sum by (op)(increase(src_codeintel_symbols_gitserver_errors_total{job=~"
 
 #### symbols: codeintel_symbols_gitserver_error_rate
 
-<p class="subtitle">Gitserver client operation error rate over 5m</p>
+<p class="subtitle">Gitserver client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -14791,7 +14791,7 @@ To see this panel, visit `/-/debug/grafana/d/symbols/symbols?viewPanel=100413` o
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"}[5m])) / (sum by (op)(increase(src_codeintel_symbols_gitserver_total{job=~"^symbols.*"}[5m])) + sum by (op)(increase(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"}) / (sum by (op)(src_codeintel_symbols_gitserver_total{job=~"^symbols.*"}) + sum by (op)(src_codeintel_symbols_gitserver_errors_total{job=~"^symbols.*"})) * 100`
 
 </details>
 
@@ -17717,7 +17717,7 @@ Query: `sum(increase(src_executor_processor_errors_total{queue=~"${queue:regex}"
 
 #### executor: executor_processor_error_rate
 
-<p class="subtitle">Handler operation error rate over 5m</p>
+<p class="subtitle">Handler operation error rate</p>
 
 Refer to the [alerts reference](./alerts.md#executor-executor-processor-error-rate) for 1 alert related to this panel.
 
@@ -17728,7 +17728,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100113`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum(increase(src_executor_processor_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}[5m])) + sum(increase(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}) / (sum(src_executor_processor_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}) + sum(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -17795,7 +17795,7 @@ Query: `sum(increase(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-
 
 #### executor: apiworker_apiclient_error_rate
 
-<p class="subtitle">Aggregate client operation error rate over 5m</p>
+<p class="subtitle">Aggregate client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -17806,7 +17806,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100203`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum(increase(src_apiworker_apiclient_total{sg_job=~"^sourcegraph-executors.*"}[5m])) + sum(increase(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"}) / (sum(src_apiworker_apiclient_total{sg_job=~"^sourcegraph-executors.*"}) + sum(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -17871,7 +17871,7 @@ Query: `sum by (op)(increase(src_apiworker_apiclient_errors_total{sg_job=~"^sour
 
 #### executor: apiworker_apiclient_error_rate
 
-<p class="subtitle">Client operation error rate over 5m</p>
+<p class="subtitle">Client operation error rate</p>
 
 This panel has no related alerts.
 
@@ -17882,7 +17882,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100213`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum by (op)(increase(src_apiworker_apiclient_total{sg_job=~"^sourcegraph-executors.*"}[5m])) + sum by (op)(increase(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum by (op)(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"}) / (sum by (op)(src_apiworker_apiclient_total{sg_job=~"^sourcegraph-executors.*"}) + sum by (op)(src_apiworker_apiclient_errors_total{sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -17949,7 +17949,7 @@ Query: `sum(increase(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^
 
 #### executor: apiworker_command_error_rate
 
-<p class="subtitle">Aggregate command operation error rate over 5m</p>
+<p class="subtitle">Aggregate command operation error rate</p>
 
 This panel has no related alerts.
 
@@ -17960,7 +17960,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100303`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum(increase(src_apiworker_command_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}[5m])) + sum(increase(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}) / (sum(src_apiworker_command_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}) + sum(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -18025,7 +18025,7 @@ Query: `sum by (op)(increase(src_apiworker_command_errors_total{op=~"setup.*",sg
 
 #### executor: apiworker_command_error_rate
 
-<p class="subtitle">Command operation error rate over 5m</p>
+<p class="subtitle">Command operation error rate</p>
 
 This panel has no related alerts.
 
@@ -18036,7 +18036,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100313`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum by (op)(increase(src_apiworker_command_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}[5m])) + sum by (op)(increase(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum by (op)(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}) / (sum by (op)(src_apiworker_command_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"}) + sum by (op)(src_apiworker_command_errors_total{op=~"setup.*",sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -18103,7 +18103,7 @@ Query: `sum(increase(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^s
 
 #### executor: apiworker_command_error_rate
 
-<p class="subtitle">Aggregate command operation error rate over 5m</p>
+<p class="subtitle">Aggregate command operation error rate</p>
 
 This panel has no related alerts.
 
@@ -18114,7 +18114,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100403`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum(increase(src_apiworker_command_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}[5m])) + sum(increase(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}) / (sum(src_apiworker_command_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}) + sum(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -18179,7 +18179,7 @@ Query: `sum by (op)(increase(src_apiworker_command_errors_total{op=~"exec.*",sg_
 
 #### executor: apiworker_command_error_rate
 
-<p class="subtitle">Command operation error rate over 5m</p>
+<p class="subtitle">Command operation error rate</p>
 
 This panel has no related alerts.
 
@@ -18190,7 +18190,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100413`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum by (op)(increase(src_apiworker_command_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}[5m])) + sum by (op)(increase(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum by (op)(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}) / (sum by (op)(src_apiworker_command_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"}) + sum by (op)(src_apiworker_command_errors_total{op=~"exec.*",sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -18257,7 +18257,7 @@ Query: `sum(increase(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=
 
 #### executor: apiworker_command_error_rate
 
-<p class="subtitle">Aggregate command operation error rate over 5m</p>
+<p class="subtitle">Aggregate command operation error rate</p>
 
 This panel has no related alerts.
 
@@ -18268,7 +18268,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100503`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum(increase(src_apiworker_command_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}[5m])) + sum(increase(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}) / (sum(src_apiworker_command_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}) + sum(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -18333,7 +18333,7 @@ Query: `sum by (op)(increase(src_apiworker_command_errors_total{op=~"teardown.*"
 
 #### executor: apiworker_command_error_rate
 
-<p class="subtitle">Command operation error rate over 5m</p>
+<p class="subtitle">Command operation error rate</p>
 
 This panel has no related alerts.
 
@@ -18344,7 +18344,7 @@ To see this panel, visit `/-/debug/grafana/d/executor/executor?viewPanel=100513`
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}[5m])) / (sum by (op)(increase(src_apiworker_command_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}[5m])) + sum by (op)(increase(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}[5m]))) * 100`
+Query: `sum by (op)(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}) / (sum by (op)(src_apiworker_command_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"}) + sum by (op)(src_apiworker_command_errors_total{op=~"teardown.*",sg_job=~"^sourcegraph-executors.*"})) * 100`
 
 </details>
 
@@ -19161,7 +19161,7 @@ Query: `sum(increase(src_codeintel_autoindexing_errors_total{job=~"^.*"}[5m]))`
 
 #### codeintel-autoindexing: codeintel_autoindexing_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19172,7 +19172,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_autoindexing_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_autoindexing_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_autoindexing_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_autoindexing_errors_total{job=~"^.*"}) / (sum(src_codeintel_autoindexing_total{job=~"^.*"}) + sum(src_codeintel_autoindexing_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19237,7 +19237,7 @@ Query: `sum by (op)(increase(src_codeintel_autoindexing_errors_total{job=~"^.*"}
 
 #### codeintel-autoindexing: codeintel_autoindexing_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19248,7 +19248,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_autoindexing_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_autoindexing_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_autoindexing_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_autoindexing_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_autoindexing_total{job=~"^.*"}) + sum by (op)(src_codeintel_autoindexing_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19315,7 +19315,7 @@ Query: `sum(increase(src_codeintel_autoindexing_transport_graphql_errors_total{j
 
 #### codeintel-autoindexing: codeintel_autoindexing_transport_graphql_error_rate
 
-<p class="subtitle">Aggregate resolver operation error rate over 5m</p>
+<p class="subtitle">Aggregate resolver operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19326,7 +19326,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_autoindexing_transport_graphql_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"}) / (sum(src_codeintel_autoindexing_transport_graphql_total{job=~"^.*"}) + sum(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19391,7 +19391,7 @@ Query: `sum by (op)(increase(src_codeintel_autoindexing_transport_graphql_errors
 
 #### codeintel-autoindexing: codeintel_autoindexing_transport_graphql_error_rate
 
-<p class="subtitle">Resolver operation error rate over 5m</p>
+<p class="subtitle">Resolver operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19402,7 +19402,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_autoindexing_transport_graphql_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_autoindexing_transport_graphql_total{job=~"^.*"}) + sum by (op)(src_codeintel_autoindexing_transport_graphql_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19469,7 +19469,7 @@ Query: `sum(increase(src_codeintel_autoindexing_store_errors_total{job=~"^.*"}[5
 
 #### codeintel-autoindexing: codeintel_autoindexing_store_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19480,7 +19480,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_autoindexing_store_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_autoindexing_store_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_autoindexing_store_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_autoindexing_store_errors_total{job=~"^.*"}) / (sum(src_codeintel_autoindexing_store_total{job=~"^.*"}) + sum(src_codeintel_autoindexing_store_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19545,7 +19545,7 @@ Query: `sum by (op)(increase(src_codeintel_autoindexing_store_errors_total{job=~
 
 #### codeintel-autoindexing: codeintel_autoindexing_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19556,7 +19556,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_autoindexing_store_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_autoindexing_store_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_autoindexing_store_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_autoindexing_store_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_autoindexing_store_total{job=~"^.*"}) + sum by (op)(src_codeintel_autoindexing_store_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19623,7 +19623,7 @@ Query: `sum(increase(src_codeintel_autoindexing_inference_errors_total{job=~"^.*
 
 #### codeintel-autoindexing: codeintel_autoindexing_inference_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19634,7 +19634,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_autoindexing_inference_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"}) / (sum(src_codeintel_autoindexing_inference_total{job=~"^.*"}) + sum(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19699,7 +19699,7 @@ Query: `sum by (op)(increase(src_codeintel_autoindexing_inference_errors_total{j
 
 #### codeintel-autoindexing: codeintel_autoindexing_inference_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19710,7 +19710,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_autoindexing_inference_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_autoindexing_inference_total{job=~"^.*"}) + sum by (op)(src_codeintel_autoindexing_inference_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19777,7 +19777,7 @@ Query: `sum(increase(src_luasandbox_errors_total{job=~"^.*"}[5m]))`
 
 #### codeintel-autoindexing: luasandbox_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19788,7 +19788,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_luasandbox_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_luasandbox_total{job=~"^.*"}[5m])) + sum(increase(src_luasandbox_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_luasandbox_errors_total{job=~"^.*"}) / (sum(src_luasandbox_total{job=~"^.*"}) + sum(src_luasandbox_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19853,7 +19853,7 @@ Query: `sum by (op)(increase(src_luasandbox_errors_total{job=~"^.*"}[5m]))`
 
 #### codeintel-autoindexing: luasandbox_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19864,7 +19864,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-autoindexing/codeintel-au
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_luasandbox_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_luasandbox_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_luasandbox_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_luasandbox_errors_total{job=~"^.*"}) / (sum by (op)(src_luasandbox_total{job=~"^.*"}) + sum by (op)(src_luasandbox_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -19937,7 +19937,7 @@ Query: `sum(increase(src_codeintel_uploads_errors_total{job=~"^.*"}[5m]))`
 
 #### codeintel-uploads: codeintel_uploads_error_rate
 
-<p class="subtitle">Aggregate service operation error rate over 5m</p>
+<p class="subtitle">Aggregate service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -19948,7 +19948,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_uploads_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_uploads_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_uploads_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_uploads_errors_total{job=~"^.*"}) / (sum(src_codeintel_uploads_total{job=~"^.*"}) + sum(src_codeintel_uploads_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20013,7 +20013,7 @@ Query: `sum by (op)(increase(src_codeintel_uploads_errors_total{job=~"^.*"}[5m])
 
 #### codeintel-uploads: codeintel_uploads_error_rate
 
-<p class="subtitle">Service operation error rate over 5m</p>
+<p class="subtitle">Service operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20024,7 +20024,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_uploads_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_uploads_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_uploads_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_uploads_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_uploads_total{job=~"^.*"}) + sum by (op)(src_codeintel_uploads_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20091,7 +20091,7 @@ Query: `sum(increase(src_codeintel_uploads_store_errors_total{job=~"^.*"}[5m]))`
 
 #### codeintel-uploads: codeintel_uploads_store_error_rate
 
-<p class="subtitle">Aggregate store operation error rate over 5m</p>
+<p class="subtitle">Aggregate store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20102,7 +20102,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_uploads_store_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_uploads_store_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_uploads_store_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_uploads_store_errors_total{job=~"^.*"}) / (sum(src_codeintel_uploads_store_total{job=~"^.*"}) + sum(src_codeintel_uploads_store_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20167,7 +20167,7 @@ Query: `sum by (op)(increase(src_codeintel_uploads_store_errors_total{job=~"^.*"
 
 #### codeintel-uploads: codeintel_uploads_store_error_rate
 
-<p class="subtitle">Store operation error rate over 5m</p>
+<p class="subtitle">Store operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20178,7 +20178,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_uploads_store_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_uploads_store_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_uploads_store_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_uploads_store_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_uploads_store_total{job=~"^.*"}) + sum by (op)(src_codeintel_uploads_store_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20245,7 +20245,7 @@ Query: `sum(increase(src_codeintel_uploads_transport_graphql_errors_total{job=~"
 
 #### codeintel-uploads: codeintel_uploads_transport_graphql_error_rate
 
-<p class="subtitle">Aggregate resolver operation error rate over 5m</p>
+<p class="subtitle">Aggregate resolver operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20256,7 +20256,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_uploads_transport_graphql_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"}) / (sum(src_codeintel_uploads_transport_graphql_total{job=~"^.*"}) + sum(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20321,7 +20321,7 @@ Query: `sum by (op)(increase(src_codeintel_uploads_transport_graphql_errors_tota
 
 #### codeintel-uploads: codeintel_uploads_transport_graphql_error_rate
 
-<p class="subtitle">Resolver operation error rate over 5m</p>
+<p class="subtitle">Resolver operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20332,7 +20332,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_uploads_transport_graphql_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_uploads_transport_graphql_total{job=~"^.*"}) + sum by (op)(src_codeintel_uploads_transport_graphql_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20399,7 +20399,7 @@ Query: `sum(increase(src_codeintel_uploads_transport_http_errors_total{job=~"^.*
 
 #### codeintel-uploads: codeintel_uploads_transport_http_error_rate
 
-<p class="subtitle">Aggregate http handler operation error rate over 5m</p>
+<p class="subtitle">Aggregate http handler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20410,7 +20410,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"}[5m])) / (sum(increase(src_codeintel_uploads_transport_http_total{job=~"^.*"}[5m])) + sum(increase(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"}) / (sum(src_codeintel_uploads_transport_http_total{job=~"^.*"}) + sum(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20475,7 +20475,7 @@ Query: `sum by (op)(increase(src_codeintel_uploads_transport_http_errors_total{j
 
 #### codeintel-uploads: codeintel_uploads_transport_http_error_rate
 
-<p class="subtitle">Http handler operation error rate over 5m</p>
+<p class="subtitle">Http handler operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20486,7 +20486,7 @@ To see this panel, visit `/-/debug/grafana/d/codeintel-uploads/codeintel-uploads
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"}[5m])) / (sum by (op)(increase(src_codeintel_uploads_transport_http_total{job=~"^.*"}[5m])) + sum by (op)(increase(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"}[5m]))) * 100`
+Query: `sum by (op)(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"}) / (sum by (op)(src_codeintel_uploads_transport_http_total{job=~"^.*"}) + sum by (op)(src_codeintel_uploads_transport_http_errors_total{job=~"^.*"})) * 100`
 
 </details>
 
@@ -20846,7 +20846,7 @@ Query: `sum(increase(src_telemetry_job_errors_total{job=~"^worker.*"}[5m]))`
 
 #### telemetry: telemetry_job_error_rate
 
-<p class="subtitle">Aggregate usage data exporter operation error rate over 5m</p>
+<p class="subtitle">Aggregate usage data exporter operation error rate</p>
 
 This panel has no related alerts.
 
@@ -20857,7 +20857,7 @@ To see this panel, visit `/-/debug/grafana/d/telemetry/telemetry?viewPanel=10000
 <details>
 <summary>Technical details</summary>
 
-Query: `sum(increase(src_telemetry_job_errors_total{job=~"^worker.*"}[5m])) / (sum(increase(src_telemetry_job_total{job=~"^worker.*"}[5m])) + sum(increase(src_telemetry_job_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum(src_telemetry_job_errors_total{job=~"^worker.*"}) / (sum(src_telemetry_job_total{job=~"^worker.*"}) + sum(src_telemetry_job_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 
@@ -20922,7 +20922,7 @@ Query: `sum by (op)(increase(src_telemetry_job_errors_total{job=~"^worker.*"}[5m
 
 #### telemetry: telemetry_job_error_rate
 
-<p class="subtitle">Usage data exporter operation error rate over 5m</p>
+<p class="subtitle">Usage data exporter operation error rate</p>
 
 Refer to the [alerts reference](./alerts.md#telemetry-telemetry-job-error-rate) for 1 alert related to this panel.
 
@@ -20933,7 +20933,7 @@ To see this panel, visit `/-/debug/grafana/d/telemetry/telemetry?viewPanel=10001
 <details>
 <summary>Technical details</summary>
 
-Query: `sum by (op)(increase(src_telemetry_job_errors_total{job=~"^worker.*"}[5m])) / (sum by (op)(increase(src_telemetry_job_total{job=~"^worker.*"}[5m])) + sum by (op)(increase(src_telemetry_job_errors_total{job=~"^worker.*"}[5m]))) * 100`
+Query: `sum by (op)(src_telemetry_job_errors_total{job=~"^worker.*"}) / (sum by (op)(src_telemetry_job_total{job=~"^worker.*"}) + sum by (op)(src_telemetry_job_errors_total{job=~"^worker.*"})) * 100`
 
 </details>
 

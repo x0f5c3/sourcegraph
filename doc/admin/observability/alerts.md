@@ -5922,16 +5922,16 @@ with your code hosts connections or networking issues affecting communication wi
 
 ## executor: executor_processor_error_rate
 
-<p class="subtitle">handler operation error rate over 5m</p>
+<p class="subtitle">handler operation error rate</p>
 
 **Descriptions**
 
-- <span class="badge badge-critical">critical</span> executor: 100%+ handler operation error rate over 5m for 1h0m0s
+- <span class="badge badge-critical">critical</span> executor: 100%+ handler operation error rate for 1h0m0s
 
 <details>
 <summary>Technical details</summary>
 
-Custom alert query: `last_over_time(sum(increase(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}[5m]))[5h:]) / (last_over_time(sum(increase(src_executor_processor_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}[5m]))[5h:]) + last_over_time(sum(increase(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"}[5m]))[5h:])) * 100`
+Custom alert query: `last_over_time(sum(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"})[5h:]) / (last_over_time(sum(src_executor_processor_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"})[5h:]) + last_over_time(sum(src_executor_processor_errors_total{queue=~"${queue:regex}",sg_job=~"^sourcegraph-executors.*"})[5h:])) * 100`
 
 </details>
 
@@ -6027,11 +6027,11 @@ an underprovisioned main postgres instance.
 
 ## telemetry: telemetry_job_error_rate
 
-<p class="subtitle">usage data exporter operation error rate over 5m</p>
+<p class="subtitle">usage data exporter operation error rate</p>
 
 **Descriptions**
 
-- <span class="badge badge-warning">warning</span> telemetry: 0%+ usage data exporter operation error rate over 5m for 30m0s
+- <span class="badge badge-warning">warning</span> telemetry: 0%+ usage data exporter operation error rate for 30m0s
 
 **Next steps**
 
