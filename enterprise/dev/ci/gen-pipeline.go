@@ -207,6 +207,8 @@ func renderPipelineDocs(w io.Writer) {
 					// In the future we might want to be more clever about this to
 					// generate more accurate docs for runtypes that run conditional steps.
 					Diff: changed.None,
+					// Make sure version parsing works.
+					Version: "v1.1.1",
 				})
 				if err != nil {
 					logger.Fatal("generating pipeline for RunType", log.String("runType", rt.String()), log.Error(err))

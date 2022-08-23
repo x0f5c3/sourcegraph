@@ -18,7 +18,6 @@ import (
 	"github.com/sourcegraph/sourcegraph/internal/database/dbutil"
 	"github.com/sourcegraph/sourcegraph/internal/observation"
 	"github.com/sourcegraph/sourcegraph/internal/timeutil"
-	"github.com/sourcegraph/sourcegraph/internal/workerutil"
 )
 
 // Upload is a subset of the lsif_uploads table and stores both processed and unprocessed
@@ -43,6 +42,7 @@ type Upload struct {
 	NumParts          int
 	UploadedParts     []int
 	UploadSize        *int64
+	UncompressedSize  *int64
 	Rank              *int
 	AssociatedIndexID *int
 }
@@ -75,6 +75,7 @@ func scanUpload(s dbutil.Scanner) (upload Upload, _ error) {
 		&upload.UploadSize,
 		&upload.AssociatedIndexID,
 		&upload.Rank,
+		&upload.UncompressedSize,
 	); err != nil {
 		return upload, err
 	}
@@ -111,6 +112,7 @@ func scanUploadWithCount(s dbutil.Scanner) (upload Upload, count int, _ error) {
 		&upload.UploadSize,
 		&upload.AssociatedIndexID,
 		&upload.Rank,
+		&upload.UncompressedSize,
 		&count,
 	); err != nil {
 		return upload, 0, err
@@ -131,11 +133,6 @@ var scanUploadsWithCount = basestore.NewSliceWithCountScanner(scanUploadWithCoun
 
 // scanFirstUpload scans a slice of uploads from the return value of `*Store.query` and returns the first.
 var scanFirstUpload = basestore.NewFirstScanner(scanUpload)
-
-// scanFirstUploadRecord scans a slice of uploads from the return value of `*Store.query` and returns the first.
-func scanFirstUploadRecord(rows *sql.Rows, err error) (workerutil.Record, bool, error) {
-	return scanFirstUpload(rows, err)
-}
 
 // scanCounts scans pairs of id/counts from the return value of `*Store.query`.
 func scanCounts(rows *sql.Rows, queryErr error) (_ map[int]int, err error) {
@@ -204,7 +201,8 @@ SELECT
 	u.uploaded_parts,
 	u.upload_size,
 	u.associated_index_id,
-	s.rank
+	s.rank,
+	u.uncompressed_size
 FROM lsif_uploads u
 LEFT JOIN (` + uploadRankQueryFragment + `) s
 ON u.id = s.id
@@ -262,7 +260,8 @@ SELECT
 	u.uploaded_parts,
 	u.upload_size,
 	u.associated_index_id,
-	s.rank
+	s.rank,
+	u.uncompressed_size
 FROM lsif_uploads u
 LEFT JOIN (` + uploadRankQueryFragment + `) s
 ON u.id = s.id
@@ -402,7 +401,8 @@ func (s *Store) GetUploads(ctx context.Context, opts GetUploadsOptions) (_ []Upl
 				uploaded_parts,
 				upload_size,
 				associated_index_id,
-				expired
+				expired,
+				uncompressed_size
 			FROM lsif_uploads
 			UNION ALL
 			SELECT *
@@ -505,6 +505,7 @@ SELECT
 	u.upload_size,
 	u.associated_index_id,
 	s.rank,
+	u.uncompressed_size,
 	COUNT(*) OVER() AS count
 FROM %s
 LEFT JOIN (` + uploadRankQueryFragment + `) s
@@ -528,7 +529,8 @@ SELECT
 	COALESCE((snapshot->'num_parts')::integer, -1) AS num_parts,
 	NULL::integer[] as uploaded_parts,
 	au.upload_size, au.associated_index_id,
-	COALESCE((snapshot->'expired')::boolean, false) AS expired
+	COALESCE((snapshot->'expired')::boolean, false) AS expired,
+	NULL::bigint AS uncompressed_size
 FROM (
 	SELECT upload_id, snapshot_transition_columns(transition_columns ORDER BY sequence ASC) AS snapshot
 	FROM lsif_uploads_audit_logs
@@ -643,6 +645,7 @@ func (s *Store) InsertUpload(ctx context.Context, upload Upload) (id int, err er
 			pq.Array(upload.UploadedParts),
 			upload.UploadSize,
 			upload.AssociatedIndexID,
+			upload.UncompressedSize,
 		),
 	))
 
@@ -661,8 +664,9 @@ INSERT INTO lsif_uploads (
 	num_parts,
 	uploaded_parts,
 	upload_size,
-	associated_index_id
-) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+	associated_index_id,
+	uncompressed_size
+) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
 RETURNING id
 `
 
@@ -748,6 +752,7 @@ var uploadColumnsWithNullRank = []*sqlf.Query{
 	sqlf.Sprintf("u.upload_size"),
 	sqlf.Sprintf("u.associated_index_id"),
 	sqlf.Sprintf("NULL"),
+	sqlf.Sprintf("u.uncompressed_size"),
 }
 
 // DeleteUploadByID deletes an upload by its identifier. This method returns a true-valued flag if a record
@@ -908,105 +913,6 @@ repositories_matching_policy AS (
 	FROM lsif_configuration_policies p
 	JOIN lsif_configuration_policies_repository_pattern_lookup rpl ON rpl.policy_id = p.id
 	WHERE p.indexing_enabled
-),
-candidate_repositories AS (
-	SELECT r.id AS id
-	FROM repo r
-	WHERE
-		r.deleted_at IS NULL AND
-		r.blocked IS NULL AND
-		r.id IN (SELECT id FROM repositories_matching_policy)
-),
-repositories AS (
-	SELECT cr.id
-	FROM candidate_repositories cr
-	LEFT JOIN %s lrs ON lrs.repository_id = cr.id
-
-	-- Ignore records that have been checked recently. Note this condition is
-	-- true for a null {column_name} (which has never been checked).
-	WHERE (%s - lrs.{column_name} > (%s * '1 second'::interval)) IS DISTINCT FROM FALSE
-	ORDER BY
-		lrs.{column_name} NULLS FIRST,
-		cr.id -- tie breaker
-	LIMIT %s
-)
-INSERT INTO %s (repository_id, {column_name})
-SELECT r.id, %s::timestamp FROM repositories r
-ON CONFLICT (repository_id) DO UPDATE
-SET {column_name} = %s
-RETURNING repository_id
-`
-
-// SelectRepositoriesForLockfileIndexScan returns a set of repository identifiers that should be considered
-// for indexing jobs. Repositories that were returned previously from this call within the given
-// process delay are not returned.
-//
-// If allowGlobalPolicies is false, then configuration policies that define neither a repository id
-// nor a non-empty set of repository patterns wl be ignored. When true, such policies apply over all
-// repositories known to the instance.
-func (s *Store) SelectRepositoriesForLockfileIndexScan(ctx context.Context, table, column string, processDelay time.Duration, allowGlobalPolicies bool, repositoryMatchLimit *int, limit int) (_ []int, err error) {
-	return s.selectRepositoriesForLockfileIndexScan(ctx, table, column, processDelay, allowGlobalPolicies, repositoryMatchLimit, limit, timeutil.Now())
-}
-
-func (s *Store) selectRepositoriesForLockfileIndexScan(ctx context.Context, table, column string, processDelay time.Duration, allowGlobalPolicies bool, repositoryMatchLimit *int, limit int, now time.Time) (_ []int, err error) {
-	ctx, _, endObservation := s.operations.selectRepositoriesForLockfileIndexScan.With(ctx, &err, observation.Args{LogFields: []log.Field{
-		log.Bool("allowGlobalPolicies", allowGlobalPolicies),
-		log.Int("limit", limit),
-	}})
-	defer endObservation(1, observation.Args{})
-
-	limitExpression := sqlf.Sprintf("")
-	if repositoryMatchLimit != nil {
-		limitExpression = sqlf.Sprintf("LIMIT %s", *repositoryMatchLimit)
-	}
-
-	replacer := strings.NewReplacer("{column_name}", column)
-	return basestore.ScanInts(s.Query(ctx, sqlf.Sprintf(
-		replacer.Replace(selectRepositoriesForLockfileIndexScanQuery),
-		allowGlobalPolicies,
-		limitExpression,
-		quote(table),
-		now,
-		int(processDelay/time.Second),
-		limit,
-		quote(table),
-		now,
-		now,
-	)))
-}
-
-const selectRepositoriesForLockfileIndexScanQuery = `
--- source: internal/codeintel/stores/dbstore/uploads.go:selectRepositoriesForLockfileIndexScan
-WITH
-repositories_matching_policy AS (
-	(
-		SELECT r.id FROM repo r WHERE EXISTS (
-			SELECT 1
-			FROM lsif_configuration_policies p
-			WHERE
-				p.lockfile_indexing_enabled AND
-				p.repository_id IS NULL AND
-				p.repository_patterns IS NULL AND
-				%s -- completely enable or disable this query
-		)
-		ORDER BY stars DESC NULLS LAST, id
-		%s
-	)
-
-	UNION ALL
-
-	SELECT p.repository_id AS id
-	FROM lsif_configuration_policies p
-	WHERE
-		p.lockfile_indexing_enabled AND
-		p.repository_id IS NOT NULL
-
-	UNION ALL
-
-	SELECT rpl.repo_id AS id
-	FROM lsif_configuration_policies p
-	JOIN lsif_configuration_policies_repository_pattern_lookup rpl ON rpl.policy_id = p.id
-	WHERE p.lockfile_indexing_enabled
 ),
 candidate_repositories AS (
 	SELECT r.id AS id
@@ -1283,16 +1189,19 @@ ranked_uploads_providing_packages AS (
 canonical_package_reference_counts AS (
 	SELECT
 		ru.id,
-		count(*) AS count
-	FROM ranked_uploads_providing_packages ru
-	JOIN lsif_references r
-	ON
-		r.scheme = ru.scheme AND
-		r.name = ru.name AND
-		r.version = ru.version AND
-		r.dump_id != ru.id
+		rc.count
+	FROM ranked_uploads_providing_packages ru,
+	LATERAL (
+		SELECT
+			COUNT(*) AS count
+		FROM lsif_references r
+		WHERE
+			r.scheme = ru.scheme AND
+			r.name = ru.name AND
+			r.version = ru.version AND
+			r.dump_id != ru.id
+	) rc
 	WHERE ru.rank = 1
-	GROUP BY ru.id
 ),
 
 -- Count (and ranks) the set of edges that cross over from the target list of uploads
@@ -1536,7 +1445,8 @@ SELECT
 	u.uploaded_parts,
 	u.upload_size,
 	u.associated_index_id,
-	s.rank
+	s.rank,
+	u.uncompressed_size
 FROM lsif_uploads_with_repository_name u
 LEFT JOIN (` + uploadRankQueryFragment + `) s
 ON u.id = s.id

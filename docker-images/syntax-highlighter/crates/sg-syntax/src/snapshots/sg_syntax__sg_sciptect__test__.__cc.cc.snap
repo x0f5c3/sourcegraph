@@ -1,0 +1,30 @@
+---
+source: crates/sg-syntax/src/sg_sciptect.rs
+expression: "dump_document(&document, &contents)"
+---
+  #include "common/common.h"
+//^^^^^^^^ IdentifierKeyword
+//        ^ IdentifierNamespace
+//         ^^^^^^^^^^^^^^^^^ StringLiteral
+  #include <csignal>
+//^^^^^^^^ IdentifierKeyword
+//        ^ IdentifierNamespace
+//         ^^^^^^^^^ StringLiteral
+  
+  int main() {
+//^^^ IdentifierType
+//    ^^^^ IdentifierFunction
+//        ^ PunctuationBracket
+//         ^ PunctuationBracket
+//           ^ PunctuationBracket
+      syntect::Exception::raise("oops");
+//           ^^ PunctuationBracket
+//                      ^^ PunctuationBracket
+//                        ^^^^^ IdentifierFunction
+//                             ^ PunctuationBracket
+//                              ^^^^^^ StringLiteral
+//                                    ^ PunctuationBracket
+//                                     ^ PunctuationDelimiter
+  }
+//^ PunctuationBracket
+

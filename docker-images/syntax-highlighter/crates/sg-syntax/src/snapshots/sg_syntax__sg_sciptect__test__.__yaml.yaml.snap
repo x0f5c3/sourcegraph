@@ -1,0 +1,110 @@
+---
+source: crates/sg-syntax/src/sg_sciptect.rs
+expression: "dump_document(&document, &contents)"
+---
+  ---
+  name: hello
+//^^^^ StringLiteralKey
+//    ^ PunctuationBracket
+//      ^^^^^ StringLiteral
+  json:
+//^^^^ StringLiteralKey
+//    ^ PunctuationBracket
+  - rigid
+//^ PunctuationBracket
+//  ^^^^^ StringLiteral
+  - better for data interchange
+//^ PunctuationBracket
+//  ^^^^^^^^^^^^^^^^^^^^^^^^^^^ StringLiteral
+  yaml:
+//^^^^ StringLiteralKey
+//    ^ PunctuationBracket
+  - slim and flexible
+//^ PunctuationBracket
+//  ^^^^^^^^^^^^^^^^^ StringLiteral
+  - better for configuration
+//^ PunctuationBracket
+//  ^^^^^^^^^^^^^^^^^^^^^^^^ StringLiteral
+  object:
+//^^^^^^ StringLiteralKey
+//      ^ PunctuationBracket
+    key: value
+//  ^^^ StringLiteralKey
+//     ^ PunctuationBracket
+//       ^^^^^ StringLiteral
+    array:
+//  ^^^^^ StringLiteralKey
+//       ^ PunctuationBracket
+    - array_value: [1,2,3]
+//  ^ PunctuationBracket
+//    ^^^^^^^^^^^ StringLiteralKey
+//               ^ PunctuationBracket
+//                 ^ PunctuationBracket
+//                  ^ NumericLiteral
+//                   ^ PunctuationBracket
+//                    ^ NumericLiteral
+//                     ^ PunctuationBracket
+//                      ^ NumericLiteral
+//                       ^ PunctuationBracket
+    - null_value:
+//  ^ PunctuationBracket
+//    ^^^^^^^^^^ StringLiteralKey
+//              ^ PunctuationBracket
+    - boolean: true
+//  ^ PunctuationBracket
+//    ^^^^^^^ StringLiteralKey
+//           ^ PunctuationBracket
+//             ^^^^ IdentifierBuiltin
+    - integer: 1
+//  ^ PunctuationBracket
+//    ^^^^^^^ StringLiteralKey
+//           ^ PunctuationBracket
+//             ^ NumericLiteral
+    - alias: aliases are like variables
+//  ^ PunctuationBracket
+//    ^^^^^ StringLiteralKey
+//         ^ PunctuationBracket
+//           ^^^^^^^^^^^^^^^^^^^^^^^^^^ StringLiteral
+    - alias: aliases are like variables
+//  ^ PunctuationBracket
+//    ^^^^^ StringLiteralKey
+//         ^ PunctuationBracket
+//           ^^^^^^^^^^^^^^^^^^^^^^^^^^ StringLiteral
+  paragraph: |
+//^^^^^^^^^ StringLiteralKey
+//         ^ PunctuationBracket
+//           ^ IdentifierKeyword
+    Blank lines denote
+//^^^^^^^^^^^^^^^^^^^^ StringLiteral 18:0..20:0
+    paragraph breaks
+  content: |-
+//^^^^^^^ StringLiteralKey
+//       ^ PunctuationBracket
+//         ^ IdentifierKeyword
+//          ^ IdentifierKeyword
+    Or we
+//^^^^^^^ StringLiteral 21:0..25:0
+    can auto
+    convert line breaks
+    to save space
+  alias:
+//^^^^^ StringLiteralKey
+//     ^ PunctuationBracket
+    - "media/**"
+//  ^ PunctuationBracket
+//    ^^^^^^^^^^ StringLiteral
+  jobs:
+//^^^^ StringLiteralKey
+//    ^ PunctuationBracket
+  bar: baz
+//^^^ StringLiteralKey
+//   ^ PunctuationBracket
+//     ^^^ StringLiteral
+  alias_reuse:
+//^^^^^^^^^^^ StringLiteralKey
+//           ^ PunctuationBracket
+    bar: baz
+//  ^^^ StringLiteralKey
+//     ^ PunctuationBracket
+//       ^^^ StringLiteral
+

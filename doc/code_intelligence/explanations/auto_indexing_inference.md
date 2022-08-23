@@ -1,8 +1,8 @@
 # Inference of auto-indexing jobs
 
-<aside class="experimental">
+<aside class="beta">
 <p>
-<span class="badge badge-experimental">Experimental</span> This feature is experimental and might change or be removed in the future. We've released it as an experimental feature to provide a preview of functionality we're working on.
+<span class="badge badge-beta">Beta</span> This feature is in beta for self-hosted customers and might change in the future.
 </p>
 
 <p><b>We're very much looking for input and feedback on this feature.</b> You can either <a href="https://about.sourcegraph.com/contact">contact us directly</a>, <a href="https://github.com/sourcegraph/sourcegraph">file an issue</a>, or <a href="https://twitter.com/sourcegraph">tweet at us</a>.</p>
@@ -12,7 +12,7 @@ When a commit of a repository is selected as a candidate for [auto-indexing](./a
 
 This document describes the heuristics used to determine the set of index jobs to schedule. See [configuration reference](../references/auto_indexing_configuration.md) for additional documentation on how index jobs are configured.
 
-As a general rule of thumb, an LSIF indexer can be invoked successfully if the source code to index can be compiled successfully. The heuristics below attempt to cover the common cases of dependency resolution, but may not be sufficient if the target code requires additional steps such as code generation, header file linking, or installation of system dependencies to compile from a fresh clone of the repository. For such cases, we recommend using the inferred job as a starting point to [explicitly supply index job configuration](../how-to/configure_auto_indexing.md#explicit-index-job-configuration).
+As a general rule of thumb, an indexer can be invoked successfully if the source code to index can be compiled successfully. The heuristics below attempt to cover the common cases of dependency resolution, but may not be sufficient if the target code requires additional steps such as code generation, header file linking, or installation of system dependencies to compile from a fresh clone of the repository. For such cases, we recommend using the inferred job as a starting point to [explicitly supply index job configuration](../how-to/configure_auto_indexing.md#explicit-index-job-configuration).
 
 ## Go
 
@@ -94,7 +94,7 @@ indexing_jobs:
 
 ## Java
 
-> NOTE: Inference for languages supported by [scip-java](https://github.com/sourcegraph/scip-java) is currently restricted to Sourcegraph Cloud.
+> NOTE: Inference for languages supported by [scip-java](https://github.com/sourcegraph/scip-java) is currently restricted to Sourcegraph.com.
 
 If the repository contains both a `lsif-java.json` file as well as `*.java`, `*.scala`, or `*.kt` files, the following index job is scheduled.
 

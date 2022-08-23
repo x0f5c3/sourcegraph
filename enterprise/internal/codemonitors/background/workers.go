@@ -13,6 +13,7 @@ import (
 	"github.com/sourcegraph/sourcegraph/enterprise/internal/codemonitors"
 	edb "github.com/sourcegraph/sourcegraph/enterprise/internal/database"
 	"github.com/sourcegraph/sourcegraph/internal/actor"
+	"github.com/sourcegraph/sourcegraph/internal/database"
 	"github.com/sourcegraph/sourcegraph/internal/database/basestore"
 	"github.com/sourcegraph/sourcegraph/internal/featureflag"
 	"github.com/sourcegraph/sourcegraph/internal/goroutine"
@@ -106,7 +107,7 @@ func createDBWorkerStoreForTriggerJobs(s basestore.ShareableStore) dbworkerstore
 		Name:              "code_monitors_trigger_jobs_worker_store",
 		TableName:         "cm_trigger_jobs",
 		ColumnExpressions: edb.TriggerJobsColumns,
-		Scan:              edb.ScanTriggerJobsRecord,
+		Scan:              dbworkerstore.BuildWorkerScan(edb.ScanTriggerJob),
 		StalledMaxAge:     60 * time.Second,
 		RetryAfter:        10 * time.Second,
 		MaxNumRetries:     3,
@@ -119,7 +120,7 @@ func createDBWorkerStoreForActionJobs(s edb.CodeMonitorStore) dbworkerstore.Stor
 		Name:              "code_monitors_action_jobs_worker_store",
 		TableName:         "cm_action_jobs",
 		ColumnExpressions: edb.ActionJobColumns,
-		Scan:              edb.ScanActionJobRecord,
+		Scan:              dbworkerstore.BuildWorkerScan(edb.ScanActionJob),
 		StalledMaxAge:     60 * time.Second,
 		RetryAfter:        10 * time.Second,
 		MaxNumRetries:     3,
@@ -283,7 +284,7 @@ func (r *actionRunner) handleEmail(ctx context.Context, j *edb.ActionJob) error 
 		if rec.NamespaceUserID == nil {
 			return errors.New("nil recipient")
 		}
-		err = SendEmailForNewSearchResult(ctx, *rec.NamespaceUserID, data)
+		err = SendEmailForNewSearchResult(ctx, database.NewDBWith(log.Scoped("handleEmail", ""), r.CodeMonitorStore), *rec.NamespaceUserID, data)
 		if err != nil {
 			return err
 		}
