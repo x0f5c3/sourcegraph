@@ -39,11 +39,7 @@ func TestSubRepoPermissionsPerforce(t *testing.T) {
 		}
 	})
 
-	// flaky test
-	// https://github.com/sourcegraph/sourcegraph/issues/40882
 	t.Run("cannot read hack.sh", func(t *testing.T) {
-		t.Skip("skipping because flaky")
-
 		// Should not be able to read hack.sh
 		blob, err := userClient.GitBlob(repoName, "master", "Security/hack.sh")
 		if err != nil {
@@ -55,15 +51,11 @@ func TestSubRepoPermissionsPerforce(t *testing.T) {
 		wantBlob := ``
 
 		if diff := cmp.Diff(wantBlob, blob); diff != "" {
-			t.Fatalf("Blob mismatch (-want +got):\n%s", diff)
+			checkUserPermsForFailure(t, diff)
 		}
 	})
 
-	// flaky test
-	// https://github.com/sourcegraph/sourcegraph/issues/40883
 	t.Run("file list excludes excluded files", func(t *testing.T) {
-		t.Skip("skipping because flaky")
-
 		files, err := userClient.GitListFilenames(repoName, "master")
 		if err != nil {
 			t.Fatal(err)
@@ -77,9 +69,24 @@ func TestSubRepoPermissionsPerforce(t *testing.T) {
 		}
 
 		if diff := cmp.Diff(wantFiles, files); diff != "" {
-			t.Fatalf("fileNames mismatch (-want +got):\n%s", diff)
+			checkUserPermsForFailure(t, diff)
 		}
 	})
+}
+
+func checkUserPermsForFailure(t *testing.T, diff string) {
+	t.Helper()
+	userPermsInfo, err := client.UserPermissionsInfo(aliceUsername)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if userPermsInfo == nil {
+		t.Fatalf("Blob mismatch (-want +got):\n%s\nUser perms info was nil", diff)
+	}
+	if userPermsInfo != nil && !userPermsInfo.SyncedAt.IsZero() {
+		t.Fatalf("Blob mismatch (-want +got):\n%s\nUser perms syncedAt was zero", diff)
+	}
+	t.Fatalf("Blob mismatch (-want +got):\n%s\nUser perms synced at was %v", diff, userPermsInfo.SyncedAt)
 }
 
 func TestSubRepoPermissionsSearch(t *testing.T) {
