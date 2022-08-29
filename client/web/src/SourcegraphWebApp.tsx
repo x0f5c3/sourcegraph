@@ -33,8 +33,21 @@ import { getEnabledExtensions } from '@sourcegraph/shared/src/api/client/enabled
 import { preloadExtensions } from '@sourcegraph/shared/src/api/client/preload'
 import { NotificationType } from '@sourcegraph/shared/src/api/extension/extensionHostApi'
 import { fetchHighlightedFileLineRanges } from '@sourcegraph/shared/src/backend/file'
+<<<<<<< Updated upstream
 import { Controller as ExtensionsController } from '@sourcegraph/shared/src/extensions/controller'
 import { createController as createExtensionsController } from '@sourcegraph/shared/src/extensions/createLazyLoadedController'
+||||||| constructed merge base
+import {
+    Controller as ExtensionsController,
+    createController as createExtensionsController,
+} from '@sourcegraph/shared/src/extensions/controller'
+=======
+import {
+    Controller as ExtensionsController,
+    createController as createExtensionsController,
+    createNoopController as createNoopExtensionsController,
+} from '@sourcegraph/shared/src/extensions/controller'
+>>>>>>> Stashed changes
 import { getModeFromPath } from '@sourcegraph/shared/src/languages'
 import { BrandedNotificationItemStyleProps } from '@sourcegraph/shared/src/notifications/NotificationItem'
 import { Notifications } from '@sourcegraph/shared/src/notifications/Notifications'
@@ -183,12 +196,21 @@ export class SourcegraphWebApp extends React.Component<
     private readonly subscriptions = new Subscription()
     private readonly userRepositoriesUpdates = new Subject<void>()
     private readonly platformContext: PlatformContext = createPlatformContext()
+<<<<<<< Updated upstream
     private readonly extensionsController: ExtensionsController | null = window.context.enableLegacyExtensions
         ? createExtensionsController(this.platformContext)
         : null
+||||||| constructed merge base
+    private readonly extensionsController: ExtensionsController = createExtensionsController(this.platformContext)
+=======
+    private readonly extensionsController: ExtensionsController = window.context.enableLegacyExtensions
+        ? createExtensionsController(this.platformContext)
+        : createNoopExtensionsController()
+>>>>>>> Stashed changes
 
     constructor(props: SourcegraphWebAppProps) {
         super(props)
+<<<<<<< Updated upstream
 
         if (this.extensionsController !== null) {
             this.subscriptions.add(this.extensionsController)
@@ -207,6 +229,41 @@ export class SourcegraphWebApp extends React.Component<
                         extensions,
                         languages: new Set([languageID]),
                     })
+||||||| constructed merge base
+        this.subscriptions.add(this.extensionsController)
+
+        // Preload extensions whenever user enabled extensions or the viewed language changes.
+        this.subscriptions.add(
+            combineLatest([
+                getEnabledExtensions(this.platformContext),
+                observeLocation(history).pipe(
+                    startWith(location),
+                    map(location => getModeFromPath(location.pathname)),
+                    distinctUntilChanged()
+                ),
+            ]).subscribe(([extensions, languageID]) => {
+                preloadExtensions({
+                    extensions,
+                    languages: new Set([languageID]),
+=======
+        if (window.context.enableLegacyExtensions && this.extensionsController) {
+            this.subscriptions.add(this.extensionsController)
+
+            // Preload extensions whenever user enabled extensions or the viewed language changes.
+            this.subscriptions.add(
+                combineLatest([
+                    getEnabledExtensions(this.platformContext),
+                    observeLocation(history).pipe(
+                        startWith(location),
+                        map(location => getModeFromPath(location.pathname)),
+                        distinctUntilChanged()
+                    ),
+                ]).subscribe(([extensions, languageID]) => {
+                    preloadExtensions({
+                        extensions,
+                        languages: new Set([languageID]),
+                    })
+>>>>>>> Stashed changes
                 })
             )
         }
@@ -470,11 +527,21 @@ export class SourcegraphWebApp extends React.Component<
     }
 
     private async setWorkspaceSearchContext(spec: string | undefined): Promise<void> {
+<<<<<<< Updated upstream
         if (this.extensionsController === null) {
             return
         }
         const extensionHostAPI = await this.extensionsController.extHostAPI
         await extensionHostAPI.setSearchContext(spec)
+||||||| constructed merge base
+        const extensionHostAPI = await this.extensionsController.extHostAPI
+        await extensionHostAPI.setSearchContext(spec)
+=======
+        if (window.context.enableLegacyExtensions && this.extensionsController) {
+            const extensionHostAPI = await this.extensionsController.extHostAPI
+            await extensionHostAPI.setSearchContext(spec)
+        }
+>>>>>>> Stashed changes
     }
 
     private onCreateNotebook = (blocks: BlockInput[]): void => {

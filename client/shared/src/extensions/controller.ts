@@ -1,5 +1,16 @@
 import { Remote } from 'comlink'
+<<<<<<< Updated upstream
 import { Observable, Unsubscribable } from 'rxjs'
+||||||| constructed merge base
+import { from, Observable, Subscription, Unsubscribable } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
+=======
+import * as comlink from 'comlink'
+
+import { from, NEVER, Observable, Subscription, Unsubscribable, of } from 'rxjs'
+import { switchMap } from 'rxjs/operators'
+import { proxySubscribable } from '../api/extension/api/common'
+>>>>>>> Stashed changes
 
 import type { CommandEntry, ExecuteCommandParameters } from '../api/client/mainthread-api'
 import type { FlatExtensionHostAPI } from '../api/contract'
@@ -39,8 +50,95 @@ export interface ExtensionsControllerProps<K extends keyof Controller = keyof Co
     /**
      * The client, which is used to communicate with and manage extensions.
      */
+<<<<<<< Updated upstream
     extensionsController: Pick<Controller, K> | null
+||||||| constructed merge base
+    extensionsController: Pick<Controller, K>
+=======
+    extensionsController: Pick<Controller, K> // ##
+>>>>>>> Stashed changes
 }
 export interface RequiredExtensionsControllerProps<K extends keyof Controller = keyof Controller> {
     extensionsController: Pick<Controller, K>
+}
+
+export function createNoopController(): Controller {
+    return {
+        executeCommand: () => Promise.resolve(),
+        commandErrors: NEVER,
+        registerCommand: () => {
+            return {
+                unsubscribe: () => {},
+            }
+        },
+        extHostAPI: Promise.resolve(comlink.wrap<FlatExtensionHostAPI>(noopFlatExtensionHostAPI)),
+        unsubscribe: () => {},
+    }
+}
+
+const NOOP = () => {}
+const NOOP_EMPTY_ARRAY_PROXY = () => proxySubscribable(of([]))
+const NOOP_NEVER_PROXY = () => proxySubscribable(NEVER)
+
+const noopFlatExtensionHostAPI: FlatExtensionHostAPI = {
+    syncSettingsData: NOOP,
+
+    addWorkspaceRoot: NOOP,
+    getWorkspaceRoots: NOOP_EMPTY_ARRAY_PROXY,
+    removeWorkspaceRoot: NOOP,
+
+    setSearchContext: NOOP,
+    transformSearchQuery: (query: string) => proxySubscribable(of(query)),
+
+    getHover: () => proxySubscribable(of({ isLoading: true, result: null })),
+    getDocumentHighlights: NOOP_EMPTY_ARRAY_PROXY,
+    getDefinition: () => proxySubscribable(of({ isLoading: true, result: [] })),
+    getReferences: () => proxySubscribable(of({ isLoading: true, result: [] })),
+    getLocations: () => proxySubscribable(of({ isLoading: true, result: [] })),
+
+    hasReferenceProvidersForDocument: () => proxySubscribable(of(false)),
+
+    getFileDecorations: () => proxySubscribable(of({})),
+
+    updateContext: NOOP,
+
+    registerContributions: (): any => ({
+        unsubscribe: NOOP,
+    }),
+    getContributions: () => proxySubscribable(of({})),
+
+    addTextDocumentIfNotExists: NOOP,
+
+    getActiveViewComponentChanges: () => proxySubscribable(of(undefined)),
+
+    getActiveCodeEditorPosition: () => proxySubscribable(of(null)),
+
+    getTextDecorations: NOOP_EMPTY_ARRAY_PROXY,
+
+    addViewerIfNotExists: () => ({ viewerId: '' }),
+    viewerUpdates: NOOP_NEVER_PROXY,
+
+    setEditorSelections: NOOP,
+    removeViewer: NOOP,
+
+    getPlainNotifications: NOOP_NEVER_PROXY,
+    getProgressNotifications: NOOP_NEVER_PROXY,
+
+    getPanelViews: NOOP_EMPTY_ARRAY_PROXY,
+
+    getInsightViewById: NOOP_NEVER_PROXY,
+    getInsightsViews: NOOP_EMPTY_ARRAY_PROXY,
+
+    getHomepageViews: NOOP_EMPTY_ARRAY_PROXY,
+
+    getDirectoryViews: NOOP_EMPTY_ARRAY_PROXY,
+
+    getGlobalPageViews: NOOP_EMPTY_ARRAY_PROXY,
+    getStatusBarItems: NOOP_EMPTY_ARRAY_PROXY,
+
+    getLinkPreviews: () => proxySubscribable(of(null)),
+
+    haveInitialExtensionsLoaded: () => proxySubscribable(of(false)),
+
+    getActiveExtensions: NOOP_EMPTY_ARRAY_PROXY,
 }

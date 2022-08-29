@@ -175,6 +175,26 @@ func NewJSContextFromRequest(req *http.Request, db database.DB) JSContext {
 		openTelemetry = clientObservability.OpenTelemetry
 	}
 
+<<<<<<< Updated upstream
+||||||| constructed merge base
+	var githubAppCloudSlug string
+	var githubAppCloudClientID string
+	if envvar.SourcegraphDotComMode() && siteConfig.Dotcom != nil && siteConfig.Dotcom.GithubAppCloud != nil {
+		githubAppCloudSlug = siteConfig.Dotcom.GithubAppCloud.Slug
+		githubAppCloudClientID = siteConfig.Dotcom.GithubAppCloud.ClientID
+	}
+
+	var enableLegacyExtensions = true
+=======
+	var githubAppCloudSlug string
+	var githubAppCloudClientID string
+	if envvar.SourcegraphDotComMode() && siteConfig.Dotcom != nil && siteConfig.Dotcom.GithubAppCloud != nil {
+		githubAppCloudSlug = siteConfig.Dotcom.GithubAppCloud.Slug
+		githubAppCloudClientID = siteConfig.Dotcom.GithubAppCloud.ClientID
+	}
+
+	var enableLegacyExtensions = false
+>>>>>>> Stashed changes
 	// 🚨 SECURITY: This struct is sent to all users regardless of whether or
 	// not they are logged in, for example on an auth.public=false private
 	// server. Including secret fields here is OK if it is based on the user's
