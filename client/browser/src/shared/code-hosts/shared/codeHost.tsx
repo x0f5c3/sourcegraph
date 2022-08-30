@@ -72,7 +72,7 @@ import {
     CommandListPopoverButtonClassProps,
 } from '@sourcegraph/shared/src/commandPalette/CommandList'
 import { ApplyLinkPreviewOptions } from '@sourcegraph/shared/src/components/linkPreviews/linkPreviews'
-import { Controller } from '@sourcegraph/shared/src/extensions/controller'
+import { CodeIntelController, Controller } from '@sourcegraph/shared/src/extensions/controller'
 import { getHoverActions, registerHoverContributions } from '@sourcegraph/shared/src/hover/actions'
 import { HoverContext, HoverOverlay, HoverOverlayClassProps } from '@sourcegraph/shared/src/hover/HoverOverlay'
 import { getModeFromPath } from '@sourcegraph/shared/src/languages'
@@ -330,7 +330,7 @@ export interface CodeIntelligenceProps extends TelemetryProps {
         'urlToFile' | 'sideloadedExtensionURL' | 'requestGraphQL' | 'settings' | 'refreshSettings' | 'sourcegraphURL'
     >
     codeHost: CodeHost
-    extensionsController: Controller
+    extensionsController: Controller | CodeIntelController
     showGlobalDebug?: boolean
 }
 

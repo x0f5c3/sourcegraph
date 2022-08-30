@@ -29,7 +29,7 @@ import { WorkspaceRootWithMetadata } from '../api/extension/extensionHostApi'
 import { syncRemoteSubscription } from '../api/util'
 import { resolveRawRepoName } from '../backend/repo'
 import { getContributedActionItems } from '../contributions/contributions'
-import { Controller, ExtensionsControllerProps } from '../extensions/controller'
+import { CodeIntelController, Controller, ExtensionsControllerProps } from '../extensions/controller'
 import { PlatformContext, PlatformContextProps, URLToFileContext } from '../platform/context'
 import { makeRepoURI, parseRepoURI, withWorkspaceRootInputRevision } from '../util/url'
 
@@ -320,7 +320,7 @@ export function registerHoverContributions({
     history,
     locationAssign,
 }: {
-    extensionsController: Pick<Controller, 'extHostAPI' | 'registerCommand'>
+    extensionsController: Pick<Controller, 'extHostAPI' | 'registerCommand'> | CodeIntelController
     platformContext: Pick<PlatformContext, 'urlToFile' | 'requestGraphQL'>
 } & {
     history: H.History

@@ -31,6 +31,10 @@ export interface Controller extends Unsubscribable {
     extHostAPI: Promise<Remote<FlatExtensionHostAPI>>
 }
 
+export class CodeIntelController {
+    myApi(): void {}
+}
+
 /**
  * React props or state containing the client. There should be only a single client for the whole
  * application.
@@ -39,7 +43,7 @@ export interface ExtensionsControllerProps<K extends keyof Controller = keyof Co
     /**
      * The client, which is used to communicate with and manage extensions.
      */
-    extensionsController: Pick<Controller, K> | null
+    extensionsController: Pick<Controller, K> | CodeIntelController
 }
 export interface RequiredExtensionsControllerProps<K extends keyof Controller = keyof Controller> {
     extensionsController: Pick<Controller, K>

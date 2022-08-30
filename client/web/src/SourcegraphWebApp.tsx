@@ -33,7 +33,7 @@ import { getEnabledExtensions } from '@sourcegraph/shared/src/api/client/enabled
 import { preloadExtensions } from '@sourcegraph/shared/src/api/client/preload'
 import { NotificationType } from '@sourcegraph/shared/src/api/extension/extensionHostApi'
 import { fetchHighlightedFileLineRanges } from '@sourcegraph/shared/src/backend/file'
-import { Controller as ExtensionsController } from '@sourcegraph/shared/src/extensions/controller'
+import { CodeIntelController, Controller as ExtensionsController } from '@sourcegraph/shared/src/extensions/controller'
 import { createController as createExtensionsController } from '@sourcegraph/shared/src/extensions/createLazyLoadedController'
 import { getModeFromPath } from '@sourcegraph/shared/src/languages'
 import { BrandedNotificationItemStyleProps } from '@sourcegraph/shared/src/notifications/NotificationItem'
@@ -183,14 +183,15 @@ export class SourcegraphWebApp extends React.Component<
     private readonly subscriptions = new Subscription()
     private readonly userRepositoriesUpdates = new Subject<void>()
     private readonly platformContext: PlatformContext = createPlatformContext()
-    private readonly extensionsController: ExtensionsController | null = window.context.enableLegacyExtensions
+    private readonly extensionsController: ExtensionsController | CodeIntelController = window.context
+        .enableLegacyExtensions
         ? createExtensionsController(this.platformContext)
-        : null
+        : new CodeIntelController()
 
     constructor(props: SourcegraphWebAppProps) {
         super(props)
 
-        if (this.extensionsController !== null) {
+        if (!(this.extensionsController instanceof CodeIntelController)) {
             this.subscriptions.add(this.extensionsController)
 
             // Preload extensions whenever user enabled extensions or the viewed language changes.
