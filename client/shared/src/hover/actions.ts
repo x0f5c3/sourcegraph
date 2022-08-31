@@ -14,6 +14,9 @@ import {
     takeUntil,
     scan,
     mapTo,
+    concatMap,
+    withLatestFrom,
+    startWith,
 } from 'rxjs/operators'
 
 import { ContributableMenu, TextDocumentPositionParameters } from '@sourcegraph/client-api'
@@ -24,7 +27,7 @@ import { Context } from '@sourcegraph/template-parser'
 
 import { ActionItemAction } from '../actions/ActionItem'
 import { wrapRemoteObservable } from '../api/client/api/common'
-import { FlatExtensionHostAPI } from '../api/contract'
+import { CodeIntelProviders, FlatExtensionHostAPI } from '../api/contract'
 import { WorkspaceRootWithMetadata } from '../api/extension/extensionHostApi'
 import { syncRemoteSubscription } from '../api/util'
 import { resolveRawRepoName } from '../backend/repo'
@@ -36,14 +39,7 @@ import { makeRepoURI, parseRepoURI, withWorkspaceRootInputRevision } from '../ut
 import { HoverContext } from './HoverOverlay'
 
 const LOADING = 'loading' as const
-
-/**
- * This function is passed to {@link module:@sourcegraph/codeintellify.createHoverifier}, which uses it to fetch
- * the list of buttons to display on the hover tooltip. This function in turn determines that by looking at all
- * action contributions for the "hover" menu. It also defines two builtin hover actions: "Go to definition" and
- * "Find references".
- */
-export function getHoverActions(
+export function getLegacyHoverActions(
     {
         extensionsController,
         platformContext,
@@ -53,7 +49,6 @@ export function getHoverActions(
     if (extensionsController === null) {
         return EMPTY
     }
-
     return getHoverActionsContext(
         {
             platformContext,
@@ -74,6 +69,109 @@ export function getHoverActions(
         },
         hoverContext
     ).pipe(switchMap(context => getHoverActionItems(context, extensionsController.extHostAPI)))
+}
+
+/**
+ * This function is passed to {@link module:@sourcegraph/codeintellify.createHoverifier}, which uses it to fetch
+ * the list of buttons to display on the hover tooltip. This function in turn determines that by looking at all
+ * action contributions for the "hover" menu. It also defines two builtin hover actions: "Go to definition" and
+ * "Find references".
+ */
+export function getHoverActions(
+    {
+        extensionsController,
+        platformContext,
+    }: ExtensionsControllerProps<'extHostAPI'> & PlatformContextProps<'urlToFile' | 'requestGraphQL'>,
+    hoverContext: HoveredToken & HoverContext
+): Observable<ActionItemAction[]> {
+    if (extensionsController === null) {
+        return EMPTY
+    }
+    console.log({ legacyExtensions: window.context?.enableLegacyExtensions })
+    if (window.context?.enableLegacyExtensions) {
+        return getLegacyHoverActions({ extensionsController, platformContext }, hoverContext)
+    }
+    const parameters: TextDocumentPositionParameters & URLToFileContext = {
+        textDocument: { uri: makeRepoURI(hoverContext) },
+        position: { line: hoverContext.line - 1, character: hoverContext.character - 1 },
+        part: hoverContext.part,
+    }
+
+    const panelURL = platformContext.urlToFile(
+        { ...hoverContext, position: hoverContext, viewState: 'panelID' },
+        { part: hoverContext.part }
+    )
+    const definitionPanel = panelURL.replace('panelID', 'def')
+    const referencesPanel = panelURL.replace('panelID', 'references')
+    const implementationsPanel = panelURL.replace('panelID', 'implementations')
+
+    const async = from(extensionsController.extHostAPI).pipe(
+        switchMap(api => wrapRemoteObservable(api.getDefinition(parameters))),
+        map<MaybeLoadingResult<Location[]>, ActionItemAction[]>(definition => {
+            console.log({ definition })
+            return [
+                {
+                    action: {
+                        id: 'goToDefinition',
+                        title: 'Go to definition',
+                        command: 'goToDefinition',
+                        commandArguments: ['${json(hoverPosition)}'],
+                    },
+                    active: true,
+                    disabledWhen: false,
+                },
+                {
+                    action: {
+                        id: 'findReferences',
+                        title: 'Find references',
+                        command: 'open',
+                        commandArguments: [referencesPanel],
+                    },
+                    active: true,
+                },
+                {
+                    action: {
+                        id: 'findImplementations',
+                        title: 'Find implementations',
+                        command: 'open',
+                        commandArguments: [implementationsPanel],
+                    },
+                    active: true,
+                },
+            ]
+        }),
+        delay(2000)
+    )
+
+    // TODO: situations that require custom button groups:
+    // - no buttons because the hover position is over a comment, or string literal. We should compute this synchronously before returning the immediate buttons.
+    // - there's no definition, grey out the button
+    // - there's only a single definition, make it a link to the definition URL
+    // - maybe gray out references/implementations if there are no results
+    return async.pipe(
+        startWith([
+            {
+                action: {
+                    id: 'goToDefinition',
+                    title: 'Go to definition',
+                    command: 'goToDefinition',
+                    commandArguments: ['${json(hoverPosition)}'],
+                },
+                active: true,
+            },
+            {
+                action: {
+                    id: 'findReferences',
+                    title: 'Find references',
+                    command: 'open',
+                    commandArguments: [referencesPanel],
+                },
+                active: true,
+            },
+        ])
+    )
+    // .forEach(y => console.log({ y }))
+    // return old
 }
 
 /**

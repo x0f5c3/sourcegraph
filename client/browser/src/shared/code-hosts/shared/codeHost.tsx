@@ -382,14 +382,14 @@ function initCodeIntelligence({
 
     const containerComponentUpdates = new Subject<void>()
 
-    subscription.add(
-        registerHoverContributions({
-            extensionsController,
-            platformContext,
-            history: H.createBrowserHistory(),
-            locationAssign: location.assign.bind(location),
-        })
-    )
+    // subscription.add(
+    //     registerHoverContributions({
+    //         extensionsController,
+    //         platformContext,
+    //         history: H.createBrowserHistory(),
+    //         locationAssign: location.assign.bind(location),
+    //     })
+    // )
 
     // Code views come and go, but there is always a single hoverifier on the page
     const hoverifier = createHoverifier<
