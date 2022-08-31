@@ -17,6 +17,7 @@ import (
 	"net/url"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"sync"
 
 	"time"
@@ -81,7 +82,7 @@ func main() {
 	cloneRepoTimeout := flag.Duration("cloneRepoTimeout", time.Minute*3, "how long to wait for a repo to clone")
 	numCloningAttempts := flag.Int("numCloningAttempts", 5, "number of cloning attempts before giving up")
 	numSimultaneousClones := flag.Int("numSimultaneousClones", 10, "number of simultaneous github.com clones")
-
+	groupName := flag.String("groupName", "", "name of bitbucket group to create and grant project read access to")
 	help := flag.Bool("help", false, "Show help")
 
 	flag.Parse()
@@ -99,6 +100,10 @@ func main() {
 
 	if len(*uploadURL) == 0 {
 		*uploadURL = *baseURL
+	}
+
+	if len(*groupName) == 0 {
+		*groupName = "groupCreated_" + strconv.FormatInt(time.Now().UnixMilli(), 10)
 	}
 
 	if len(*scratchDir) == 0 {
@@ -138,10 +143,18 @@ func main() {
 	if *deleteProjects {
 		clearAllProjects(client, *admin)
 		err := os.Remove(*progressFilepath)
-		if err != nil {
+		if err != nil && !os.IsNotExist(err) {
 			log15.Error("failed to remove feeder database file", "progressFilepath", *progressFilepath, "error", err)
 			os.Exit(1)
 		}
+	}
+
+	// TODO Delete previous bb groups
+	groupVars := map[string]interface{}{"name": *groupName}
+	resp, err := client.DefaultApi.CreateGroup(groupVars)
+	if err != nil {
+		log15.Error("failed to create group", "group", *groupName, "error", err, "status", resp.StatusCode)
+		os.Exit(1)
 	}
 
 	fdr, err := newFeederDB(*progressFilepath)
@@ -239,6 +252,7 @@ func main() {
 			cloneSem:           cloneSem,
 			cloneRepoTimeout:   *cloneRepoTimeout,
 			numCloningAttempts: *numCloningAttempts,
+			groupName:          *groupName,
 		}
 		wkrs = append(wkrs, wkr)
 		go wkr.run(ctx)

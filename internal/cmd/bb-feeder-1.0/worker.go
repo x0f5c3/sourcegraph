@@ -104,6 +104,9 @@ type worker struct {
 
 	// host to add as a remote to a cloned repo pointing to bb instance
 	host string
+
+	// bitbucket group with read access to each project
+	groupName string
 }
 
 // run spins until work channel closes or context cancels
@@ -122,6 +125,11 @@ func (wkr *worker) run(ctx context.Context) {
 		err = wkr.fdr.declareOrg(wkr.currentProject)
 		if err != nil {
 			wkr.logger.Error("failed to declare project", "project", wkr.currentProject, "error", err)
+		}
+
+		err = wkr.addProjectReadPerms(ctx)
+		if err != nil {
+			wkr.logger.Error("failed to add project read permissions for group", "project", wkr.currentProject, "group", wkr.groupName, "error", err)
 		}
 	}
 
@@ -330,6 +338,21 @@ func (wkr *worker) addBBProject(ctx context.Context) error {
 	bbProject := bbv1.Project{Key: wkr.currentProject, Name: wkr.currentProject}
 
 	_, err = wkr.client.DefaultApi.CreateProject(bbProject)
+
+	return err
+}
+
+func (wkr *worker) addProjectReadPerms(ctx context.Context) error {
+	err := wkr.rateLimiter.Wait(ctx)
+	if err != nil {
+		wkr.logger.Error("failed to get a request spot from rate limiter", "error", err)
+		return err
+	}
+
+	var groupPermsVars map[string]interface{}
+	groupPermsVars = map[string]interface{}{"name": wkr.groupName, "permission": "PROJECT_READ"}
+
+	_, err = wkr.client.DefaultApi.SetPermissionForGroups_32(wkr.currentProject, groupPermsVars)
 
 	return err
 }
