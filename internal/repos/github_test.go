@@ -169,7 +169,6 @@ func TestPublicRepos_PaginationTerminatesGracefully(t *testing.T) {
 	results := make(chan *githubResult)
 	go func() {
 		githubSrc.listPublic(context.Background(), results)
-		fmt.Printf("LEN RESULTS: %d\n", len(results))
 		close(results)
 	}()
 
@@ -181,26 +180,6 @@ func TestPublicRepos_PaginationTerminatesGracefully(t *testing.T) {
 			t.Error("unexpected error, expected repository instead")
 		}
 	}
-
-	fmt.Printf("NUM REPOS: %d\n", len(results))
-	seen := make(map[int64]bool)
-	shouldInclude := []string{}
-	catchall := []string{}
-	for res := range results {
-		if res.err != nil {
-			fmt.Printf("error: %s\n", res.err)
-			continue
-		}
-		if !seen[res.repo.DatabaseID] && !githubSrc.excludes(res.repo) {
-			shouldInclude = append(shouldInclude, res.repo.NameWithOwner)
-			//myResults <- SourceResult{Source: githubSrc, Repo: githubSrc.makeRepo(res.repo)}
-			seen[res.repo.DatabaseID] = true
-		} else {
-			catchall = append(catchall, res.repo.NameWithOwner)
-		}
-	}
-	fmt.Printf("SHOULD INCLUDE: %v\n", shouldInclude)
-	fmt.Printf("CATCHALL: %v\n", catchall)
 }
 
 func prepareGheToken(t *testing.T, fixtureName string) string {
