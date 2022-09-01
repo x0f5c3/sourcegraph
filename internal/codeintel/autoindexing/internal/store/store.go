@@ -33,6 +33,8 @@ type Store interface {
 	// Index configurations
 	GetIndexConfigurationByRepositoryID(ctx context.Context, repositoryID int) (_ shared.IndexConfiguration, _ bool, err error)
 	UpdateIndexConfigurationByRepositoryID(ctx context.Context, repositoryID int, data []byte) (err error)
+	GetInferenceScript(ctx context.Context) (script string, err error)
+	SetInferenceScript(ctx context.Context, script string) (err error)
 }
 
 // store manages the autoindexing store.

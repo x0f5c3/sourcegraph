@@ -30,6 +30,8 @@ type operations struct {
 	// Index Configuration
 	getIndexConfigurationByRepositoryID    *observation.Operation
 	updateIndexConfigurationByRepositoryID *observation.Operation
+	setInferenceScript                     *observation.Operation
+	getInferenceScript                     *observation.Operation
 }
 
 func newOperations(observationContext *observation.Context) *operations {
@@ -75,5 +77,7 @@ func newOperations(observationContext *observation.Context) *operations {
 		// Index Configuration
 		getIndexConfigurationByRepositoryID:    op("GetIndexConfigurationByRepositoryID"),
 		updateIndexConfigurationByRepositoryID: op("UpdateIndexConfigurationByRepositoryID"),
+		getInferenceScript:                     op("GetInferenceScript"),
+		setInferenceScript:                     op("SetInferenceScript"),
 	}
 }

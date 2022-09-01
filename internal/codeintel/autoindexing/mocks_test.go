@@ -47,6 +47,9 @@ type MockStore struct {
 	// GetIndexesByIDsFunc is an instance of a mock function object
 	// controlling the behavior of the method GetIndexesByIDs.
 	GetIndexesByIDsFunc *StoreGetIndexesByIDsFunc
+	// GetInferenceScriptFunc is an instance of a mock function object
+	// controlling the behavior of the method GetInferenceScript.
+	GetInferenceScriptFunc *StoreGetInferenceScriptFunc
 	// GetLastIndexScanForRepositoryFunc is an instance of a mock function
 	// object controlling the behavior of the method
 	// GetLastIndexScanForRepository.
@@ -63,6 +66,9 @@ type MockStore struct {
 	// IsQueuedFunc is an instance of a mock function object controlling the
 	// behavior of the method IsQueued.
 	IsQueuedFunc *StoreIsQueuedFunc
+	// SetInferenceScriptFunc is an instance of a mock function object
+	// controlling the behavior of the method SetInferenceScript.
+	SetInferenceScriptFunc *StoreSetInferenceScriptFunc
 	// UpdateIndexConfigurationByRepositoryIDFunc is an instance of a mock
 	// function object controlling the behavior of the method
 	// UpdateIndexConfigurationByRepositoryID.
@@ -111,6 +117,11 @@ func NewMockStore() *MockStore {
 				return
 			},
 		},
+		GetInferenceScriptFunc: &StoreGetInferenceScriptFunc{
+			defaultHook: func(context.Context) (r0 string, r1 error) {
+				return
+			},
+		},
 		GetLastIndexScanForRepositoryFunc: &StoreGetLastIndexScanForRepositoryFunc{
 			defaultHook: func(context.Context, int) (r0 *time.Time, r1 error) {
 				return
@@ -133,6 +144,11 @@ func NewMockStore() *MockStore {
 		},
 		IsQueuedFunc: &StoreIsQueuedFunc{
 			defaultHook: func(context.Context, int, string) (r0 bool, r1 error) {
+				return
+			},
+		},
+		SetInferenceScriptFunc: &StoreSetInferenceScriptFunc{
+			defaultHook: func(context.Context, string) (r0 error) {
 				return
 			},
 		},
@@ -188,6 +204,11 @@ func NewStrictMockStore() *MockStore {
 				panic("unexpected invocation of MockStore.GetIndexesByIDs")
 			},
 		},
+		GetInferenceScriptFunc: &StoreGetInferenceScriptFunc{
+			defaultHook: func(context.Context) (string, error) {
+				panic("unexpected invocation of MockStore.GetInferenceScript")
+			},
+		},
 		GetLastIndexScanForRepositoryFunc: &StoreGetLastIndexScanForRepositoryFunc{
 			defaultHook: func(context.Context, int) (*time.Time, error) {
 				panic("unexpected invocation of MockStore.GetLastIndexScanForRepository")
@@ -211,6 +232,11 @@ func NewStrictMockStore() *MockStore {
 		IsQueuedFunc: &StoreIsQueuedFunc{
 			defaultHook: func(context.Context, int, string) (bool, error) {
 				panic("unexpected invocation of MockStore.IsQueued")
+			},
+		},
+		SetInferenceScriptFunc: &StoreSetInferenceScriptFunc{
+			defaultHook: func(context.Context, string) error {
+				panic("unexpected invocation of MockStore.SetInferenceScript")
 			},
 		},
 		UpdateIndexConfigurationByRepositoryIDFunc: &StoreUpdateIndexConfigurationByRepositoryIDFunc{
@@ -251,6 +277,9 @@ func NewMockStoreFrom(i store.Store) *MockStore {
 		GetIndexesByIDsFunc: &StoreGetIndexesByIDsFunc{
 			defaultHook: i.GetIndexesByIDs,
 		},
+		GetInferenceScriptFunc: &StoreGetInferenceScriptFunc{
+			defaultHook: i.GetInferenceScript,
+		},
 		GetLastIndexScanForRepositoryFunc: &StoreGetLastIndexScanForRepositoryFunc{
 			defaultHook: i.GetLastIndexScanForRepository,
 		},
@@ -265,6 +294,9 @@ func NewMockStoreFrom(i store.Store) *MockStore {
 		},
 		IsQueuedFunc: &StoreIsQueuedFunc{
 			defaultHook: i.IsQueued,
+		},
+		SetInferenceScriptFunc: &StoreSetInferenceScriptFunc{
+			defaultHook: i.SetInferenceScript,
 		},
 		UpdateIndexConfigurationByRepositoryIDFunc: &StoreUpdateIndexConfigurationByRepositoryIDFunc{
 			defaultHook: i.UpdateIndexConfigurationByRepositoryID,
@@ -1059,6 +1091,111 @@ func (c StoreGetIndexesByIDsFuncCall) Results() []interface{} {
 	return []interface{}{c.Result0, c.Result1}
 }
 
+// StoreGetInferenceScriptFunc describes the behavior when the
+// GetInferenceScript method of the parent MockStore instance is invoked.
+type StoreGetInferenceScriptFunc struct {
+	defaultHook func(context.Context) (string, error)
+	hooks       []func(context.Context) (string, error)
+	history     []StoreGetInferenceScriptFuncCall
+	mutex       sync.Mutex
+}
+
+// GetInferenceScript delegates to the next hook function in the queue and
+// stores the parameter and result values of this invocation.
+func (m *MockStore) GetInferenceScript(v0 context.Context) (string, error) {
+	r0, r1 := m.GetInferenceScriptFunc.nextHook()(v0)
+	m.GetInferenceScriptFunc.appendCall(StoreGetInferenceScriptFuncCall{v0, r0, r1})
+	return r0, r1
+}
+
+// SetDefaultHook sets function that is called when the GetInferenceScript
+// method of the parent MockStore instance is invoked and the hook queue is
+// empty.
+func (f *StoreGetInferenceScriptFunc) SetDefaultHook(hook func(context.Context) (string, error)) {
+	f.defaultHook = hook
+}
+
+// PushHook adds a function to the end of hook queue. Each invocation of the
+// GetInferenceScript method of the parent MockStore instance invokes the
+// hook at the front of the queue and discards it. After the queue is empty,
+// the default hook function is invoked for any future action.
+func (f *StoreGetInferenceScriptFunc) PushHook(hook func(context.Context) (string, error)) {
+	f.mutex.Lock()
+	f.hooks = append(f.hooks, hook)
+	f.mutex.Unlock()
+}
+
+// SetDefaultReturn calls SetDefaultHook with a function that returns the
+// given values.
+func (f *StoreGetInferenceScriptFunc) SetDefaultReturn(r0 string, r1 error) {
+	f.SetDefaultHook(func(context.Context) (string, error) {
+		return r0, r1
+	})
+}
+
+// PushReturn calls PushHook with a function that returns the given values.
+func (f *StoreGetInferenceScriptFunc) PushReturn(r0 string, r1 error) {
+	f.PushHook(func(context.Context) (string, error) {
+		return r0, r1
+	})
+}
+
+func (f *StoreGetInferenceScriptFunc) nextHook() func(context.Context) (string, error) {
+	f.mutex.Lock()
+	defer f.mutex.Unlock()
+
+	if len(f.hooks) == 0 {
+		return f.defaultHook
+	}
+
+	hook := f.hooks[0]
+	f.hooks = f.hooks[1:]
+	return hook
+}
+
+func (f *StoreGetInferenceScriptFunc) appendCall(r0 StoreGetInferenceScriptFuncCall) {
+	f.mutex.Lock()
+	f.history = append(f.history, r0)
+	f.mutex.Unlock()
+}
+
+// History returns a sequence of StoreGetInferenceScriptFuncCall objects
+// describing the invocations of this function.
+func (f *StoreGetInferenceScriptFunc) History() []StoreGetInferenceScriptFuncCall {
+	f.mutex.Lock()
+	history := make([]StoreGetInferenceScriptFuncCall, len(f.history))
+	copy(history, f.history)
+	f.mutex.Unlock()
+
+	return history
+}
+
+// StoreGetInferenceScriptFuncCall is an object that describes an invocation
+// of method GetInferenceScript on an instance of MockStore.
+type StoreGetInferenceScriptFuncCall struct {
+	// Arg0 is the value of the 1st argument passed to this method
+	// invocation.
+	Arg0 context.Context
+	// Result0 is the value of the 1st result returned from this method
+	// invocation.
+	Result0 string
+	// Result1 is the value of the 2nd result returned from this method
+	// invocation.
+	Result1 error
+}
+
+// Args returns an interface slice containing the arguments of this
+// invocation.
+func (c StoreGetInferenceScriptFuncCall) Args() []interface{} {
+	return []interface{}{c.Arg0}
+}
+
+// Results returns an interface slice containing the results of this
+// invocation.
+func (c StoreGetInferenceScriptFuncCall) Results() []interface{} {
+	return []interface{}{c.Result0, c.Result1}
+}
+
 // StoreGetLastIndexScanForRepositoryFunc describes the behavior when the
 // GetLastIndexScanForRepository method of the parent MockStore instance is
 // invoked.
@@ -1609,6 +1746,111 @@ func (c StoreIsQueuedFuncCall) Args() []interface{} {
 // invocation.
 func (c StoreIsQueuedFuncCall) Results() []interface{} {
 	return []interface{}{c.Result0, c.Result1}
+}
+
+// StoreSetInferenceScriptFunc describes the behavior when the
+// SetInferenceScript method of the parent MockStore instance is invoked.
+type StoreSetInferenceScriptFunc struct {
+	defaultHook func(context.Context, string) error
+	hooks       []func(context.Context, string) error
+	history     []StoreSetInferenceScriptFuncCall
+	mutex       sync.Mutex
+}
+
+// SetInferenceScript delegates to the next hook function in the queue and
+// stores the parameter and result values of this invocation.
+func (m *MockStore) SetInferenceScript(v0 context.Context, v1 string) error {
+	r0 := m.SetInferenceScriptFunc.nextHook()(v0, v1)
+	m.SetInferenceScriptFunc.appendCall(StoreSetInferenceScriptFuncCall{v0, v1, r0})
+	return r0
+}
+
+// SetDefaultHook sets function that is called when the SetInferenceScript
+// method of the parent MockStore instance is invoked and the hook queue is
+// empty.
+func (f *StoreSetInferenceScriptFunc) SetDefaultHook(hook func(context.Context, string) error) {
+	f.defaultHook = hook
+}
+
+// PushHook adds a function to the end of hook queue. Each invocation of the
+// SetInferenceScript method of the parent MockStore instance invokes the
+// hook at the front of the queue and discards it. After the queue is empty,
+// the default hook function is invoked for any future action.
+func (f *StoreSetInferenceScriptFunc) PushHook(hook func(context.Context, string) error) {
+	f.mutex.Lock()
+	f.hooks = append(f.hooks, hook)
+	f.mutex.Unlock()
+}
+
+// SetDefaultReturn calls SetDefaultHook with a function that returns the
+// given values.
+func (f *StoreSetInferenceScriptFunc) SetDefaultReturn(r0 error) {
+	f.SetDefaultHook(func(context.Context, string) error {
+		return r0
+	})
+}
+
+// PushReturn calls PushHook with a function that returns the given values.
+func (f *StoreSetInferenceScriptFunc) PushReturn(r0 error) {
+	f.PushHook(func(context.Context, string) error {
+		return r0
+	})
+}
+
+func (f *StoreSetInferenceScriptFunc) nextHook() func(context.Context, string) error {
+	f.mutex.Lock()
+	defer f.mutex.Unlock()
+
+	if len(f.hooks) == 0 {
+		return f.defaultHook
+	}
+
+	hook := f.hooks[0]
+	f.hooks = f.hooks[1:]
+	return hook
+}
+
+func (f *StoreSetInferenceScriptFunc) appendCall(r0 StoreSetInferenceScriptFuncCall) {
+	f.mutex.Lock()
+	f.history = append(f.history, r0)
+	f.mutex.Unlock()
+}
+
+// History returns a sequence of StoreSetInferenceScriptFuncCall objects
+// describing the invocations of this function.
+func (f *StoreSetInferenceScriptFunc) History() []StoreSetInferenceScriptFuncCall {
+	f.mutex.Lock()
+	history := make([]StoreSetInferenceScriptFuncCall, len(f.history))
+	copy(history, f.history)
+	f.mutex.Unlock()
+
+	return history
+}
+
+// StoreSetInferenceScriptFuncCall is an object that describes an invocation
+// of method SetInferenceScript on an instance of MockStore.
+type StoreSetInferenceScriptFuncCall struct {
+	// Arg0 is the value of the 1st argument passed to this method
+	// invocation.
+	Arg0 context.Context
+	// Arg1 is the value of the 2nd argument passed to this method
+	// invocation.
+	Arg1 string
+	// Result0 is the value of the 1st result returned from this method
+	// invocation.
+	Result0 error
+}
+
+// Args returns an interface slice containing the arguments of this
+// invocation.
+func (c StoreSetInferenceScriptFuncCall) Args() []interface{} {
+	return []interface{}{c.Arg0, c.Arg1}
+}
+
+// Results returns an interface slice containing the results of this
+// invocation.
+func (c StoreSetInferenceScriptFuncCall) Results() []interface{} {
+	return []interface{}{c.Result0}
 }
 
 // StoreUpdateIndexConfigurationByRepositoryIDFunc describes the behavior
