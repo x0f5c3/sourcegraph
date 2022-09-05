@@ -272,11 +272,22 @@ func mapConcat(q []query.Node) ([]query.Node, bool) {
 				changed = changed || newChanged
 				continue
 			}
-			// no need to recurse: `concat` nodes only have patterns.
+			// Process `concat` nodes. No need to recurse, they only contain patterns.
 			mapped = append(mapped, query.Operator{
 				Kind:     query.And,
 				Operands: n.Operands,
 			})
+
+			// Add negated pattern. Invariant: concat nodes are nonempty.
+			negatedPattern := query.SubstituteConcat(query.Space)([]query.Node{node})[0].(query.Pattern)
+			negatedPattern.Negated = true
+			if !negatedPattern.Annotation.Labels.IsSet(query.Quoted) {
+				negatedPattern.Annotation.Labels.Set(query.Quoted)
+				negatedPattern.Annotation.Labels.Set(query.IsAlias)
+				negatedPattern.Value = negatedPattern.Value
+			}
+			mapped = append(mapped, negatedPattern)
+
 			changed = true
 			continue
 		}

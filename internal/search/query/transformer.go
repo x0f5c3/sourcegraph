@@ -610,7 +610,7 @@ func standard(patterns []Pattern) []Node {
 				// Use existing `space` concatenator on literal
 				// patterns. Correct and safe cast under
 				// invariant len(literals) > 0.
-				result = append(result, space(literals)[0].(Pattern))
+				result = append(result, Space(literals)[0].(Pattern))
 			}
 
 			result = append(result, p)
@@ -622,15 +622,15 @@ func standard(patterns []Pattern) []Node {
 	}
 
 	if len(literals) > 0 {
-		result = append(result, space(literals)[0].(Pattern))
+		result = append(result, Space(literals)[0].(Pattern))
 	}
 
 	return result
 }
 
-// fuzzyRegexp interpolates patterns with spaces and concatenates them.
-// Invariant: len(patterns) > 0.
-func space(patterns []Pattern) []Node {
+// Space interpolates patterns with spaces and concatenates them. Invariant:
+// len(patterns) > 0.
+func Space(patterns []Pattern) []Node {
 	if len(patterns) == 1 {
 		return []Node{patterns[0]}
 	}
@@ -649,13 +649,13 @@ func space(patterns []Pattern) []Node {
 	}
 }
 
-// substituteConcat returns a function that concatenates all contiguous patterns
+// SubstituteConcat returns a function that concatenates all contiguous patterns
 // in the tree, rooted by a concat operator. Concat operators containing negated
 // patterns are lifted out: (concat "a" (not "b")) -> ("a" (not "b"))
 //
 // The callback parameter defines how the function concatenates patterns. The
 // return value of callback is substituted in-place in the tree.
-func substituteConcat(callback func([]Pattern) []Node) func([]Node) []Node {
+func SubstituteConcat(callback func([]Pattern) []Node) func(nodes []Node) []Node {
 	isPattern := func(node Node) bool {
 		if pattern, ok := node.(Pattern); ok && !pattern.Negated {
 			return true

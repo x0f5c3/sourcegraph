@@ -1,4 +1,4 @@
 {
   "Input": "context:global parse func",
-  "Query": "context:global (parse AND func)"
+  "Query": "context:global (parse AND func AND -content:\"parse func\")"
 }
