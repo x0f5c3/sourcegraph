@@ -208,6 +208,7 @@ require (
 require github.com/hmarr/codeowners v0.4.0
 
 require (
+	github.com/c2h5oh/datasize v0.0.0-20220606134207-859f65c6625b
 	github.com/opsgenie/opsgenie-go-sdk-v2 v1.2.13
 	go.opentelemetry.io/otel/exporters/jaeger v1.9.0
 )
