@@ -55,5 +55,8 @@ type AutoIndexingResolver interface {
 	InferedIndexConfigurationHints(ctx context.Context, repositoryID int, commit string) ([]config.IndexJobHint, error)       // in the service InferIndexConfiguration second return
 	UpdateIndexConfigurationByRepositoryID(ctx context.Context, repositoryID int, configuration string) error                 // simple dbstore
 
+	CodeIntelligenceInferenceScript(ctx context.Context) (string, error)
+	UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) error
+
 	IndexConnectionResolverFromFactory(opts autoindexingShared.GetIndexesOptions) *autoindexinggraphql.IndexesResolver
 }

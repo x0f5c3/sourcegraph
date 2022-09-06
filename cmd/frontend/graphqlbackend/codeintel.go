@@ -37,6 +37,8 @@ type AutoindexingServiceResolver interface {
 	LSIFIndexesByRepo(ctx context.Context, args *LSIFRepositoryIndexesQueryArgs) (LSIFIndexConnectionResolver, error)
 	QueueAutoIndexJobsForRepo(ctx context.Context, args *QueueAutoIndexJobsForRepoArgs) ([]LSIFIndexResolver, error)
 	UpdateRepositoryIndexConfiguration(ctx context.Context, args *UpdateRepositoryIndexConfigurationArgs) (*EmptyResponse, error)
+	CodeIntelligenceInferenceScript(ctx context.Context) (string, error)
+	UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (*EmptyResponse, error)
 }
 
 type ExecutorResolver interface {

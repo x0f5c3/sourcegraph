@@ -47,6 +47,14 @@ func (r *frankenResolver) UpdateRepositoryIndexConfiguration(ctx context.Context
 	return r.getAutoindexingServiceResolver().UpdateRepositoryIndexConfiguration(ctx, args)
 }
 
+func (r *frankenResolver) CodeIntelligenceInferenceScript(ctx context.Context) (string, error) {
+	return r.getAutoindexingServiceResolver().CodeIntelligenceInferenceScript(ctx)
+}
+
+func (r *frankenResolver) UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (_ *gql.EmptyResponse, err error) {
+	return r.getAutoindexingServiceResolver().UpdateCodeIntelligenceInferenceScript(ctx, script)
+}
+
 func (r *frankenResolver) getUploadsServiceResolver() gql.UploadsServiceResolver {
 	return r.Resolver
 

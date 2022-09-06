@@ -636,12 +636,22 @@ func (r *Resolver) UpdateRepositoryIndexConfiguration(ctx context.Context, args 
 	if err != nil {
 		return nil, err
 	}
-	autoIndexingResolver := r.resolver.AutoIndexingResolver()
-	if err := autoIndexingResolver.UpdateIndexConfigurationByRepositoryID(ctx, int(repositoryID), args.Configuration); err != nil {
+	if err := r.resolver.AutoIndexingResolver().UpdateIndexConfigurationByRepositoryID(ctx, int(repositoryID), args.Configuration); err != nil {
 		return nil, err
 	}
 
 	return &gql.EmptyResponse{}, nil
+}
+
+func (r *Resolver) CodeIntelligenceInferenceScript(ctx context.Context) (_ string, err error) {
+	// ctx, _, endObservation := r.observationContext.updateIndexConfiguration.With(ctx, &err, observation.Args{})
+	// defer endObservation(1, observation.Args{})
+
+	return r.resolver.AutoIndexingResolver().CodeIntelligenceInferenceScript(ctx)
+}
+
+func (r *Resolver) UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (_ *gql.EmptyResponse, err error) {
+	return &gql.EmptyResponse{}, r.resolver.AutoIndexingResolver().UpdateCodeIntelligenceInferenceScript(ctx, script)
 }
 
 func (r *Resolver) PreviewRepositoryFilter(ctx context.Context, args *gql.PreviewRepositoryFilterArgs) (_ gql.RepositoryFilterPreviewResolver, err error) {

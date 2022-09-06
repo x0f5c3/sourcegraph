@@ -26,8 +26,8 @@ type Resolver interface {
 	InferedIndexConfiguration(ctx context.Context, repositoryID int, commit string) (*config.IndexConfiguration, bool, error) // in the service InferIndexConfiguration first return
 	InferedIndexConfigurationHints(ctx context.Context, repositoryID int, commit string) ([]config.IndexJobHint, error)       // in the service InferIndexConfiguration second return
 	UpdateIndexConfigurationByRepositoryID(ctx context.Context, repositoryID int, configuration string) error                 // simple dbstore
-	GetInferenceScript(ctx context.Context) (script string, err error)
-	SetInferenceScript(ctx context.Context, script string) (err error)
+	CodeIntelligenceInferenceScript(ctx context.Context) (script string, err error)
+	UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (err error)
 
 	// Index Connection Factory
 	IndexConnectionResolverFromFactory(opts shared.GetIndexesOptions) *IndexesResolver // for the resolver
@@ -158,11 +158,11 @@ func (r *resolver) UpdateIndexConfigurationByRepositoryID(ctx context.Context, r
 	return r.svc.UpdateIndexConfigurationByRepositoryID(ctx, repositoryID, []byte(configuration))
 }
 
-func (r *resolver) GetInferenceScript(ctx context.Context) (script string, err error) {
+func (r *resolver) CodeIntelligenceInferenceScript(ctx context.Context) (script string, err error) {
 	return r.svc.GetInferenceScript(ctx)
 }
 
-func (r *resolver) SetInferenceScript(ctx context.Context, script string) (err error) {
+func (r *resolver) UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (err error) {
 	return r.svc.SetInferenceScript(ctx, script)
 }
 
