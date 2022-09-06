@@ -20,7 +20,7 @@ type rule struct {
 	transform   []transform
 }
 
-type transform func(query.Basic) *query.Basic
+type transform func(query.Basic) (*query.Basic, string)
 
 var rulesNarrow = []rule{
 	{
@@ -58,7 +58,7 @@ var rulesWiden = []rule{
 
 // unquotePatterns is a rule that unquotes all patterns in the input query (it
 // removes quotes, and honors escape sequences inside quoted values).
-func unquotePatterns(b query.Basic) *query.Basic {
+func unquotePatterns(b query.Basic) (*query.Basic, string) {
 	// Go back all the way to the raw tree representation :-). We just parse
 	// the string as regex, since parsing with regex annotates quoted
 	// patterns.

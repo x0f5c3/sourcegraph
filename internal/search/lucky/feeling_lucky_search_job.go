@@ -17,8 +17,13 @@ import (
 
 // autoQuery is an automatically generated query with associated data (e.g., description).
 type autoQuery struct {
+	// description of rules generating this query
 	description string
+	// the query that runs
 	query       query.Basic
+	// the query to display; different form the query that runs, because the
+	// query that runs may include extra terms that negate previous patterns
+	displayQuery string
 }
 
 // newJob is a function that converts a query to a job, and one which lucky
