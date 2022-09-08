@@ -490,7 +490,9 @@ func (op *RepoOptions) String() string {
 		fmt.Fprintf(&b, "DescriptionPatterns: %q\n", op.DescriptionPatterns)
 	}
 
-	fmt.Fprintf(&b, "CommitAfter: %s\n", op.CommitAfter)
+	if op.CommitAfter != nil {
+		fmt.Fprintf(&b, "CommitAfter: %s\n", op.CommitAfter.TimeRef)
+	}
 	fmt.Fprintf(&b, "Visibility: %s\n", string(op.Visibility))
 
 	if op.UseIndex != query.Yes {
