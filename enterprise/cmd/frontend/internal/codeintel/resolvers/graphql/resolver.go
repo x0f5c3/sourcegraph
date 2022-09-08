@@ -650,8 +650,8 @@ func (r *Resolver) CodeIntelligenceInferenceScript(ctx context.Context) (_ strin
 	return r.resolver.AutoIndexingResolver().CodeIntelligenceInferenceScript(ctx)
 }
 
-func (r *Resolver) UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (_ *gql.EmptyResponse, err error) {
-	return &gql.EmptyResponse{}, r.resolver.AutoIndexingResolver().UpdateCodeIntelligenceInferenceScript(ctx, script)
+func (r *Resolver) UpdateCodeIntelligenceInferenceScript(ctx context.Context, args *gql.UpdateCodeIntelligenceInferenceScriptArgs) (_ *gql.EmptyResponse, err error) {
+	return &gql.EmptyResponse{}, r.resolver.AutoIndexingResolver().UpdateCodeIntelligenceInferenceScript(ctx, args.Script)
 }
 
 func (r *Resolver) PreviewRepositoryFilter(ctx context.Context, args *gql.PreviewRepositoryFilterArgs) (_ gql.RepositoryFilterPreviewResolver, err error) {

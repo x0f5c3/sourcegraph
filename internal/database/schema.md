@@ -713,6 +713,16 @@ Webhook actions configured on code monitors
 
 **url**: The webhook URL we send the code monitor event to
 
+# Table "public.codeintel_inference_scripts"
+```
+ Column | Type | Collation | Nullable | Default 
+--------+------+-----------+----------+---------
+ script | text |           | not null | 
+
+```
+
+Contains auto-index job inference Lua scripts as an alternative to setting via environment variables.
+
 # Table "public.codeintel_langugage_support_requests"
 ```
    Column    |  Type   | Collation | Nullable |                             Default                              

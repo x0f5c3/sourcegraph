@@ -51,8 +51,8 @@ func (r *frankenResolver) CodeIntelligenceInferenceScript(ctx context.Context) (
 	return r.getAutoindexingServiceResolver().CodeIntelligenceInferenceScript(ctx)
 }
 
-func (r *frankenResolver) UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (_ *gql.EmptyResponse, err error) {
-	return r.getAutoindexingServiceResolver().UpdateCodeIntelligenceInferenceScript(ctx, script)
+func (r *frankenResolver) UpdateCodeIntelligenceInferenceScript(ctx context.Context, args *gql.UpdateCodeIntelligenceInferenceScriptArgs) (_ *gql.EmptyResponse, err error) {
+	return r.getAutoindexingServiceResolver().UpdateCodeIntelligenceInferenceScript(ctx, args)
 }
 
 func (r *frankenResolver) getUploadsServiceResolver() gql.UploadsServiceResolver {

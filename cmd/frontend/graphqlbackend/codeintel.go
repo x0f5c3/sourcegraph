@@ -38,7 +38,7 @@ type AutoindexingServiceResolver interface {
 	QueueAutoIndexJobsForRepo(ctx context.Context, args *QueueAutoIndexJobsForRepoArgs) ([]LSIFIndexResolver, error)
 	UpdateRepositoryIndexConfiguration(ctx context.Context, args *UpdateRepositoryIndexConfigurationArgs) (*EmptyResponse, error)
 	CodeIntelligenceInferenceScript(ctx context.Context) (string, error)
-	UpdateCodeIntelligenceInferenceScript(ctx context.Context, script string) (*EmptyResponse, error)
+	UpdateCodeIntelligenceInferenceScript(ctx context.Context, args *UpdateCodeIntelligenceInferenceScriptArgs) (*EmptyResponse, error)
 }
 
 type ExecutorResolver interface {
@@ -362,6 +362,10 @@ type IndexConfigurationResolver interface {
 type UpdateRepositoryIndexConfigurationArgs struct {
 	Repository    graphql.ID
 	Configuration string
+}
+
+type UpdateCodeIntelligenceInferenceScriptArgs struct {
+	Script string
 }
 
 type PreviewRepositoryFilterArgs struct {
