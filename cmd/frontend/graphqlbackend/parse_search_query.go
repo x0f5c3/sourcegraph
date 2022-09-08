@@ -3,7 +3,12 @@ package graphqlbackend
 import (
 	"context"
 
+	"github.com/sourcegraph/sourcegraph/internal/search"
+	"github.com/sourcegraph/sourcegraph/internal/search/job"
+	"github.com/sourcegraph/sourcegraph/internal/search/job/jobutil"
+	"github.com/sourcegraph/sourcegraph/internal/search/job/printer"
 	"github.com/sourcegraph/sourcegraph/internal/search/query"
+	"github.com/sourcegraph/sourcegraph/schema"
 )
 
 func (r *schemaResolver) ParseSearchQuery(ctx context.Context, args *struct {
@@ -27,9 +32,21 @@ func (r *schemaResolver) ParseSearchQuery(ctx context.Context, args *struct {
 		return nil, err
 	}
 
+	j, err := jobutil.NewPlanJob(&search.Inputs{
+		UserSettings: &schema.Settings{},
+		PatternType: query.SearchTypeStandard,
+		Protocol: search.Streaming,
+		Features: &search.Features{},
+		OnSourcegraphDotCom: false,
+	}, plan)
+
+	mermaid := printer.MermaidVerbose(j, job.VerbosityNone)
+
+/*
 	jsonString, err := query.ToJSON(plan.ToQ())
 	if err != nil {
 		return nil, err
 	}
-	return &JSONValue{Value: jsonString}, nil
+*/
+	return &JSONValue{Value: mermaid}, nil
 }
