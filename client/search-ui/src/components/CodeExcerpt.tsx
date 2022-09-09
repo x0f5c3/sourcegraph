@@ -21,10 +21,10 @@ import { Icon, Code } from '@sourcegraph/wildcard'
 import styles from './CodeExcerpt.module.scss'
 
 interface Shape {
-    top?: number;
-    left?: number;
-    bottom?: number;
-    right?: number;
+    top?: number
+    left?: number
+    bottom?: number
+    right?: number
 }
 
 export interface FetchFileParameters {
@@ -216,8 +216,6 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
     }, [hoverifier, tableContainerElements, viewerUpdates])
 
     return (
-        // TODO: Somehow the visibility sensor doesn't work in the ref panel. Not sure what's missing.
-
         <VisibilitySensor onChange={setIsVisible} partialVisibility={true} offset={visibilityOffset}>
             <Code
                 data-testid="code-excerpt"
