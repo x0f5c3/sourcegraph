@@ -864,28 +864,37 @@ const CollapsibleLocationGroup: React.FunctionComponent<
         highlighted = group.path.split(filter)
     }
 
+    const { repo, commitID, file } = useMemo(() => group.locations[0], [group])
+    const ranges = useMemo(
+        () =>
+            group.locations.map(location => ({
+                startLine: location.range?.start.line ?? 0,
+                // TODO: off-by-one danger?
+                endLine: (location.range?.end.line ?? 0) + 1,
+            })),
+        [group.locations]
+    )
+
     const fetchHighlightedFileRangeLines = useCallback(
-        (reference: Location, startLine: number, endLine: number): Observable<string[]> => {
-            console.log('we are here')
-            // TODO: This is really bad.  We should send one request per file by passing in all `ranges` here.
-            return fetchHighlightedFileLineRanges(
+        (startLine: number, endLine: number): Observable<string[]> =>
+            fetchHighlightedFileLineRanges(
                 {
-                    repoName: reference.repo,
-                    commitID: reference.commitID,
-                    filePath: reference.file,
+                    repoName: repo,
+                    commitID,
+                    filePath: file,
                     disableTimeout: false,
                     format: HighlightResponseFormat.HTML_HIGHLIGHT,
-                    ranges: [{ startLine, endLine: endLine + 1 }],
+                    ranges,
                 },
                 false
             ).pipe(
-                map(lines => {
-                    console.log(lines)
-                    return lines[0]
-                })
-            )
-        },
-        [fetchHighlightedFileLineRanges]
+                map(
+                    lines =>
+                        // TODO: off-by-one danger?
+                        lines[ranges.findIndex(group => group.startLine === startLine && group.endLine === endLine + 1)]
+                )
+            ),
+        [fetchHighlightedFileLineRanges, repo, commitID, file, ranges]
     )
 
     const open = isOpen(group.path) ?? true
@@ -940,8 +949,6 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                             {group.locations.map(reference => {
                                 const className = isActiveLocation(reference) ? styles.locationActive : ''
 
-                                const locationLine = getLineContent(reference)
-
                                 return (
                                     <li
                                         key={reference.url}
@@ -956,15 +963,14 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                             className={styles.locationLink}
                                         >
                                             <CodeExcerpt
+                                                className={styles.locationLinkCodeExcerpt}
                                                 commitID={reference.commitID}
                                                 filePath={reference.file}
                                                 repoName={reference.repo}
                                                 highlightRanges={[]}
                                                 startLine={reference.range?.start.line ?? 0}
                                                 endLine={reference.range?.end.line ?? 0}
-                                                fetchHighlightedFileRangeLines={(startLine: number, endLine: number) =>
-                                                    fetchHighlightedFileRangeLines(reference, startLine, endLine)
-                                                }
+                                                fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
                                             />
                                         </Button>
                                     </li>

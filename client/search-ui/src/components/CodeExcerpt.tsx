@@ -119,9 +119,6 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
     const [highlightedBlobLinesOrError, setHighlightedBlobLinesOrError] = useState<string[] | ErrorLike | null>(null)
     const [isVisible] = useState(true)
 
-    console.log('highlightedBlobLinesOrError', highlightedBlobLinesOrError)
-    console.log('plainTExtBlobLinesOrError', plainTextBlobLinesOrError)
-    console.log('isVisible', isVisible)
     const blobLinesOrError = fetchPlainTextFileRangeLines
         ? highlightedBlobLinesOrError || plainTextBlobLinesOrError
         : highlightedBlobLinesOrError
@@ -154,7 +151,6 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
     useEffect(() => {
         let subscription: Subscription | undefined
         if (isVisible) {
-            console.log('lol')
             const observable = blobLines ? of(blobLines) : fetchHighlightedFileRangeLines(startLine, endLine)
             subscription = observable.pipe(catchError(error => [asError(error)])).subscribe(blobLinesOrError => {
                 setHighlightedBlobLinesOrError(blobLinesOrError)
