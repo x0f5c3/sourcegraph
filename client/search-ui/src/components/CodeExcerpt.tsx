@@ -215,6 +215,7 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
         }
     }, [hoverifier, tableContainerElements, viewerUpdates])
 
+    console.log('isVisible', isVisible)
     return (
         <VisibilitySensor onChange={setIsVisible} partialVisibility={true} offset={visibilityOffset}>
             <Code

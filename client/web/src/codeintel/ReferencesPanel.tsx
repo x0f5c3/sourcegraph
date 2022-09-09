@@ -875,9 +875,11 @@ const CollapsibleLocationGroup: React.FunctionComponent<
         [group.locations]
     )
 
+    console.log('over here')
     const fetchHighlightedFileRangeLines = useCallback(
-        (startLine: number, endLine: number): Observable<string[]> =>
-            fetchHighlightedFileLineRanges(
+        (startLine: number, endLine: number): Observable<string[]> => {
+            console.log('inside here', startLine, endLine)
+            return fetchHighlightedFileLineRanges(
                 {
                     repoName: repo,
                     commitID,
@@ -888,12 +890,14 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                 },
                 false
             ).pipe(
-                map(
-                    lines =>
-                        // TODO: off-by-one danger?
-                        lines[ranges.findIndex(group => group.startLine === startLine && group.endLine === endLine + 1)]
-                )
-            ),
+                map(lines => {
+                    console.log('lines', lines)
+                    return lines[
+                        ranges.findIndex(group => group.startLine === startLine && group.endLine === endLine + 1)
+                    ]
+                })
+            )
+        },
         [fetchHighlightedFileLineRanges, repo, commitID, file, ranges]
     )
 
@@ -979,7 +983,7 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 startLine={reference.range?.start.line ?? 0}
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
-                                                visibilityOffset={{ bottom: 0 }}
+                                                visibilityOffset={{ bottom: -500 }}
                                             />
                                         </Button>
                                     </li>
@@ -991,38 +995,6 @@ const CollapsibleLocationGroup: React.FunctionComponent<
             </div>
         </Collapse>
     )
-}
-
-interface LocationLine {
-    prePostToken?: { pre: string; token: string; post: string }
-    line?: string
-}
-
-export const getLineContent = (location: Location): LocationLine => {
-    const range = location.range
-    if (range !== undefined) {
-        const line = location.lines[range.start.line]
-
-        if (range.end.line === range.start.line) {
-            return {
-                prePostToken: {
-                    pre: line.slice(0, range.start.character).trimStart(),
-                    token: line.slice(range.start.character, range.end.character),
-                    post: line.slice(range.end.character),
-                },
-                line: line.trimStart(),
-            }
-        }
-        return {
-            prePostToken: {
-                pre: line.slice(0, range.start.character).trimStart(),
-                token: line.slice(range.start.character),
-                post: '',
-            },
-            line: line.trimStart(),
-        }
-    }
-    return {}
 }
 
 const LoadingCodeIntel: React.FunctionComponent<React.PropsWithChildren<{}>> = () => (

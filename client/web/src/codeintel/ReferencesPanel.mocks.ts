@@ -24,6 +24,34 @@ const diffFileContent =
 const printFileContent =
     'package diff\n\nimport (\n\t"bytes"\n\t"fmt"\n\t"io"\n\t"path/filepath"\n\t"time"\n)\n\n// PrintMultiFileDiff prints a multi-file diff in unified diff format.\nfunc PrintMultiFileDiff(ds []*FileDiff) ([]byte, error) {\n\tvar buf bytes.Buffer\n\tfor _, d := range ds {\n\t\tdiff, err := PrintFileDiff(d)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tif _, err := buf.Write(diff); err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t}\n\treturn buf.Bytes(), nil\n}\n\n// PrintFileDiff prints a FileDiff in unified diff format.\n//\n// TODO(sqs): handle escaping whitespace/etc. chars in filenames\nfunc PrintFileDiff(d *FileDiff) ([]byte, error) {\n\tvar buf bytes.Buffer\n\n\tfor _, xheader := range d.Extended {\n\t\tif _, err := fmt.Fprintln(\u0026buf, xheader); err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t}\n\n\t// FileDiff is added/deleted file\n\t// No further hunks printing needed\n\tif d.NewName == "" {\n\t\t_, err := fmt.Fprintf(\u0026buf, onlyInMessage, filepath.Dir(d.OrigName), filepath.Base(d.OrigName))\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\treturn buf.Bytes(), nil\n\t}\n\n\tif d.Hunks == nil {\n\t\treturn buf.Bytes(), nil\n\t}\n\n\tif err := printFileHeader(\u0026buf, "--- ", d.OrigName, d.OrigTime); err != nil {\n\t\treturn nil, err\n\t}\n\tif err := printFileHeader(\u0026buf, "+++ ", d.NewName, d.NewTime); err != nil {\n\t\treturn nil, err\n\t}\n\n\tph, err := PrintHunks(d.Hunks)\n\tif err != nil {\n\t\treturn nil, err\n\t}\n\n\tif _, err := buf.Write(ph); err != nil {\n\t\treturn nil, err\n\t}\n\treturn buf.Bytes(), nil\n}\n\nfunc printFileHeader(w io.Writer, prefix string, filename string, timestamp *time.Time) error {\n\tif _, err := fmt.Fprint(w, prefix, filename); err != nil {\n\t\treturn err\n\t}\n\tif timestamp != nil {\n\t\tif _, err := fmt.Fprint(w, "\\t", timestamp.Format(diffTimeFormatLayout)); err != nil {\n\t\t\treturn err\n\t\t}\n\t}\n\tif _, err := fmt.Fprintln(w); err != nil {\n\t\treturn err\n\t}\n\treturn nil\n}\n\n// PrintHunks prints diff hunks in unified diff format.\nfunc PrintHunks(hunks []*Hunk) ([]byte, error) {\n\tvar buf bytes.Buffer\n\tfor _, hunk := range hunks {\n\t\t_, err := fmt.Fprintf(\u0026buf,\n\t\t\t"@@ -%d,%d +%d,%d @@", hunk.OrigStartLine, hunk.OrigLines, hunk.NewStartLine, hunk.NewLines,\n\t\t)\n\t\tif err != nil {\n\t\t\treturn nil, err\n\t\t}\n\t\tif hunk.Section != "" {\n\t\t\t_, err := fmt.Fprint(\u0026buf, " ", hunk.Section)\n\t\t\tif err != nil {\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t}\n\t\tif _, err := fmt.Fprintln(\u0026buf); err != nil {\n\t\t\treturn nil, err\n\t\t}\n\n\t\tif hunk.OrigNoNewlineAt == 0 {\n\t\t\tif _, err := buf.Write(hunk.Body); err != nil {\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t} else {\n\t\t\tif _, err := buf.Write(hunk.Body[:hunk.OrigNoNewlineAt]); err != nil {\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t\tif err := printNoNewlineMessage(\u0026buf); err != nil {\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t\tif _, err := buf.Write(hunk.Body[hunk.OrigNoNewlineAt:]); err != nil {\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t}\n\n\t\tif !bytes.HasSuffix(hunk.Body, []byte{\'\\n\'}) {\n\t\t\tif _, err := fmt.Fprintln(\u0026buf); err != nil {\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t\tif err := printNoNewlineMessage(\u0026buf); err != nil {\n\t\t\t\treturn nil, err\n\t\t\t}\n\t\t}\n\t}\n\treturn buf.Bytes(), nil\n}\n\nfunc printNoNewlineMessage(w io.Writer) error {\n\tif _, err := w.Write([]byte(noNewlineMessage)); err != nil {\n\t\treturn err\n\t}\n\tif _, err := fmt.Fprintln(w); err != nil {\n\t\treturn err\n\t}\n\treturn nil\n}\n'
 
+export const highlightedLinesSimple = [
+    '<tr><td class="line" data-line="1"></td><td class="code">line 1</td></tr>',
+    '<tr><td class="line" data-line="2"></td><td class="code">line 2</td></tr>',
+    '<tr><td class="line" data-line="3"></td><td class="code">line 3</td></tr>',
+    '<tr><td class="line" data-line="4"></td><td class="code">line 4</td></tr>',
+    '<tr><td class="line" data-line="5"></td><td class="code">line 5</td></tr>',
+    '<tr><td class="line" data-line="6"></td><td class="code">line 6</td></tr>',
+    '<tr><td class="line" data-line="7"></td><td class="code">line 7</td></tr>',
+    '<tr><td class="line" data-line="8"></td><td class="code">line 8</td></tr>',
+    '<tr><td class="line" data-line="9"></td><td class="code">line 9</td></tr>',
+    '<tr><td class="line" data-line="10"></td><td class="code">line 10</td></tr>',
+    '<tr><td class="line" data-line="11"></td><td class="code">line 11</td></tr>',
+    '<tr><td class="line" data-line="12"></td><td class="code">line 12</td></tr>',
+    '<tr><td class="line" data-line="13"></td><td class="code">line 13</td></tr>',
+    '<tr><td class="line" data-line="14"></td><td class="code">line 14</td></tr>',
+    '<tr><td class="line" data-line="15"></td><td class="code">line 15</td></tr>',
+    '<tr><td class="line" data-line="16"></td><td class="code">line 16</td></tr>',
+    '<tr><td class="line" data-line="17"></td><td class="code">line 17</td></tr>',
+    '<tr><td class="line" data-line="18"></td><td class="code">line 18</td></tr>',
+    '<tr><td class="line" data-line="19"></td><td class="code">line 19</td></tr>',
+    '<tr><td class="line" data-line="20"></td><td class="code">line 20</td></tr>',
+    '<tr><td class="line" data-line="21"></td><td class="code">line 21</td></tr>',
+    '<tr><td class="line" data-line="22"></td><td class="code">line 22</td></tr>',
+    '<tr><td class="line" data-line="23"></td><td class="code">line 23</td></tr>',
+    '<tr><td class="line" data-line="24"></td><td class="code">line 24</td></tr>',
+    '<tr><td class="line" data-line="25"></td><td class="code">line 25</td></tr>',
+]
+
 // highlightedDiffFileContent is a shortened version of the highlighted
 // contents of diff/diff.go so it's easier to manage here.
 const highlightedDiffFileContent = [
