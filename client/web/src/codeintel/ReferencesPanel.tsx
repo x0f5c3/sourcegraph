@@ -967,7 +967,15 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 commitID={reference.commitID}
                                                 filePath={reference.file}
                                                 repoName={reference.repo}
-                                                highlightRanges={[]}
+                                                highlightRanges={[
+                                                    {
+                                                        line: reference.range?.start.line ?? 0,
+                                                        character: reference.range?.start.character ?? 0,
+                                                        highlightLength:
+                                                            (reference.range?.end.character ?? 0) -
+                                                            (reference.range?.start.character ?? 0),
+                                                    },
+                                                ]}
                                                 startLine={reference.range?.start.line ?? 0}
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
