@@ -94,6 +94,10 @@ $group-divider-height: 0.25rem;
 }
 
 .location {
+    display: flex;
+    flex-direction: column;
+    min-height: 18px;
+
     button {
         padding-top: 0;
         padding-bottom: 0;
@@ -132,6 +136,9 @@ $group-divider-height: 0.25rem;
     }
 
     &--link {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
         color: inherit;
 
         &--line-number {
@@ -149,6 +156,9 @@ $group-divider-height: 0.25rem;
         }
 
         &--code-excerpt {
+            flex: 1;
+            width: 100%;
+
             :global(.line) {
                 min-width: 2.5rem;
             }

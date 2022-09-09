@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { mdiAlertCircle } from '@mdi/js'
 import classNames from 'classnames'
 import { range } from 'lodash'
+import VisibilitySensor from 'react-visibility-sensor'
 import { Observable, Subscription, BehaviorSubject, of } from 'rxjs'
 import { catchError, filter } from 'rxjs/operators'
 
@@ -18,6 +19,13 @@ import { Repo } from '@sourcegraph/shared/src/util/url'
 import { Icon, Code } from '@sourcegraph/wildcard'
 
 import styles from './CodeExcerpt.module.scss'
+
+interface Shape {
+    top?: number;
+    left?: number;
+    bottom?: number;
+    right?: number;
+}
 
 export interface FetchFileParameters {
     repoName: string
@@ -47,6 +55,7 @@ interface Props extends Repo {
 
     viewerUpdates?: Observable<{ viewerId: ViewerId } & HoverContext>
     hoverifier?: Hoverifier<HoverContext, HoverMerged, ActionItemAction>
+    visibilityOffset?: Shape
     onCopy?: () => void
 }
 
@@ -98,7 +107,7 @@ const domFunctions: DOMFunctions = {
 }
 
 const makeTableHTML = (blobLines: string[]): string => '<table>' + blobLines.join('') + '</table>'
-const visibilitySensorOffset = { bottom: -500 }
+const DEFAULT_VISIBILITY_OFFSET: Shape = { bottom: 0 }
 
 /**
  * A code excerpt that displays syntax highlighting and match range highlighting.
@@ -112,12 +121,13 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
     highlightRanges,
     viewerUpdates,
     hoverifier,
+    visibilityOffset = DEFAULT_VISIBILITY_OFFSET,
     className,
     onCopy,
 }) => {
     const [plainTextBlobLinesOrError, setPlainTextBlobLinesOrError] = useState<string[] | ErrorLike | null>(null)
     const [highlightedBlobLinesOrError, setHighlightedBlobLinesOrError] = useState<string[] | ErrorLike | null>(null)
-    const [isVisible] = useState(true)
+    const [isVisible, setIsVisible] = useState()
 
     const blobLinesOrError = fetchPlainTextFileRangeLines
         ? highlightedBlobLinesOrError || plainTextBlobLinesOrError
@@ -208,42 +218,42 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
     return (
         // TODO: Somehow the visibility sensor doesn't work in the ref panel. Not sure what's missing.
 
-        // <VisibilitySensor onChange={setIsVisible} partialVisibility={true} offset={visibilitySensorOffset}>
-        <Code
-            data-testid="code-excerpt"
-            onCopy={onCopy}
-            className={classNames(
-                styles.codeExcerpt,
-                className,
-                isErrorLike(blobLinesOrError) && styles.codeExcerptError
-            )}
-        >
-            {blobLinesOrError && !isErrorLike(blobLinesOrError) && (
-                <div
-                    ref={updateTableContainerElementReference}
-                    dangerouslySetInnerHTML={{ __html: makeTableHTML(blobLinesOrError) }}
-                />
-            )}
-            {blobLinesOrError && isErrorLike(blobLinesOrError) && (
-                <div className={styles.codeExcerptAlert}>
-                    <Icon className="mr-2" aria-hidden={true} svgPath={mdiAlertCircle} />
-                    {blobLinesOrError.message}
-                </div>
-            )}
-            {!blobLinesOrError && (
-                <table>
-                    <tbody>
-                        {range(startLine, endLine).map(index => (
-                            <tr key={index}>
-                                <td className="line" data-line={index + 1} />
-                                {/* create empty space to fill viewport (as if the blob content were already fetched, otherwise we'll overfetch) */}
-                                <td className="code"> </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            )}
-        </Code>
-        // </VisibilitySensor>
+        <VisibilitySensor onChange={setIsVisible} partialVisibility={true} offset={visibilityOffset}>
+            <Code
+                data-testid="code-excerpt"
+                onCopy={onCopy}
+                className={classNames(
+                    styles.codeExcerpt,
+                    className,
+                    isErrorLike(blobLinesOrError) && styles.codeExcerptError
+                )}
+            >
+                {blobLinesOrError && !isErrorLike(blobLinesOrError) && (
+                    <div
+                        ref={updateTableContainerElementReference}
+                        dangerouslySetInnerHTML={{ __html: makeTableHTML(blobLinesOrError) }}
+                    />
+                )}
+                {blobLinesOrError && isErrorLike(blobLinesOrError) && (
+                    <div className={styles.codeExcerptAlert}>
+                        <Icon className="mr-2" aria-hidden={true} svgPath={mdiAlertCircle} />
+                        {blobLinesOrError.message}
+                    </div>
+                )}
+                {!blobLinesOrError && (
+                    <table>
+                        <tbody>
+                            {range(startLine, endLine).map(index => (
+                                <tr key={index}>
+                                    <td className="line" data-line={index + 1} />
+                                    {/* create empty space to fill viewport (as if the blob content were already fetched, otherwise we'll overfetch) */}
+                                    <td className="code"> </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
+            </Code>
+        </VisibilitySensor>
     )
 }

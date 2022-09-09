@@ -971,6 +971,7 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 startLine={reference.range?.start.line ?? 0}
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
+                                                visibilityOffset={{ bottom: 0 }}
                                             />
                                         </Button>
                                     </li>
