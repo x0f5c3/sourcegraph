@@ -1,10 +1,12 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { mdiArrowCollapseRight, mdiChevronDown, mdiChevronRight, mdiFilterOutline } from '@mdi/js'
 import classNames from 'classnames'
 import * as H from 'history'
 import { capitalize } from 'lodash'
 import { MemoryRouter, useHistory, useLocation } from 'react-router'
+import { Observable } from 'rxjs'
+import { map } from 'rxjs/operators'
 
 import { HoveredToken } from '@sourcegraph/codeintellify'
 import {
@@ -16,6 +18,7 @@ import {
     toPositionOrRangeQueryParameter,
 } from '@sourcegraph/common'
 import { useQuery } from '@sourcegraph/http-client'
+import { CodeExcerpt, FetchFileParameters } from '@sourcegraph/search-ui'
 import { LanguageSpec } from '@sourcegraph/shared/src/codeintel/legacy-extensions/language-specs/language-spec'
 import { findLanguageSpec } from '@sourcegraph/shared/src/codeintel/legacy-extensions/language-specs/languages'
 import { displayRepoName } from '@sourcegraph/shared/src/components/RepoLink'
@@ -77,6 +80,8 @@ interface ReferencesPanelProps
         HoverThresholdProps,
         ExtensionsControllerProps,
         ThemeProps {
+    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
+
     /** Whether to show the first loaded reference in mini code view */
     jumpToFirst?: boolean
 
@@ -529,6 +534,8 @@ interface CollapsibleLocationListProps extends ActiveLocationProps, CollapseProp
     fetchMore?: () => void
     loadingMore: boolean
     navigateToUrl: (url: string) => void
+
+    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
 }
 
 const CollapsibleLocationList: React.FunctionComponent<
@@ -569,6 +576,7 @@ const CollapsibleLocationList: React.FunctionComponent<
                             navigateToUrl={props.navigateToUrl}
                             handleOpenChange={(id, isOpen) => props.handleOpenChange(props.name + id, isOpen)}
                             isOpen={id => props.isOpen(props.name + id)}
+                            fetchHighlightedFileLineRanges={props.fetchHighlightedFileLineRanges}
                         />
                     ) : (
                         <Text className="text-muted pl-2">
@@ -720,6 +728,8 @@ interface LocationsListProps extends ActiveLocationProps, CollapseProps, SearchT
     locations: Location[]
     filter: string | undefined
     navigateToUrl: (url: string) => void
+
+    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
 }
 
 const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsListProps>> = ({
@@ -731,6 +741,7 @@ const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsLi
     handleOpenChange,
     isOpen,
     searchToken,
+    fetchHighlightedFileLineRanges,
 }) => {
     const repoLocationGroups = useMemo(() => buildRepoLocationGroups(locations), [locations])
     const openByDefault = repoLocationGroups.length === 1
@@ -749,6 +760,7 @@ const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsLi
                     navigateToUrl={navigateToUrl}
                     handleOpenChange={handleOpenChange}
                     isOpen={isOpen}
+                    fetchHighlightedFileLineRanges={fetchHighlightedFileLineRanges}
                 />
             ))}
         </>
@@ -764,6 +776,11 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
                 navigateToUrl: (url: string) => void
                 repoLocationGroup: RepoLocationGroup
                 openByDefault: boolean
+
+                fetchHighlightedFileLineRanges: (
+                    parameters: FetchFileParameters,
+                    force?: boolean
+                ) => Observable<string[][]>
             }
     >
 > = ({
@@ -776,6 +793,7 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
     isOpen,
     handleOpenChange,
     searchToken,
+    fetchHighlightedFileLineRanges,
 }) => {
     const open = isOpen(repoLocationGroup.repoName) ?? openByDefault
 
@@ -809,6 +827,7 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
                             handleOpenChange={(id, isOpen) => handleOpenChange(repoLocationGroup.repoName + id, isOpen)}
                             isOpen={id => isOpen(repoLocationGroup.repoName + id)}
                             navigateToUrl={navigateToUrl}
+                            fetchHighlightedFileLineRanges={fetchHighlightedFileLineRanges}
                         />
                     ))}
                 </CollapsePanel>
@@ -825,13 +844,49 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                 group: LocationGroup
                 filter: string | undefined
                 navigateToUrl: (url: string) => void
+                fetchHighlightedFileLineRanges: (
+                    parameters: FetchFileParameters,
+                    force?: boolean
+                ) => Observable<string[][]>
             }
     >
-> = ({ group, setActiveLocation, isActiveLocation, filter, isOpen, handleOpenChange, navigateToUrl }) => {
+> = ({
+    group,
+    setActiveLocation,
+    isActiveLocation,
+    filter,
+    isOpen,
+    handleOpenChange,
+    fetchHighlightedFileLineRanges,
+}) => {
     let highlighted = [group.path]
     if (filter !== undefined) {
         highlighted = group.path.split(filter)
     }
+
+    const fetchHighlightedFileRangeLines = useCallback(
+        (reference: Location, startLine: number, endLine: number): Observable<string[]> => {
+            console.log('we are here')
+            // TODO: This is really bad.  We should send one request per file by passing in all `ranges` here.
+            return fetchHighlightedFileLineRanges(
+                {
+                    repoName: reference.repo,
+                    commitID: reference.commitID,
+                    filePath: reference.file,
+                    disableTimeout: false,
+                    format: HighlightResponseFormat.HTML_HIGHLIGHT,
+                    ranges: [{ startLine, endLine: endLine + 1 }],
+                },
+                false
+            ).pipe(
+                map(lines => {
+                    console.log(lines)
+                    return lines[0]
+                })
+            )
+        },
+        [fetchHighlightedFileLineRanges]
+    )
 
     const open = isOpen(group.path) ?? true
 
@@ -886,27 +941,6 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                 const className = isActiveLocation(reference) ? styles.locationActive : ''
 
                                 const locationLine = getLineContent(reference)
-                                const lineWithHighlightedToken = locationLine.prePostToken ? (
-                                    <>
-                                        {locationLine.prePostToken.pre === '' ? (
-                                            <></>
-                                        ) : (
-                                            <Code>{locationLine.prePostToken.pre}</Code>
-                                        )}
-                                        <mark className="p-0 selection-highlight sourcegraph-document-highlight">
-                                            <Code>{locationLine.prePostToken.token}</Code>
-                                        </mark>
-                                        {locationLine.prePostToken.post === '' ? (
-                                            <></>
-                                        ) : (
-                                            <Code>{locationLine.prePostToken.post}</Code>
-                                        )}
-                                    </>
-                                ) : locationLine.line ? (
-                                    <Code>{locationLine.line}</Code>
-                                ) : (
-                                    ''
-                                )
 
                                 return (
                                     <li
@@ -921,11 +955,17 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                             data-test-reference-url={reference.url}
                                             className={styles.locationLink}
                                         >
-                                            <span className={styles.locationLinkLineNumber}>
-                                                {(reference.range?.start?.line ?? 0) + 1}
-                                                {': '}
-                                            </span>
-                                            {lineWithHighlightedToken}
+                                            <CodeExcerpt
+                                                commitID={reference.commitID}
+                                                filePath={reference.file}
+                                                repoName={reference.repo}
+                                                highlightRanges={[]}
+                                                startLine={reference.range?.start.line ?? 0}
+                                                endLine={reference.range?.end.line ?? 0}
+                                                fetchHighlightedFileRangeLines={(startLine: number, endLine: number) =>
+                                                    fetchHighlightedFileRangeLines(reference, startLine, endLine)
+                                                }
+                                            />
                                         </Button>
                                     </li>
                                 )

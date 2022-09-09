@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } fro
 import { mdiAlertCircle } from '@mdi/js'
 import classNames from 'classnames'
 import { range } from 'lodash'
-import VisibilitySensor from 'react-visibility-sensor'
 import { Observable, Subscription, BehaviorSubject, of } from 'rxjs'
 import { catchError, filter } from 'rxjs/operators'
 
@@ -118,8 +117,11 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
 }) => {
     const [plainTextBlobLinesOrError, setPlainTextBlobLinesOrError] = useState<string[] | ErrorLike | null>(null)
     const [highlightedBlobLinesOrError, setHighlightedBlobLinesOrError] = useState<string[] | ErrorLike | null>(null)
-    const [isVisible, setIsVisible] = useState(false)
+    const [isVisible] = useState(true)
 
+    console.log('highlightedBlobLinesOrError', highlightedBlobLinesOrError)
+    console.log('plainTExtBlobLinesOrError', plainTextBlobLinesOrError)
+    console.log('isVisible', isVisible)
     const blobLinesOrError = fetchPlainTextFileRangeLines
         ? highlightedBlobLinesOrError || plainTextBlobLinesOrError
         : highlightedBlobLinesOrError
@@ -152,6 +154,7 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
     useEffect(() => {
         let subscription: Subscription | undefined
         if (isVisible) {
+            console.log('lol')
             const observable = blobLines ? of(blobLines) : fetchHighlightedFileRangeLines(startLine, endLine)
             subscription = observable.pipe(catchError(error => [asError(error)])).subscribe(blobLinesOrError => {
                 setHighlightedBlobLinesOrError(blobLinesOrError)
@@ -207,42 +210,44 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
     }, [hoverifier, tableContainerElements, viewerUpdates])
 
     return (
-        <VisibilitySensor onChange={setIsVisible} partialVisibility={true} offset={visibilitySensorOffset}>
-            <Code
-                data-testid="code-excerpt"
-                onCopy={onCopy}
-                className={classNames(
-                    styles.codeExcerpt,
-                    className,
-                    isErrorLike(blobLinesOrError) && styles.codeExcerptError
-                )}
-            >
-                {blobLinesOrError && !isErrorLike(blobLinesOrError) && (
-                    <div
-                        ref={updateTableContainerElementReference}
-                        dangerouslySetInnerHTML={{ __html: makeTableHTML(blobLinesOrError) }}
-                    />
-                )}
-                {blobLinesOrError && isErrorLike(blobLinesOrError) && (
-                    <div className={styles.codeExcerptAlert}>
-                        <Icon className="mr-2" aria-hidden={true} svgPath={mdiAlertCircle} />
-                        {blobLinesOrError.message}
-                    </div>
-                )}
-                {!blobLinesOrError && (
-                    <table>
-                        <tbody>
-                            {range(startLine, endLine).map(index => (
-                                <tr key={index}>
-                                    <td className="line" data-line={index + 1} />
-                                    {/* create empty space to fill viewport (as if the blob content were already fetched, otherwise we'll overfetch) */}
-                                    <td className="code"> </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </Code>
-        </VisibilitySensor>
+        // TODO: Somehow the visibility sensor doesn't work in the ref panel. Not sure what's missing.
+
+        // <VisibilitySensor onChange={setIsVisible} partialVisibility={true} offset={visibilitySensorOffset}>
+        <Code
+            data-testid="code-excerpt"
+            onCopy={onCopy}
+            className={classNames(
+                styles.codeExcerpt,
+                className,
+                isErrorLike(blobLinesOrError) && styles.codeExcerptError
+            )}
+        >
+            {blobLinesOrError && !isErrorLike(blobLinesOrError) && (
+                <div
+                    ref={updateTableContainerElementReference}
+                    dangerouslySetInnerHTML={{ __html: makeTableHTML(blobLinesOrError) }}
+                />
+            )}
+            {blobLinesOrError && isErrorLike(blobLinesOrError) && (
+                <div className={styles.codeExcerptAlert}>
+                    <Icon className="mr-2" aria-hidden={true} svgPath={mdiAlertCircle} />
+                    {blobLinesOrError.message}
+                </div>
+            )}
+            {!blobLinesOrError && (
+                <table>
+                    <tbody>
+                        {range(startLine, endLine).map(index => (
+                            <tr key={index}>
+                                <td className="line" data-line={index + 1} />
+                                {/* create empty space to fill viewport (as if the blob content were already fetched, otherwise we'll overfetch) */}
+                                <td className="code"> </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            )}
+        </Code>
+        // </VisibilitySensor>
     )
 }

@@ -75,6 +75,7 @@ describe('ReferencesPanel', () => {
                     {...defaultProps}
                     externalHistory={fakeExternalHistory}
                     externalLocation={fakeExternalHistory.location}
+                    fetchHighlightedFileLineRanges={() => of([])}
                 />
             </MockedTestProvider>
         )

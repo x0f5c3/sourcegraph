@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react'
 
 import * as H from 'history'
-import { EMPTY, from, ReplaySubject, Subscription } from 'rxjs'
+import { EMPTY, from, Observable, ReplaySubject, Subscription } from 'rxjs'
 import { map, mapTo, switchMap, tap } from 'rxjs/operators'
 
 import {
@@ -10,6 +10,7 @@ import {
 } from '@sourcegraph/branded/src/components/panel/TabbedPanelContent'
 import { TextDocumentPositionParameters } from '@sourcegraph/client-api'
 import { isErrorLike } from '@sourcegraph/common'
+import { FetchFileParameters } from '@sourcegraph/search-ui'
 import { wrapRemoteObservable } from '@sourcegraph/shared/src/api/client/api/common'
 import { Activation, ActivationProps } from '@sourcegraph/shared/src/components/activation/Activation'
 import { ExtensionsControllerProps } from '@sourcegraph/shared/src/extensions/controller'
@@ -38,6 +39,8 @@ interface Props
     repoID: Scalars['ID']
     repoName: string
     commitID: string
+
+    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
 }
 
 export type BlobPanelTabID = 'info' | 'def' | 'references' | 'impl' | 'typedef' | 'history'
@@ -74,6 +77,7 @@ function useBlobPanelViews({
     isLightTheme,
     platformContext,
     telemetryService,
+    fetchHighlightedFileLineRanges,
 }: Props): void {
     const subscriptions = useMemo(() => new Subscription(), [])
 
@@ -177,6 +181,7 @@ function useBlobPanelViews({
                                 key="references"
                                 externalHistory={history}
                                 externalLocation={location}
+                                fetchHighlightedFileLineRanges={fetchHighlightedFileLineRanges}
                             />
                         ) : (
                             <></>
@@ -194,6 +199,7 @@ function useBlobPanelViews({
             telemetryService,
             platformContext,
             extensionsController,
+            fetchHighlightedFileLineRanges,
         ])
     )
 
