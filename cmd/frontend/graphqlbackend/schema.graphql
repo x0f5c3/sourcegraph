@@ -1941,7 +1941,7 @@ enum ExecutorCompatibility {
     """
     Executor version is more than one version ahead of the sourcegraph instance.
     """
-    TOONEW
+    VERSION_AHEAD
 }
 
 """
