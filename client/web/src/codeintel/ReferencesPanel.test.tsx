@@ -9,6 +9,7 @@ import { Controller } from '@sourcegraph/shared/src/extensions/controller'
 import { PlatformContext } from '@sourcegraph/shared/src/platform/context'
 import { NOOP_TELEMETRY_SERVICE } from '@sourcegraph/shared/src/telemetry/telemetryService'
 import { MockedTestProvider, waitForNextApolloResponse } from '@sourcegraph/shared/src/testing/apollo'
+import '@sourcegraph/shared/dev/mockReactVisibilitySensor'
 
 import { ReferencesPanelProps, ReferencesPanelWithMemoryRouter } from './ReferencesPanel'
 import { buildReferencePanelMocks, highlightedLinesDiffGo, highlightedLinesGoDiffGo } from './ReferencesPanel.mocks'
