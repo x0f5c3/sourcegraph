@@ -18,7 +18,7 @@ import {
     toPositionOrRangeQueryParameter,
 } from '@sourcegraph/common'
 import { useQuery } from '@sourcegraph/http-client'
-import { CodeExcerpt, FetchFileParameters } from '@sourcegraph/search-ui'
+import { Shape, CodeExcerpt, FetchFileParameters } from '@sourcegraph/search-ui'
 import { LanguageSpec } from '@sourcegraph/shared/src/codeintel/legacy-extensions/language-specs/language-spec'
 import { findLanguageSpec } from '@sourcegraph/shared/src/codeintel/legacy-extensions/language-specs/languages'
 import { displayRepoName } from '@sourcegraph/shared/src/components/RepoLink'
@@ -73,15 +73,20 @@ import styles from './ReferencesPanel.module.scss'
 
 type Token = HoveredToken & RepoSpec & RevisionSpec & FileSpec & ResolvedRevisionSpec
 
-interface ReferencesPanelProps
+interface HighlightedFileLineRangesProps {
+    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
+
+    // For testing only.
+    visibilityOffset?: Shape
+}
+export interface ReferencesPanelProps
     extends SettingsCascadeProps,
         PlatformContextProps<'urlToFile' | 'requestGraphQL' | 'settings'>,
         TelemetryProps,
         HoverThresholdProps,
         ExtensionsControllerProps,
-        ThemeProps {
-    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
-
+        ThemeProps,
+        HighlightedFileLineRangesProps {
     /** Whether to show the first loaded reference in mini code view */
     jumpToFirst?: boolean
 
@@ -526,7 +531,11 @@ interface ActiveLocationProps {
     setActiveLocation: (reference: Location | undefined) => void
 }
 
-interface CollapsibleLocationListProps extends ActiveLocationProps, CollapseProps, SearchTokenProps {
+interface CollapsibleLocationListProps
+    extends ActiveLocationProps,
+        CollapseProps,
+        SearchTokenProps,
+        HighlightedFileLineRangesProps {
     name: string
     locations: Location[]
     filter: string | undefined
@@ -534,8 +543,6 @@ interface CollapsibleLocationListProps extends ActiveLocationProps, CollapseProp
     fetchMore?: () => void
     loadingMore: boolean
     navigateToUrl: (url: string) => void
-
-    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
 }
 
 const CollapsibleLocationList: React.FunctionComponent<
@@ -724,12 +731,14 @@ const SideBlob: React.FunctionComponent<
     )
 }
 
-interface LocationsListProps extends ActiveLocationProps, CollapseProps, SearchTokenProps {
+interface LocationsListProps
+    extends ActiveLocationProps,
+        CollapseProps,
+        SearchTokenProps,
+        HighlightedFileLineRangesProps {
     locations: Location[]
     filter: string | undefined
     navigateToUrl: (url: string) => void
-
-    fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
 }
 
 const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsListProps>> = ({
@@ -771,16 +780,12 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
     React.PropsWithChildren<
         ActiveLocationProps &
             CollapseProps &
-            SearchTokenProps & {
+            SearchTokenProps &
+            HighlightedFileLineRangesProps & {
                 filter: string | undefined
                 navigateToUrl: (url: string) => void
                 repoLocationGroup: RepoLocationGroup
                 openByDefault: boolean
-
-                fetchHighlightedFileLineRanges: (
-                    parameters: FetchFileParameters,
-                    force?: boolean
-                ) => Observable<string[][]>
             }
     >
 > = ({
@@ -840,14 +845,11 @@ const CollapsibleLocationGroup: React.FunctionComponent<
     React.PropsWithChildren<
         ActiveLocationProps &
             CollapseProps &
-            SearchTokenProps & {
+            SearchTokenProps &
+            HighlightedFileLineRangesProps & {
                 group: LocationGroup
                 filter: string | undefined
                 navigateToUrl: (url: string) => void
-                fetchHighlightedFileLineRanges: (
-                    parameters: FetchFileParameters,
-                    force?: boolean
-                ) => Observable<string[][]>
             }
     >
 > = ({
@@ -858,6 +860,7 @@ const CollapsibleLocationGroup: React.FunctionComponent<
     isOpen,
     handleOpenChange,
     fetchHighlightedFileLineRanges,
+    visibilityOffset,
 }) => {
     let highlighted = [group.path]
     if (filter !== undefined) {
@@ -875,11 +878,9 @@ const CollapsibleLocationGroup: React.FunctionComponent<
         [group.locations]
     )
 
-    console.log('over here')
     const fetchHighlightedFileRangeLines = useCallback(
-        (startLine: number, endLine: number): Observable<string[]> => {
-            console.log('inside here', startLine, endLine)
-            return fetchHighlightedFileLineRanges(
+        (startLine: number, endLine: number): Observable<string[]> =>
+            fetchHighlightedFileLineRanges(
                 {
                     repoName: repo,
                     commitID,
@@ -891,13 +892,11 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                 false
             ).pipe(
                 map(lines => {
-                    console.log('lines', lines)
                     return lines[
                         ranges.findIndex(group => group.startLine === startLine && group.endLine === endLine + 1)
                     ]
                 })
-            )
-        },
+            ),
         [fetchHighlightedFileLineRanges, repo, commitID, file, ranges]
     )
 
@@ -983,7 +982,7 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 startLine={reference.range?.start.line ?? 0}
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
-                                                visibilityOffset={{ bottom: -500 }}
+                                                visibilityOffset={visibilityOffset || { bottom: -500 }}
                                             />
                                         </Button>
                                     </li>

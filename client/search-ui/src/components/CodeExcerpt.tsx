@@ -20,7 +20,7 @@ import { Icon, Code } from '@sourcegraph/wildcard'
 
 import styles from './CodeExcerpt.module.scss'
 
-interface Shape {
+export interface Shape {
     top?: number
     left?: number
     bottom?: number
@@ -215,7 +215,7 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
         }
     }, [hoverifier, tableContainerElements, viewerUpdates])
 
-    console.log('isVisible', isVisible)
+    console.log('visibilityOffset', visibilityOffset, 'isVisible', isVisible)
     return (
         <VisibilitySensor onChange={setIsVisible} partialVisibility={true} offset={visibilityOffset}>
             <Code
