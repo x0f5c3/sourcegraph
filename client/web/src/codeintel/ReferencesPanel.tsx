@@ -18,7 +18,7 @@ import {
     toPositionOrRangeQueryParameter,
 } from '@sourcegraph/common'
 import { useQuery } from '@sourcegraph/http-client'
-import { Shape, CodeExcerpt, FetchFileParameters } from '@sourcegraph/search-ui'
+import { CodeExcerpt, FetchFileParameters } from '@sourcegraph/search-ui'
 import { LanguageSpec } from '@sourcegraph/shared/src/codeintel/legacy-extensions/language-specs/language-spec'
 import { findLanguageSpec } from '@sourcegraph/shared/src/codeintel/legacy-extensions/language-specs/languages'
 import { displayRepoName } from '@sourcegraph/shared/src/components/RepoLink'
@@ -888,11 +888,10 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                 },
                 false
             ).pipe(
-                map(lines => {
-                    return lines[
-                        ranges.findIndex(group => group.startLine === startLine && group.endLine === endLine + 1)
-                    ]
-                })
+                map(
+                    lines =>
+                        lines[ranges.findIndex(group => group.startLine === startLine && group.endLine === endLine + 1)]
+                )
             ),
         [fetchHighlightedFileLineRanges, repo, commitID, file, ranges]
     )
