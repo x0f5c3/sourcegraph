@@ -21,7 +21,7 @@ import (
 	"github.com/sourcegraph/sourcegraph/lib/errors"
 )
 
-// usernamesForTests is a list of test cases containing valid and invalid usernames and org names.
+// usernamesForTests is a list of test cases containing valid and invalid usernames.
 var usernamesForTests = []struct {
 	name      string
 	wantValid bool
@@ -43,7 +43,17 @@ var usernamesForTests = []struct {
 	{"777", true},
 	{"7-7", true},
 	{"long-butnotquitelongenoughtoreachlimit", true},
+	{"7_7", true},
+	{"a_b", true},
+	{"a_b_c", true},
+	{"a_b_", true},
+	{"a-b_c", true},
+	{"a-b_c-", true},
 
+	{"nick__", false},
+	{"nick__s", false},
+	{"nick-_", false},
+	{"nick_-", false},
 	{".nick", false},
 	{"-nick", false},
 	{"nick.", false},
@@ -51,10 +61,8 @@ var usernamesForTests = []struct {
 	{"nick--sny", false},
 	{"nick..sny", false},
 	{"nick.-sny", false},
-	{"nick_s", false},
 	{"_", false},
 	{"_nick", false},
-	{"nick_", false},
 	{"ke$ha", false},
 	{"ni%k", false},
 	{"#nick", false},

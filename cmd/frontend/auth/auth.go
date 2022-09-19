@@ -61,12 +61,12 @@ func composeMiddleware(middlewares ...*Middleware) *Middleware {
 // username formatting rules (based on, but not identical to
 // https://help.github.com/enterprise/2.11/admin/guides/user-management/using-ldap/#username-considerations-with-ldap):
 //
-// - Any characters not in `[a-zA-Z0-9-.]` are replaced with `-`
+// - Any characters not in `[a-zA-Z0-9-._]` are replaced with `-`
 // - Usernames with exactly one `@` character are interpreted as an email address, so the username will be extracted by truncating at the `@` character.
 // - Usernames with two or more `@` characters are not considered an email address, so the `@` will be treated as a non-standard character and be replaced with `-`
-// - Usernames with consecutive `-` or `.` characters are not allowed
+// - Usernames with consecutive `-` or `.` or `_` characters are not allowed
 // - Usernames that start or end with `.` are not allowed
-// - Usernames that start with `-` are not allowed
+// - Usernames that start with `-` or `_` are not allowed
 //
 // Usernames that could not be converted return an error.
 //
@@ -90,6 +90,6 @@ func NormalizeUsername(name string) (string, error) {
 }
 
 var (
-	disallowedSymbols   = lazyregexp.New(`(^[\-\.])|(\.$)|([\-\.]{2,})`)
-	disallowedCharacter = lazyregexp.New(`[^a-zA-Z0-9\-\.]`)
+	disallowedSymbols   = lazyregexp.New(`(^[\-\.\_])|(\.$)|([\-\.\_]{2,})`)
+	disallowedCharacter = lazyregexp.New(`[^a-zA-Z0-9\-\.\_]`)
 )
