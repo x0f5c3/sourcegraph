@@ -5,7 +5,7 @@ import classNames from 'classnames'
 import * as H from 'history'
 import { capitalize } from 'lodash'
 import { MemoryRouter, useHistory, useLocation } from 'react-router'
-import { Observable } from 'rxjs'
+import { Observable, of } from 'rxjs'
 import { map } from 'rxjs/operators'
 
 import { HoveredToken } from '@sourcegraph/codeintellify'
@@ -864,7 +864,7 @@ const CollapsibleLocationGroup: React.FunctionComponent<
         highlighted = group.path.split(filter)
     }
 
-    const { repo, commitID, file } = useMemo(() => group.locations[0], [group])
+    const { repo, commitID, file, content } = useMemo(() => group.locations[0], [group])
     const ranges = useMemo(
         () =>
             group.locations.map(location => ({
@@ -894,6 +894,20 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                 )
             ),
         [fetchHighlightedFileLineRanges, repo, commitID, file, ranges]
+    )
+
+    const fetchPlainTextFileRangeLines = useCallback(
+        (location: Location): Observable<string[]> => {
+            const range = location.range
+            if (range !== undefined) {
+                const lineNumber = range.start.line + 1
+                const lineContent = location.lines[range.start.line]
+                const tableLine = `<tr><td class="line" data-line="${lineNumber}"></td><td class="code">${lineContent}</td></tr>`
+                return of([tableLine])
+            }
+            return of([])
+        },
+        [content]
     )
 
     const open = isOpen(group.path) ?? true
@@ -979,6 +993,9 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
                                                 visibilityOffset={{ bottom: 0 }}
+                                                fetchPlainTextFileRangeLines={(): Observable<string[]> => {
+                                                    return fetchPlainTextFileRangeLines(reference)
+                                                }}
                                             />
                                         </Button>
                                     </li>
