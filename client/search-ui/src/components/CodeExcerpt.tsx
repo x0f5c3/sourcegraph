@@ -127,7 +127,7 @@ export const CodeExcerpt: React.FunctionComponent<Props> = ({
 }) => {
     const [plainTextBlobLinesOrError, setPlainTextBlobLinesOrError] = useState<string[] | ErrorLike | null>(null)
     const [highlightedBlobLinesOrError, setHighlightedBlobLinesOrError] = useState<string[] | ErrorLike | null>(null)
-    const [isVisible, setIsVisible] = useState()
+    const [isVisible, setIsVisible] = useState(false)
 
     const blobLinesOrError = fetchPlainTextFileRangeLines
         ? highlightedBlobLinesOrError || plainTextBlobLinesOrError
