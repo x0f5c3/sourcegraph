@@ -75,10 +75,8 @@ type Token = HoveredToken & RepoSpec & RevisionSpec & FileSpec & ResolvedRevisio
 
 interface HighlightedFileLineRangesProps {
     fetchHighlightedFileLineRanges: (parameters: FetchFileParameters, force?: boolean) => Observable<string[][]>
-
-    // For testing only.
-    visibilityOffset?: Shape
 }
+
 export interface ReferencesPanelProps
     extends SettingsCascadeProps,
         PlatformContextProps<'urlToFile' | 'requestGraphQL' | 'settings'>,
@@ -584,7 +582,6 @@ const CollapsibleLocationList: React.FunctionComponent<
                             handleOpenChange={(id, isOpen) => props.handleOpenChange(props.name + id, isOpen)}
                             isOpen={id => props.isOpen(props.name + id)}
                             fetchHighlightedFileLineRanges={props.fetchHighlightedFileLineRanges}
-                            visibilityOffset={props.visibilityOffset}
                         />
                     ) : (
                         <Text className="text-muted pl-2">
@@ -752,7 +749,6 @@ const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsLi
     isOpen,
     searchToken,
     fetchHighlightedFileLineRanges,
-    visibilityOffset,
 }) => {
     const repoLocationGroups = useMemo(() => buildRepoLocationGroups(locations), [locations])
     const openByDefault = repoLocationGroups.length === 1
@@ -772,7 +768,6 @@ const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsLi
                     handleOpenChange={handleOpenChange}
                     isOpen={isOpen}
                     fetchHighlightedFileLineRanges={fetchHighlightedFileLineRanges}
-                    visibilityOffset={visibilityOffset}
                 />
             ))}
         </>
@@ -802,7 +797,6 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
     handleOpenChange,
     searchToken,
     fetchHighlightedFileLineRanges,
-    visibilityOffset,
 }) => {
     const open = isOpen(repoLocationGroup.repoName) ?? openByDefault
 
@@ -837,7 +831,6 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
                             isOpen={id => isOpen(repoLocationGroup.repoName + id)}
                             navigateToUrl={navigateToUrl}
                             fetchHighlightedFileLineRanges={fetchHighlightedFileLineRanges}
-                            visibilityOffset={visibilityOffset}
                         />
                     ))}
                 </CollapsePanel>
@@ -865,7 +858,6 @@ const CollapsibleLocationGroup: React.FunctionComponent<
     isOpen,
     handleOpenChange,
     fetchHighlightedFileLineRanges,
-    visibilityOffset,
 }) => {
     let highlighted = [group.path]
     if (filter !== undefined) {
@@ -987,7 +979,8 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 startLine={reference.range?.start.line ?? 0}
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
-                                                visibilityOffset={visibilityOffset || { bottom: -500 }}
+                                                // TODO: This should probably take the height of the panel into account.
+                                                visibilityOffset={{ bottom: -500 }}
                                             />
                                         </Button>
                                     </li>
