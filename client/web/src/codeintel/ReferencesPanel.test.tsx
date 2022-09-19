@@ -61,7 +61,7 @@ const defaultProps: Omit<ReferencesPanelProps, 'externalHistory' | 'externalLoca
         console.error('attempt to fetch highlighted lines for file without mocks', args.filePath)
         return of([])
     },
-    visibilityOffset: {},
+    visibilityOffset: { bottom: 0 },
 }
 
 describe('ReferencesPanel', () => {

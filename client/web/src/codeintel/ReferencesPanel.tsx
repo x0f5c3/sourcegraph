@@ -584,6 +584,7 @@ const CollapsibleLocationList: React.FunctionComponent<
                             handleOpenChange={(id, isOpen) => props.handleOpenChange(props.name + id, isOpen)}
                             isOpen={id => props.isOpen(props.name + id)}
                             fetchHighlightedFileLineRanges={props.fetchHighlightedFileLineRanges}
+                            visibilityOffset={props.visibilityOffset}
                         />
                     ) : (
                         <Text className="text-muted pl-2">
@@ -751,6 +752,7 @@ const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsLi
     isOpen,
     searchToken,
     fetchHighlightedFileLineRanges,
+    visibilityOffset,
 }) => {
     const repoLocationGroups = useMemo(() => buildRepoLocationGroups(locations), [locations])
     const openByDefault = repoLocationGroups.length === 1
@@ -770,6 +772,7 @@ const LocationsList: React.FunctionComponent<React.PropsWithChildren<LocationsLi
                     handleOpenChange={handleOpenChange}
                     isOpen={isOpen}
                     fetchHighlightedFileLineRanges={fetchHighlightedFileLineRanges}
+                    visibilityOffset={visibilityOffset}
                 />
             ))}
         </>
@@ -799,6 +802,7 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
     handleOpenChange,
     searchToken,
     fetchHighlightedFileLineRanges,
+    visibilityOffset,
 }) => {
     const open = isOpen(repoLocationGroup.repoName) ?? openByDefault
 
@@ -833,6 +837,7 @@ const CollapsibleRepoLocationGroup: React.FunctionComponent<
                             isOpen={id => isOpen(repoLocationGroup.repoName + id)}
                             navigateToUrl={navigateToUrl}
                             fetchHighlightedFileLineRanges={fetchHighlightedFileLineRanges}
+                            visibilityOffset={visibilityOffset}
                         />
                     ))}
                 </CollapsePanel>
