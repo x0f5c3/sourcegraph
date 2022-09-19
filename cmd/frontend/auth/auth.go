@@ -90,6 +90,6 @@ func NormalizeUsername(name string) (string, error) {
 }
 
 var (
-	disallowedSymbols   = lazyregexp.New(`(^[\-\.\_])|(\.$)|([\-\.\_]{2,})`)
+	disallowedSymbols   = lazyregexp.New(`(^[\-\.])|(\.$)|([\-\.]{2,})`)
 	disallowedCharacter = lazyregexp.New(`[^a-zA-Z0-9\-\.\_]`)
 )

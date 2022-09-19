@@ -2,4 +2,4 @@
 
 ALTER TABLE users
 	DROP CONSTRAINT users_username_valid_chars,
-  ADD CONSTRAINT users_username_valid_chars CHECK (username ~ '^[a-zA-Z0-9](?:[a-zA-Z0-9]|[-._](?=[a-zA-Z0-9]))*[_-]?$'::citext);
+  ADD CONSTRAINT users_username_valid_chars CHECK (username ~ '^[a-zA-Z0-9_](?:[a-zA-Z0-9_]|[-.](?=[a-zA-Z0-9_]))*-?$'::citext);

@@ -18,7 +18,11 @@ func TestNormalizeUsername(t *testing.T) {
 		{in: "john(test)@gmail.com", out: "john-test-"},
 		{in: "bob!", out: "bob-"},
 		{in: "john_doe", out: "john_doe"},
+		{in: "john__doe", out: "john__doe"},
+		{in: "_john", out: "_john"},
+		{in: "__john", out: "__john"},
 		{in: "bob_", out: "bob_"},
+		{in: "bob__", out: "bob__"},
 		{in: "user_@name", out: "user_"},
 		{in: "--username-", hasErr: true},
 		{in: "bob.!bob", hasErr: true},
@@ -27,9 +31,6 @@ func TestNormalizeUsername(t *testing.T) {
 		{in: ".username", hasErr: true},
 		{in: "user..name", hasErr: true},
 		{in: "user.-name", hasErr: true},
-		{in: "user_(name)", hasErr: true},
-		{in: "user_-name", hasErr: true},
-		{in: "user_.name", hasErr: true},
 	}
 
 	for _, tc := range testCases {
