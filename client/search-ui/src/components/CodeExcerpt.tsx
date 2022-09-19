@@ -107,7 +107,7 @@ const domFunctions: DOMFunctions = {
 }
 
 const makeTableHTML = (blobLines: string[]): string => '<table>' + blobLines.join('') + '</table>'
-const DEFAULT_VISIBILITY_OFFSET: Shape = { bottom: 0 }
+const DEFAULT_VISIBILITY_OFFSET: Shape = { bottom: -500 }
 
 /**
  * A code excerpt that displays syntax highlighting and match range highlighting.

@@ -980,7 +980,7 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
                                                 // TODO: This should probably take the height of the panel into account.
-                                                visibilityOffset={{ bottom: -500 }}
+                                                visibilityOffset={{ bottom: 0 }}
                                             />
                                         </Button>
                                     </li>
