@@ -990,9 +990,9 @@ const CollapsibleLocationGroup: React.FunctionComponent<
                                                 endLine={reference.range?.end.line ?? 0}
                                                 fetchHighlightedFileRangeLines={fetchHighlightedFileRangeLines}
                                                 visibilityOffset={{ bottom: 0 }}
-                                                fetchPlainTextFileRangeLines={(): Observable<string[]> => {
-                                                    return fetchPlainTextFileRangeLines(reference)
-                                                }}
+                                                fetchPlainTextFileRangeLines={(): Observable<string[]> =>
+                                                    fetchPlainTextFileRangeLines(reference)
+                                                }
                                             />
                                         </Button>
                                     </li>
