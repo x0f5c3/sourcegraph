@@ -1,11 +1,12 @@
 local path = require "path"
 local patterns = require "sg.patterns"
 local recognizer = require "sg.autoindex.recognizer"
+local fun = require "fun"
 
 local indexer = "sourcegraph/scip-java"
 local outfile = "index.scip"
 
-local is_proejct_structure_supported = function(base)
+local is_project_structure_supported = function(base)
   return base == "pom.xml" or base == "build.gradle" or base == "build.gradle.kts"
 end
 
@@ -46,11 +47,11 @@ return recognizer.new_path_recognizer {
     local hints = {}
     local visited = {}
 
-    for i, p in ipairs(paths) do
+    fun.each(function(p)
       local dir = path.dirname(p)
       local base = path.basename(p)
 
-      if visited[dir] == nil and is_proejct_structure_supported(base) then
+      if visited[dir] == nil and is_project_structure_supported(base) then
         table.insert(hints, {
           root = dir,
           indexer = indexer,
@@ -59,13 +60,13 @@ return recognizer.new_path_recognizer {
 
         visited[dir] = true
       end
-    end
+    end, paths)
 
-    for i, p in ipairs(paths) do
+    fun.each(function(p)
       local dir = path.dirname(p)
       local base = path.basename(p)
 
-      if visited[dir] == nil and not is_proejct_structure_supported(base) then
+      if visited[dir] == nil and not is_project_structure_supported(base) then
         table.insert(hints, {
           root = dir,
           indexer = indexer,
@@ -74,7 +75,7 @@ return recognizer.new_path_recognizer {
 
         visited[dir] = true
       end
-    end
+    end, paths)
 
     return hints
   end,

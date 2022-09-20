@@ -46,16 +46,16 @@ local goext_recognizer = recognizer.new_path_recognizer {
   -- in the repository. Within this function we filter out files that are
   -- not directly in the root of the repository (the simple pre-mod libs).
   generate = function(_, paths)
-    for i, p in ipairs(paths) do
-      if path.dirname(p) == "" then
-        return {
-          steps = {},
-          root = "",
-          indexer = indexer,
-          indexer_args = { "GO111MODULE=off", "lsif-go", "--no-animation" },
-          outfile = "",
-        }
-      end
+    if fun.any(function(p)
+      return path.dirname(p) == ""
+    end, paths) then
+      return {
+        steps = {},
+        root = "",
+        indexer = indexer,
+        indexer_args = { "GO111MODULE=off", "lsif-go", "--no-animation" },
+        outfile = "",
+      }
     end
 
     return {}
