@@ -2,6 +2,7 @@ local path = require "path"
 local patterns = require "sg.patterns"
 local shared = require "sg.autoindex.shared"
 local recognizer = require "sg.autoindex.recognizer"
+local fun = require "fun"
 
 local indexer = "sourcegraph/lsif-go:latest"
 
@@ -17,26 +18,21 @@ local gomod_recognizer = recognizer.new_path_recognizer {
 
   -- Invoked when go.mod files exist
   generate = function(_, paths)
-    local jobs = {}
-    for i, p in ipairs(paths) do
-      local root = path.dirname(p)
-
-      table.insert(jobs, {
+    return fun.totable(fun.map(function(p)
+      return {
         steps = {
           {
-            root = root,
+            root = path.dirname(p),
             image = indexer,
             commands = { "go mod download" },
           },
         },
-        root = root,
+        root = path.dirname(p),
         indexer = indexer,
         indexer_args = { "lsif-go", "--no-animation" },
         outfile = "",
-      })
-    end
-
-    return jobs
+      }
+    end, paths))
   end,
 }
 
