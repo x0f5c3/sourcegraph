@@ -1,7 +1,7 @@
 local json = require "json"
 local path = require "path"
 local patterns = require "sg.patterns"
-local recognizers = require "sg.recognizers"
+local recognizer = require "sg.autoindex.recognizer"
 
 local shared = require "sg.autoindex.shared"
 local util = require "sg.autoindex.util"
@@ -54,7 +54,7 @@ local infer_typescript_job = function(api, tsconfig_path, should_infer_config)
   local root = path.dirname(tsconfig_path)
   local reverse_ancestors = util.reverse(path.ancestors(tsconfig_path))
 
-  api:register(recognizers.path_recognizer {
+  api:register(require("sg.autoindex.recognizer").new_path_recognizer {
     patterns = {
       -- To disambiguate installation steps
       patterns.path_basename "yarn.lock",
@@ -131,7 +131,7 @@ local infer_typescript_job = function(api, tsconfig_path, should_infer_config)
   return {}
 end
 
-return recognizers.path_recognizer {
+return recognizer.new_path_recognizer {
   patterns = {
     patterns.path_basename "package.json",
     patterns.path_basename "tsconfig.json",
@@ -141,10 +141,10 @@ return recognizers.path_recognizer {
   -- Invoked when package.json or tsconfig.json files exist
   generate = function(api, paths)
     local has_tsconfig = false
-    for i = 1, #paths do
-      if path.basename(paths[i]) == "tsconfig.json" then
+    for i, p in ipairs(paths) do
+      if path.basename(p) == "tsconfig.json" then
         -- Infer typescript jobs
-        infer_typescript_job(api, paths[i], false)
+        infer_typescript_job(api, p, false)
         has_tsconfig = true
       end
     end

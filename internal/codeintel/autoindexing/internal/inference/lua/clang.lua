@@ -1,6 +1,6 @@
 local path = require "path"
 local patterns = require "sg.patterns"
-local recognizers = require "sg.recognizers"
+local recognizer = require "sg.autoindex.recognizer"
 
 local indexer = "sourcegraph/lsif-clang"
 
@@ -8,7 +8,7 @@ local is_cmakelist_file = function(base)
   return string.lower(base) == "cmakelists.txt"
 end
 
-return recognizers.path_recognizer {
+return recognizer.new_path_recognizer {
   patterns = {
     patterns.path_extension "cpp",
     patterns.path_extension "c",
@@ -31,9 +31,9 @@ return recognizers.path_recognizer {
     local hints = {}
     local visited = {}
 
-    for i = 1, #paths do
-      local dir = path.dirname(paths[i])
-      local base = path.basename(paths[i])
+    for i, p in ipairs(paths) do
+      local dir = path.dirname(p)
+      local base = path.basename(p)
 
       if visited[dir] == nil and is_cmakelist_file(base) then
         table.insert(hints, {
@@ -46,9 +46,9 @@ return recognizers.path_recognizer {
       end
     end
 
-    for i = 1, #paths do
-      local dir = path.dirname(paths[i])
-      local base = path.basename(paths[i])
+    for i, p in ipairs(paths) do
+      local dir = path.dirname(p)
+      local base = path.basename(p)
 
       if visited[dir] == nil and not is_cmakelist_file(base) then
         table.insert(hints, {

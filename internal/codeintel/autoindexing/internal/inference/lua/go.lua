@@ -1,8 +1,7 @@
 local path = require "path"
 local patterns = require "sg.patterns"
-local recognizers = require "sg.recognizers"
-
 local shared = require "sg.autoindex.shared"
+local recognizer = require "sg.autoindex.recognizer"
 
 local indexer = "sourcegraph/lsif-go:latest"
 
@@ -10,7 +9,7 @@ local exclude_paths = patterns.path_combine(shared.exclude_paths, {
   patterns.path_segment "vendor",
 })
 
-local gomod_recognizer = recognizers.path_recognizer {
+local gomod_recognizer = recognizer.new_path_recognizer {
   patterns = {
     patterns.path_basename "go.mod",
     patterns.path_exclude(exclude_paths),
@@ -19,8 +18,8 @@ local gomod_recognizer = recognizers.path_recognizer {
   -- Invoked when go.mod files exist
   generate = function(_, paths)
     local jobs = {}
-    for i = 1, #paths do
-      local root = path.dirname(paths[i])
+    for i, p in ipairs(paths) do
+      local root = path.dirname(p)
 
       table.insert(jobs, {
         steps = {
@@ -41,7 +40,7 @@ local gomod_recognizer = recognizers.path_recognizer {
   end,
 }
 
-local goext_recognizer = recognizers.path_recognizer {
+local goext_recognizer = recognizer.new_path_recognizer {
   patterns = {
     patterns.path_extension "go",
     patterns.path_exclude(exclude_paths),
@@ -51,8 +50,8 @@ local goext_recognizer = recognizers.path_recognizer {
   -- in the repository. Within this function we filter out files that are
   -- not directly in the root of the repository (the simple pre-mod libs).
   generate = function(_, paths)
-    for i = 1, #paths do
-      if path.dirname(paths[i]) == "" then
+    for i, p in ipairs(paths) do
+      if path.dirname(p) == "" then
         return {
           steps = {},
           root = "",
@@ -67,7 +66,7 @@ local goext_recognizer = recognizers.path_recognizer {
   end,
 }
 
-return recognizers.fallback_recognizer {
+return recognizer.new_fallback_recognizer {
   gomod_recognizer,
   goext_recognizer,
 }
