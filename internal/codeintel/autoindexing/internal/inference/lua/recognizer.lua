@@ -35,10 +35,6 @@ M.new_path_recognizer = function(config)
 end
 
 M.new_fallback_recognizer = function(config)
-  -- for i, c in ipairs(config) do
-  -- 	config[i] = normalize(c)
-  -- end
-
   return recognizers.fallback_recognizer(config)
 end
 
