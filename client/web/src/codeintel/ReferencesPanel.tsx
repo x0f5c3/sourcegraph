@@ -864,7 +864,7 @@ const CollapsibleLocationGroup: React.FunctionComponent<
         highlighted = group.path.split(filter)
     }
 
-    const { repo, commitID, file, content } = useMemo(() => group.locations[0], [group])
+    const { repo, commitID, file } = useMemo(() => group.locations[0], [group])
     const ranges = useMemo(
         () =>
             group.locations.map(location => ({
@@ -896,19 +896,16 @@ const CollapsibleLocationGroup: React.FunctionComponent<
         [fetchHighlightedFileLineRanges, repo, commitID, file, ranges]
     )
 
-    const fetchPlainTextFileRangeLines = useCallback(
-        (location: Location): Observable<string[]> => {
-            const range = location.range
-            if (range !== undefined) {
-                const lineNumber = range.start.line + 1
-                const lineContent = location.lines[range.start.line]
-                const tableLine = `<tr><td class="line" data-line="${lineNumber}"></td><td class="code">${lineContent}</td></tr>`
-                return of([tableLine])
-            }
-            return of([])
-        },
-        [content]
-    )
+    const fetchPlainTextFileRangeLines = (location: Location): Observable<string[]> => {
+        const range = location.range
+        if (range !== undefined) {
+            const lineNumber = range.start.line + 1
+            const lineContent = location.lines[range.start.line]
+            const tableLine = `<tr><td class="line" data-line="${lineNumber}"></td><td class="code">${lineContent}</td></tr>`
+            return of([tableLine])
+        }
+        return of([])
+    }
 
     const open = isOpen(group.path) ?? true
 
